@@ -1,0 +1,45 @@
+{
+  "name": "node-js-getting-started",
+  "version": "0.2.6",
+  "description": "A sample Node.js app using Express 4",
+  "engines": {
+    "node": "6.11.1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon weather/index.js --exec babel-node",
+    "build": "babel weather -d dist",
+    "serve": "node dist/index.js",
+    "test": "mocha --compilers js:babel-register",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "bluebird": "^3.5.0",
+    "chai": "^4.1.1",
+    "chai-as-promised": "^7.1.1",
+    "ejs": "2.5.6",
+    "express": "4.15.2",
+    "mocha": "^3.5.0",
+    "node-fetch": "^1.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0",
+    "request": "^2.81.0",
+    "tape": "^4.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LinkUp/backend"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ],
+  "license": "MIT"
+}
