@@ -12,5 +12,5 @@ app.set("views", `${__dirname}/views`)
 app.set("view engine", "ejs")
 
 app.listen(app.get("port"), () => {
-    console.log(`Node app is running on port ${port}`)
+  console.log(`Node app is running on port ${port}`)
 })
