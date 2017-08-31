@@ -1,4 +1,3 @@
-import WeatherService from "./services/weatherService.js"
 import express from "express"
 
 const app = express()
