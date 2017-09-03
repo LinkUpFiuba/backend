@@ -5,9 +5,15 @@ export default function UserService() {
     create: username => {
       const usersRef = Database('users')
 
-      usersRef.push().set({
-        name: username
+      usersRef.push({
+        name: username,
+        age: 23
       })
+    },
+    get: username => {
+      const usersRef = Database('users')
+
+      return usersRef.orderByChild('name').equalTo(username).once('value')
     }
   }
 }

@@ -14,7 +14,12 @@ app.set('view engine', 'ejs')
 
 app.post('/users/:username', (request, response) => {
   UserService().create(request.params.username)
+  // No logro que esto se mande
   response.status(201)
+})
+
+app.get('/users/:username', (request, response) => {
+  UserService().get(request.params.username).then(snapshot => response.json(snapshot.val()))
 })
 
 app.listen(app.get('port'), () => {
