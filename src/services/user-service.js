@@ -5,7 +5,7 @@ export default function UserService() {
     create: username => {
       const usersRef = Database('users')
 
-      usersRef.push({
+      return usersRef.push({
         name: username,
         age: 23
       })
@@ -16,8 +16,6 @@ export default function UserService() {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
-    getAllUsers: () => {
-      return Database('users').once('value')
-    }
+    getAllUsers: () => Database('users').once('value')
   }
 }

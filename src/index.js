@@ -13,9 +13,7 @@ app.set('views', `${__dirname}/views`)
 app.set('view engine', 'ejs')
 
 app.post('/users/:username', (request, response) => {
-  UserService().create(request.params.username)
-  // No logro que esto se mande
-  response.status(201)
+  UserService().create(request.params.username).then(response.status(201).send())
 })
 
 app.get('/users', (request, response) => {
