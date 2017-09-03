@@ -9,7 +9,7 @@ export default function UserService() {
       return 'Invalid Schema'
     }
     const v = new Validator.Validator()
-    const result = v.validate(user, userSchema())
+    const result = v.validate(user, userSchema)
     if (result.errors.length > 0) {
       return result.errors
     }
