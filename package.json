@@ -22,8 +22,10 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
     "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
     "express": "4.15.2",
     "firebase-admin": "^5.2.1",
+    "jsonschema": "^1.2.0",
     "node-fetch": "^1.7.2"
   },
   "devDependencies": {
