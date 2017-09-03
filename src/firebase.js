@@ -12,14 +12,19 @@ export const Firebase = () => {
   console.log(admin.app().name)
 
   const db = admin.database()
+  const ref = db.ref('/')
   // Escribo en la db
-  db.ref('/').set({
+  ref.set({
     username: 'test',
     email: 'test@mail.com'
+  }).then(() => {
+    console.log('Synchronization succeeded')
+  }).catch(() => {
+    console.log('Synchronization failed')
   })
 
   // Leo de la db
-  db.ref('/').once('value', snapshot => {
+  ref.on('value').then(snapshot => {
     console.log(snapshot.val())
   })
 }
