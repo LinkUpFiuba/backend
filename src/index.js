@@ -18,8 +18,8 @@ app.post('/users/:username', (request, response) => {
   response.status(201)
 })
 
-app.get('/users/:username', (request, response) => {
-  UserService().get(request.params.username).then(snapshot => response.json(snapshot.val()))
+app.get('/users', (request, response) => {
+  UserService().getAllUsers().then(users => response.json(users))
 })
 
 app.listen(app.get('port'), () => {

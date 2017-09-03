@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin'
-import serviceAccount from '../config/firebase-adminsdk.json'
+import serviceAccount from '../../../config/firebase-adminsdk.json'
 
 export default function Database(table) {
   if (admin.apps.length === 0) {

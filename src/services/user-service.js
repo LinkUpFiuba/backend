@@ -1,4 +1,4 @@
-import Database from '../database'
+import Database from './gateway/database'
 
 export default function UserService() {
   return {
@@ -12,8 +12,12 @@ export default function UserService() {
     },
     get: username => {
       const usersRef = Database('users')
-
-      return usersRef.orderByChild('name').equalTo(username).once('value')
+      return usersRef.orderByChild('name').equalTo(username).once('value', snap => {
+        snap.forEach(childSnap => childSnap.val().name)
+      })
+    },
+    getAllUsers: () => {
+      return Database('users').once('value')
     }
   }
 }

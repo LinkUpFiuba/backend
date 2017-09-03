@@ -1,7 +1,6 @@
-// Correr como npm run build && node dist/firebase.js
 
 import * as admin from 'firebase-admin'
-import serviceAccount from '../config/firebase-adminsdk.json'
+import serviceAccount from '../../../config/firebase-adminsdk.json'
 
 export const Firebase = () => {
   admin.initializeApp({
