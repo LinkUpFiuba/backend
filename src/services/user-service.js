@@ -13,14 +13,14 @@ export default function UserService() {
     if (result.errors.length > 0) {
       return result.errors
     }
-    return false
+    return true
   }
 
   return {
     createUser: user => {
       const usersRef = Database('users')
       const result = validateUser(user)
-      if (result) {
+      if (result !== true) {
         return Promise.reject(result)
       }
       return usersRef.push({
@@ -38,7 +38,9 @@ export default function UserService() {
       return Database('users').once('value').then(snap => {
         const usersArray = []
         snap.forEach(childSnap => {
-          usersArray.push(childSnap.val())
+          const user = childSnap.val()
+          user.id = childSnap.key
+          usersArray.push(user)
         })
         return usersArray
       })

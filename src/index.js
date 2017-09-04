@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.set('views', `${__dirname}/views`)
 app.set('view engine', 'ejs')
 
-app.post('/users/:username', (request, response) => {
+app.post('/users', (request, response) => {
   UserService().createUser(request.body)
     .then(() => response.status(201).send())
     .catch(err => {
