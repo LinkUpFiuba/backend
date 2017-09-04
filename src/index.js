@@ -1,5 +1,5 @@
 import express from 'express'
-import UserService from './services/user-service'
+import UserService from './services/userService'
 import bodyParser from 'body-parser'
 
 const app = express()
@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.set('views', `${__dirname}/views`)
 app.set('view engine', 'ejs')
 
-app.post('/users/:username', (request, response) => {
+app.post('/users', (request, response) => {
   UserService().createUser(request.body)
     .then(() => response.status(201).send())
     .catch(err => {
@@ -23,8 +23,8 @@ app.post('/users/:username', (request, response) => {
     })
 })
 
-app.get('/users/:username', (request, response) => {
-  UserService().getUser(request.params.username).then(users => response.json(users))
+app.get('/users/:id', (request, response) => {
+  UserService().getUser(request.params.id).then(users => response.json(users))
 })
 
 app.get('/users', (request, response) => {
