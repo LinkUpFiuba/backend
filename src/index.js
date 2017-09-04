@@ -1,5 +1,5 @@
 import express from 'express'
-import UserService from './services/user-service'
+import UserService from './services/userService'
 import bodyParser from 'body-parser'
 
 const app = express()
