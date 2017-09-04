@@ -23,8 +23,8 @@ app.post('/users', (request, response) => {
     })
 })
 
-app.get('/users/:username', (request, response) => {
-  UserService().getUser(request.params.username).then(users => response.json(users))
+app.get('/users/:id', (request, response) => {
+  UserService().getUser(request.params.id).then(users => response.json(users))
 })
 
 app.get('/users', (request, response) => {

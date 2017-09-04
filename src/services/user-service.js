@@ -28,9 +28,9 @@ export default function UserService() {
         age: user.age
       })
     },
-    getUser: username => {
+    getUser: id => {
       const usersRef = Database('users')
-      return usersRef.orderByChild('name').equalTo(username).once('value', snap => {
+      return usersRef.orderByKey().equalTo(id).once('value', snap => {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
