@@ -5,23 +5,24 @@ import Promise from 'bluebird'
 
 export default function UserService() {
   const validateUser = user => {
-    if (user === undefined) {
-      return 'Invalid Schema'
-    }
+    const correctness = {};
     const v = new Validator.Validator()
     const result = v.validate(user, userSchema)
     if (result.errors.length > 0) {
-      return result.errors
+      correctness.result = false
+      correctness.message = result.errors
+      return correctness
     }
-    return true
+    correctness.result = true
+    return correctness
   }
 
   return {
     createUser: user => {
       const usersRef = Database('users')
-      const result = validateUser(user)
-      if (result !== true) {
-        return Promise.reject(result)
+      const correctness = validateUser(user)
+      if (!correctness.result) {
+        return Promise.reject(correctness.message)
       }
       return usersRef.push({
         name: user.name,
