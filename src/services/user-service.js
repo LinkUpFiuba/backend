@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 
 export default function UserService() {
   const validateUser = user => {
-    const correctness = {};
+    const correctness = {}
     const v = new Validator.Validator()
     const result = v.validate(user, userSchema)
     if (result.errors.length > 0) {
