@@ -28,10 +28,7 @@ app.get('/users/:id', (request, response) => {
 })
 
 app.get('/users', (request, response) => {
-  UserService().getAllUsers()
-    .then(users => {
-      response.json(users)
-    })
+  UserService().getAllUsers().then(users => response.json(users))
 })
 
 app.listen(app.get('port'), () => {
