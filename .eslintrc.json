@@ -11,7 +11,7 @@
   },
   "rules": {
     "array-bracket-spacing": ["error", "never"],
-    "arrow-body-style": ["error", "as-needed"],
+    //"arrow-body-style": ["error", "as-needed"],
     "arrow-parens": ["error", "as-needed"],
     "brace-style": ["error", "1tbs"],
     "curly": ["error", "multi-line", "consistent"],
