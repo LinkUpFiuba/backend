@@ -3,7 +3,7 @@ import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 
-export default function UserService() {
+export default function UserService(uid = null) {
   const validateUser = user => {
     const correctness = {}
     const v = new Validator.Validator()
@@ -39,9 +39,11 @@ export default function UserService() {
       return Database('users').once('value').then(snap => {
         const usersArray = []
         snap.forEach(childSnap => {
-          const user = childSnap.val()
-          user.id = childSnap.key
-          usersArray.push(user)
+          if (childSnap.key !== uid) {
+            const user = childSnap.val()
+            user.id = childSnap.key
+            usersArray.push(user)
+          }
         })
         return usersArray
       })
