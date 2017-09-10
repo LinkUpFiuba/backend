@@ -50,7 +50,7 @@ app.post('/getToken', (request, response) => {
   firebaseService().initiazeFirebase()
   firebase.auth().signInWithEmailAndPassword(request.body.email, request.body.password)
     .then(user => response.json({ user: user }))
-    .catch(error => response.json({error: error}))
+    .catch(error => response.json({ error: error }))
 })
 
 app.listen(app.get('port'), () => {
