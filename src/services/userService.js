@@ -35,13 +35,15 @@ export default function UserService() {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
-    getAllUsers: () => {
+    getAllUsers: uid => {
       return Database('users').once('value').then(snap => {
         const usersArray = []
         snap.forEach(childSnap => {
-          const user = childSnap.val()
-          user.id = childSnap.key
-          usersArray.push(user)
+          if (childSnap.key !== uid) {
+            const user = childSnap.val()
+            user.id = childSnap.key
+            usersArray.push(user)
+          }
         })
         return usersArray
       })

@@ -1,5 +1,6 @@
 import express from 'express'
 import UserService from './services/userService'
+import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
 
 const app = express()
@@ -17,9 +18,9 @@ app.set('view engine', 'ejs')
 app.post('/users', (request, response) => {
   UserService().createUser(request.body)
     .then(() => response.status(201).send())
-    .catch(err => {
+    .catch(error => {
       response.status(400)
-      return response.json({ message: err })
+      return response.json({ message: error })
     })
 })
 
@@ -28,7 +29,19 @@ app.get('/users/:id', (request, response) => {
 })
 
 app.get('/users', (request, response) => {
-  UserService().getAllUsers().then(users => response.json(users))
+  if (!request.get('token')) {
+    response.status(400)
+    return response.json({ message: 'El header "token" debe enviarse como parte del request' })
+  }
+  Administrator().auth().verifyIdToken(request.get('token'))
+    .then(decodedToken => {
+      const uid = decodedToken.uid
+      UserService().getAllUsers(uid).then(users => response.json(users))
+    })
+    .catch(error => {
+      response.status(401)
+      return response.json({ message: error })
+    })
 })
 
 app.listen(app.get('port'), () => {
