@@ -1,5 +1,6 @@
 import express from 'express'
 import UserService from './services/userService'
+import LinkService from './services/linkService'
 import bodyParser from 'body-parser'
 
 const app = express()
@@ -29,6 +30,16 @@ app.get('/users/:id', (request, response) => {
 
 app.get('/users', (request, response) => {
   UserService().getAllUsers().then(users => response.json(users))
+})
+
+app.put('/link/:id', (request, response) => {
+  const uid = request.get('token')
+  LinkService(uid).link(request.params.id).then(() => response.status(201).send())
+})
+
+app.put('/unlink/:id', (request, response) => {
+  const uid = request.get('token')
+  LinkService(uid).unlink(request.params.id).then(() => response.status(201).send())
 })
 
 app.listen(app.get('port'), () => {
