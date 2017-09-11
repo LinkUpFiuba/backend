@@ -6,9 +6,12 @@ cache:
   directories:
     - node_modules
 
+before_script:
+  - sudo -- sh -c -e "echo '127.0.0.1	localhost.firebaseio.test' >> /etc/hosts"
+
 script:
-  - npm run lint
   - npm test
+  - npm run lint
 
 notifications:
   slack: link-up-group:CDs71nA1i9gYXueHfHghIjNe
