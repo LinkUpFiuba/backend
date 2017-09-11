@@ -11,7 +11,7 @@
     "start": "nodemon src/index.js --exec babel-node",
     "build": "babel src -d dist",
     "serve": "node dist/index.js",
-    "test": "mocha --compilers js:babel-register",
+    "test": "MOCKFIREBASE_DB_URL='ws://localhost.firebaseio.test:5000' mocha --compilers js:babel-register",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -31,16 +31,22 @@
   "devDependencies": {
     "chai": "^4.1.1",
     "chai-as-promised": "^7.1.1",
+    "ecdsa-sig-formatter": "^1.0.9",
     "eslint": "^4.5.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "firebase": "^4.3.1",
+    "firebase-server": "^0.11.0",
     "mocha": "^3.5.0",
     "nodemon": "^1.11.0",
     "request": "^2.81.0",
-    "tape": "^4.7.0"
+    "tape": "^4.7.0",
+    "websocket": "^1.0.24",
+    "websocket-driver": "^0.6.5",
+    "websocket-extensions": "^0.1.2"
   },
   "repository": {
     "type": "git",
