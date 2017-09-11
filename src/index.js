@@ -2,6 +2,8 @@ import express from 'express'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
+import firebase from 'firebase'
+import firebaseService from './services/firebaseService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -42,6 +44,13 @@ app.get('/users', (request, response) => {
       response.status(401)
       return response.json({ message: error })
     })
+})
+
+app.post('/getToken', (request, response) => {
+  firebaseService().initiazeFirebase()
+  firebase.auth().signInWithEmailAndPassword(request.body.email, request.body.password)
+    .then(user => response.json({ user: user }))
+    .catch(error => response.json({ error: error }))
 })
 
 app.listen(app.get('port'), () => {
