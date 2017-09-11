@@ -3,7 +3,7 @@ import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 
-export default function UserService(uid = null) {
+export default function UserService() {
   const validateUser = user => {
     const correctness = {}
     const v = new Validator.Validator()

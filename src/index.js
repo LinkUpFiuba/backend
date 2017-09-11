@@ -44,7 +44,6 @@ app.get('/users', (request, response) => {
       response.status(401)
       return response.json({ message: error })
     })
-
 })
 
 app.post('/getToken', (request, response) => {
