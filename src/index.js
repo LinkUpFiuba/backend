@@ -1,5 +1,6 @@
 import express from 'express'
 import UserService from './services/userService'
+import LinkService from './services/linkService'
 import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
 
@@ -42,6 +43,16 @@ app.get('/users', (request, response) => {
       response.status(401)
       return response.json({ message: error })
     })
+})
+
+app.put('/link/:id', (request, response) => {
+  const uid = request.get('token')
+  LinkService(uid).link(request.params.id).then(() => response.status(201).send())
+})
+
+app.put('/unlink/:id', (request, response) => {
+  const uid = request.get('token')
+  LinkService(uid).unlink(request.params.id).then(() => response.status(201).send())
 })
 
 app.listen(app.get('port'), () => {
