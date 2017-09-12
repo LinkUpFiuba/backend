@@ -35,18 +35,38 @@ export default function UserService() {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
-    getAllUsers: uid => {
-      return Database('users').once('value').then(snap => {
-        const usersArray = []
-        snap.forEach(childSnap => {
-          if (childSnap.key !== uid) {
-            const user = childSnap.val()
-            user.id = childSnap.key
-            usersArray.push(user)
+    // TODO: Solo busca por un sexo. TOdavia no lo de amigos
+    getPosibleLinks: uid => {
+      const ref = Database('users')
+      let search
+      let gender
+      // Busca usuario actual
+      return ref.child(uid).once('value')
+        .then(actualUser => {
+          gender = actualUser.val().gender
+          if (gender === 'female') {
+            gender = 'women'
+          }
+          if (actualUser.val().interests.men === true) {
+            search = 'male'
+          } else if (actualUser.val().interests.women === true) {
+            search = 'female'
           }
         })
-        return usersArray
-      })
+        .then(() => {
+          return ref.orderByChild(`interests/${gender}`).equalTo(true).once('value')
+            .then(users => {
+              const usersArray = []
+              users.forEach(queryUser => {
+                if (queryUser.key !== uid && queryUser.val().gender === search) {
+                  const user = queryUser.val()
+                  user.id = queryUser.key
+                  usersArray.push(user)
+                }
+              })
+              return usersArray
+            })
+        })
     }
   }
 }

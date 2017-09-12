@@ -32,13 +32,13 @@ app.get('/users/:id', (request, response) => {
 
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
-    response.status(400)
+    response.status(401)
     return response.json({ message: 'El header "token" debe enviarse como parte del request' })
   }
   Administrator().auth().verifyIdToken(request.get('token'))
     .then(decodedToken => {
       const uid = decodedToken.uid
-      UserService().getAllUsers(uid).then(users => response.json(users))
+      UserService().getPosibleLinks(uid).then(users => response.json(users))
     })
     .catch(error => {
       response.status(401)
