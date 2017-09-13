@@ -32,7 +32,7 @@ app.get('/users/:id', (request, response) => {
 
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
-    response.status(401)
+    response.status(400)
     return response.json({ message: 'El header "token" debe enviarse como parte del request' })
   }
   Administrator().auth().verifyIdToken(request.get('token'))

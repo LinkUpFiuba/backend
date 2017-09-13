@@ -4,6 +4,10 @@ import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 
 export default function UserService() {
+  const FRIENDS = 'friends'
+  const MALE = 'male'
+  const FEMALE = 'female'
+
   const validateUser = user => {
     const correctness = {}
     const v = new Validator.Validator()
@@ -17,7 +21,7 @@ export default function UserService() {
     return correctness
   }
 
-  function getSexualPosibleMatches(ref, gender, uid, search) {
+  const getSexualPosibleMatches = (ref, gender, uid, search) => {
     return ref.orderByChild(`interests/${gender}`).equalTo(true).once('value')
       .then(users => {
         const usersArray = []
@@ -32,8 +36,8 @@ export default function UserService() {
       })
   }
 
-  function getFriendPosibleMatches(ref, actualUserId) {
-    return ref.orderByChild('interests/friends').equalTo(true).once('value')
+  const getFriendPosibleMatches = (ref, actualUserId) => {
+    return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
         const usersArray = []
         users.forEach(queryUser => {
@@ -47,16 +51,16 @@ export default function UserService() {
       })
   }
 
-  function getIntererst(actualUser) {
-    let search = ''
-    if (actualUser.val().interests.male === true) {
-      search += 'male'
+  function getSearchInterests(actualUser) {
+    const search = []
+    if (actualUser.val().interests.male) {
+      search.push(MALE)
     }
-    if (actualUser.val().interests.female === true) {
-      search += 'female'
+    if (actualUser.val().interests.female) {
+      search.push(FEMALE)
     }
-    if (actualUser.val().interests.friends === true) {
-      search += 'friends'
+    if (actualUser.val().interests.friends) {
+      search.push(FRIENDS)
     }
     return search
   }
@@ -81,16 +85,16 @@ export default function UserService() {
     },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
-      let search = ''
       let gender
+      let search
       // Busca usuario actual
       return ref.child(actualUserUid).once('value')
         .then(actualUser => {
           gender = actualUser.val().gender
-          search = getIntererst(actualUser)
+          search = getSearchInterests(actualUser)
         })
         .then(() => {
-          if (search !== 'friends') {
+          if (!search.includes(FRIENDS)) {
             return getSexualPosibleMatches(ref, gender, actualUserUid, search)
           }
           return getFriendPosibleMatches(ref, actualUserUid)
