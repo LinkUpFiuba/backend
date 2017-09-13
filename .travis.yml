@@ -6,9 +6,13 @@ cache:
   directories:
     - node_modules
 
+addons:
+  hosts:
+    - localhost.firebaseio.test
+
 script:
-  - npm run lint
   - npm test
+  - npm run lint
 
 notifications:
   slack: link-up-group:CDs71nA1i9gYXueHfHghIjNe
