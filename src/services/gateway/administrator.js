@@ -3,6 +3,7 @@ import * as firebase from 'firebase'
 
 export default () => {
   const TEST_URL = process.env.MOCKFIREBASE_DB_URL
+
   if (!TEST_URL) {
     if (admin.apps.length === 0) {
       admin.initializeApp({
@@ -15,14 +16,13 @@ export default () => {
       })
     }
     return admin
-  } else {
-    if (firebase.apps.length === 0) {
-      const config = {
-        apiKey: 'fake-api-key-for-testing-purposes-only',
-        databaseURL: TEST_URL
-      }
-      firebase.initializeApp(config, 'TestingEnvironment')
-    }
-    return firebase.app('TestingEnvironment')
   }
+  if (firebase.apps.length === 0) {
+    const config = {
+      apiKey: 'fake-api-key-for-testing-purposes-only',
+      databaseURL: TEST_URL
+    }
+    firebase.initializeApp(config, 'TestingEnvironment')
+  }
+  return firebase.app('TestingEnvironment')
 }
