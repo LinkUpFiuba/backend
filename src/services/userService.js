@@ -17,6 +17,50 @@ export default function UserService() {
     return correctness
   }
 
+  function getSexualPosibleMatches(ref, gender, uid, search) {
+    return ref.orderByChild(`interests/${gender}`).equalTo(true).once('value')
+      .then(users => {
+        const usersArray = []
+        users.forEach(queryUser => {
+          if (queryUser.key !== uid && search.includes(queryUser.val().gender)) {
+            const user = queryUser.val()
+            user.id = queryUser.key
+            usersArray.push(user)
+          }
+        })
+        return usersArray
+      })
+  }
+
+  function getFriendPosibleMatches(ref, actualUserId) {
+    return ref.orderByChild('interests/friends').equalTo(true).once('value')
+      .then(users => {
+        const usersArray = []
+        users.forEach(queryUser => {
+          if (queryUser.key !== actualUserId) {
+            const user = queryUser.val()
+            user.id = queryUser.key
+            usersArray.push(user)
+          }
+        })
+        return usersArray
+      })
+  }
+
+  function getIntererst(actualUser) {
+    let search = ''
+    if (actualUser.val().interests.male === true) {
+      search += 'male'
+    }
+    if (actualUser.val().interests.female === true) {
+      search += 'female'
+    }
+    if (actualUser.val().interests.friends === true) {
+      search += 'friends'
+    }
+    return search
+  }
+
   return {
     createUser: user => {
       const usersRef = Database('users')
@@ -35,34 +79,21 @@ export default function UserService() {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
-    // TODO: TOdavia no lo de amigos
-    getPosibleLinks: uid => {
+    getPosibleLinks: actualUserUid => {
       const ref = Database('users')
       let search = ''
       let gender
       // Busca usuario actual
-      return ref.child(uid).once('value')
+      return ref.child(actualUserUid).once('value')
         .then(actualUser => {
           gender = actualUser.val().gender
-          if (actualUser.val().interests.male === true) {
-            search += 'male'
-          } if (actualUser.val().interests.female === true) {
-            search += 'female'
-          }
+          search = getIntererst(actualUser)
         })
         .then(() => {
-          return ref.orderByChild(`interests/${gender}`).equalTo(true).once('value')
-            .then(users => {
-              const usersArray = []
-              users.forEach(queryUser => {
-                if (queryUser.key !== uid && search.includes(queryUser.val().gender)) {
-                  const user = queryUser.val()
-                  user.id = queryUser.key
-                  usersArray.push(user)
-                }
-              })
-              return usersArray
-            })
+          if (search !== 'friends') {
+            return getSexualPosibleMatches(ref, gender, actualUserUid, search)
+          }
+          return getFriendPosibleMatches(ref, actualUserUid)
         })
     }
   }
