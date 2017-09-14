@@ -2,6 +2,7 @@ import Database from './gateway/database'
 import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
+import geolib from 'geolib'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -28,7 +29,8 @@ export default function UserService() {
         users.forEach(queryUser => {
           if (queryUser.key !== actualUser.Uid &&
               validateAges(queryUser.val(), actualUser) &&
-              search.includes(queryUser.val().gender)) {
+              validateDistance(queryUser.val(), actualUser) &&
+            search.includes(queryUser.val().gender)) {
             const user = queryUser.val()
             user.id = queryUser.key
             usersArray.push(user)
@@ -44,13 +46,20 @@ export default function UserService() {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid && validateAges(queryUser.val(), actualUser)) {
+          if (queryUser.key !== actualUser.Uid &&
+            validateDistance(queryUser.val(), actualUser) &&
+            validateAges(queryUser.val(), actualUser)) {
             user.id = queryUser.key
             usersArray.push(user)
           }
         })
         return usersArray
       })
+  }
+
+  const validateDistance = (user1, user2) => {
+    const distance = geolib.getDistance(user1.location, user2.location) / 1000
+    return distance <= user1.maxDistance && distance <= user2.maxDistance
   }
 
   const validateAges = (user1, user2) => {

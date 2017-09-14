@@ -3,9 +3,14 @@ export const maleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
     range: {
       minAge: 50,
       maxAge: 100
+    },
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
     },
     interests: {
       'male': false,
@@ -20,9 +25,14 @@ export const femaleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
     range: {
       minAge: 50,
       maxAge: 100
+    },
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
     },
     interests: {
       'male': false,
@@ -37,6 +47,11 @@ export const maleSearchForMale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -54,6 +69,11 @@ export const maleSearchForFemale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -71,6 +91,11 @@ export const maleSearchForFemaleAndMale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -88,6 +113,11 @@ export const femaleSearchForMale = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -105,6 +135,11 @@ export const femaleSearchForMaleInAgeRange = id => {
     Uid: id,
     gender: 'female',
     age: 25,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 20,
       maxAge: 30
@@ -122,6 +157,11 @@ export const maleSearchForFemaleInAgeRange = id => {
     Uid: id,
     gender: 'male',
     age: 28,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 20,
       maxAge: 25
@@ -139,6 +179,11 @@ export const maleSearchForFemaleInImposibleAgeRange = id => {
     Uid: id,
     gender: 'male',
     age: 28,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 0,
       maxAge: 10
@@ -156,6 +201,11 @@ export const femaleSearchForFemale = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -173,6 +223,11 @@ export const femaleSearchForFemaleAndMale = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
