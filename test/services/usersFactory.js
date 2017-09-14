@@ -1,7 +1,12 @@
 export const maleSearchForFriends = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'female',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': false,
       'female': false,
@@ -12,8 +17,13 @@ export const maleSearchForFriends = id => {
 
 export const femaleSearchForFriends = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'female',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': false,
       'female': false,
@@ -24,8 +34,13 @@ export const femaleSearchForFriends = id => {
 
 export const maleSearchForMale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'male',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': true,
       'female': false,
@@ -36,8 +51,13 @@ export const maleSearchForMale = id => {
 
 export const maleSearchForFemale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'male',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': false,
       'female': true,
@@ -48,8 +68,13 @@ export const maleSearchForFemale = id => {
 
 export const maleSearchForFemaleAndMale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'male',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': true,
       'female': true,
@@ -60,8 +85,13 @@ export const maleSearchForFemaleAndMale = id => {
 
 export const femaleSearchForMale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'female',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': true,
       'female': false,
@@ -70,10 +100,66 @@ export const femaleSearchForMale = id => {
   }
 }
 
+export const femaleSearchForMaleInAgeRange = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    age: 25,
+    range: {
+      minAge: 20,
+      maxAge: 30
+    },
+    interests: {
+      'male': true,
+      'female': false,
+      'friends': false
+    }
+  }
+}
+
+export const maleSearchForFemaleInAgeRange = id => {
+  return {
+    Uid: id,
+    gender: 'male',
+    age: 28,
+    range: {
+      minAge: 20,
+      maxAge: 25
+    },
+    interests: {
+      'male': false,
+      'female': true,
+      'friends': false
+    }
+  }
+}
+
+export const maleSearchForFemaleInImposibleAgeRange = id => {
+  return {
+    Uid: id,
+    gender: 'male',
+    age: 28,
+    range: {
+      minAge: 0,
+      maxAge: 10
+    },
+    interests: {
+      'male': false,
+      'female': true,
+      'friends': false
+    }
+  }
+}
+
 export const femaleSearchForFemale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'female',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': false,
       'female': true,
@@ -84,8 +170,13 @@ export const femaleSearchForFemale = id => {
 
 export const femaleSearchForFemaleAndMale = id => {
   return {
-    id: id,
+    Uid: id,
     gender: 'female',
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
     interests: {
       'male': true,
       'female': true,

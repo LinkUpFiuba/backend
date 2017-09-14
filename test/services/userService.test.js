@@ -5,14 +5,16 @@ import UserService from '../../src/services/userService'
 import FirebaseServer from 'firebase-server'
 import {
   femaleSearchForFemale, femaleSearchForFemaleAndMale,
-  femaleSearchForFriends, femaleSearchForMale, maleSearchForFemale,
-  maleSearchForFemaleAndMale, maleSearchForFriends,
+  femaleSearchForFriends, femaleSearchForMale, femaleSearchForMaleInAgeRange, maleSearchForFemale,
+  maleSearchForFemaleAndMale, maleSearchForFemaleInAgeRange, maleSearchForFemaleInImposibleAgeRange,
+  maleSearchForFriends,
   maleSearchForMale
 } from './usersFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
+// De 50 para arriba no importa el ragno, los tests sobre la edad son por debjo de 50
 describe('UserService', () => {
   describe('#getPosibleLinks(uid)', () => {
     let server
@@ -26,6 +28,9 @@ describe('UserService', () => {
     const id8 = '8'
     const id9 = '9'
     const id10 = '10'
+    const id11 = '11'
+    const id12 = '12'
+    const id13 = '13'
     const maleForFriends = maleSearchForFriends(id1)
     const maleForFriends2 = maleSearchForFriends(id4)
     const femaleForFriends = femaleSearchForFriends(id2)
@@ -36,11 +41,14 @@ describe('UserService', () => {
     const maleForMaleAndFemale = maleSearchForFemaleAndMale(id8)
     const femaleForFemale = femaleSearchForFemale(id9)
     const femaleForMaleAndFemale = femaleSearchForFemaleAndMale(id10)
+    const femaleForMaleInAgeRange = femaleSearchForMaleInAgeRange(id11)
+    const maleForFemaleInAgeRange = maleSearchForFemaleInAgeRange(id12)
+    const maleForFemaleInImposibleAgeRange = maleSearchForFemaleInImposibleAgeRange(id13)
 
     const serchForUser = (users, userForSearch) => {
       let find = false
       users.forEach(user => {
-        if (user.id === userForSearch.id) {
+        if (user.Uid === userForSearch.Uid) {
           find = true
         }
       })
@@ -59,7 +67,10 @@ describe('UserService', () => {
           [id7]: maleForMale2,
           [id8]: maleForMaleAndFemale,
           [id9]: femaleForFemale,
-          [id10]: femaleForMaleAndFemale
+          [id10]: femaleForMaleAndFemale,
+          [id11]: femaleForMaleInAgeRange,
+          [id12]: maleForFemaleInAgeRange,
+          [id13]: maleForFemaleInImposibleAgeRange
         }
       }
       server = new FirebaseServer(5000, 'localhost.firebaseio.test', users)
@@ -67,7 +78,7 @@ describe('UserService', () => {
 
     describe('Search for friends', () => {
       it('returns all who search for friends, whatever sex', () => {
-        return UserService().getPosibleLinks(maleForFriends.id).then(users => {
+        return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
           expect(users.length).to.equal(2)
           expect(serchForUser(users, femaleForFriends)).to.equal(true)
           expect(serchForUser(users, maleForFriends2)).to.equal(true)
@@ -75,7 +86,7 @@ describe('UserService', () => {
       })
 
       it('male who search for female, does not find a female who search for friends', () => {
-        return UserService().getPosibleLinks(maleForFemale.id).then(users => {
+        return UserService().getPosibleLinks(maleForFemale.Uid).then(users => {
           expect(serchForUser(users, femaleForFriends)).to.equal(false)
         })
       })
@@ -83,28 +94,28 @@ describe('UserService', () => {
 
     describe('Search for people of one gender', () => {
       it('male search for female', () => {
-        return UserService().getPosibleLinks(maleForFemale.id).then(users => {
+        return UserService().getPosibleLinks(maleForFemale.Uid).then(users => {
           expect(users.length).to.equal(2)
           expect(serchForUser(users, femaleForMale)).to.equal(true)
         })
       })
 
       it('male search for male', () => {
-        return UserService().getPosibleLinks(maleForMale.id).then(users => {
+        return UserService().getPosibleLinks(maleForMale.Uid).then(users => {
           expect(users.length).to.equal(2)
           expect(serchForUser(users, maleForMale2)).to.equal(true)
         })
       })
 
       it('male search for male inverse', () => {
-        return UserService().getPosibleLinks(maleForMale2.id).then(users => {
+        return UserService().getPosibleLinks(maleForMale2.Uid).then(users => {
           expect(users.length).to.equal(2)
           expect(serchForUser(users, maleForMale)).to.equal(true)
         })
       })
 
       it('male search for male and female', () => {
-        return UserService().getPosibleLinks(maleForMaleAndFemale.id).then(users => {
+        return UserService().getPosibleLinks(maleForMaleAndFemale.Uid).then(users => {
           expect(users.length).to.equal(4)
           expect(serchForUser(users, maleForMale2)).to.equal(true)
           expect(serchForUser(users, maleForMale)).to.equal(true)
@@ -114,24 +125,39 @@ describe('UserService', () => {
       })
 
       it('female search for male', () => {
-        return UserService().getPosibleLinks(femaleForMale.id).then(users => {
+        return UserService().getPosibleLinks(femaleForMale.Uid).then(users => {
           expect(serchForUser(users, maleForFemale)).to.equal(true)
         })
       })
 
       it('female search for female', () => {
-        return UserService().getPosibleLinks(femaleForFemale.id).then(users => {
+        return UserService().getPosibleLinks(femaleForFemale.Uid).then(users => {
           expect(users.length).to.equal(1)
           expect(serchForUser(users, femaleForMaleAndFemale)).to.equal(true)
         })
       })
 
       it('female search for male and female', () => {
-        return UserService().getPosibleLinks(femaleForMaleAndFemale.id).then(users => {
+        return UserService().getPosibleLinks(femaleForMaleAndFemale.Uid).then(users => {
           expect(users.length).to.equal(3)
           expect(serchForUser(users, femaleForFemale)).to.equal(true)
           expect(serchForUser(users, maleForFemale)).to.equal(true)
           expect(serchForUser(users, maleForMaleAndFemale)).to.equal(true)
+        })
+      })
+    })
+
+    describe('Test age range', () => {
+      it('male search for female within range', () => {
+        return UserService().getPosibleLinks(maleForFemaleInAgeRange.Uid).then(users => {
+          expect(users.length).to.equal(1)
+          expect(serchForUser(users, femaleForMaleInAgeRange)).to.equal(true)
+        })
+      })
+
+      it('male search for female in an imposible range gets nothing', () => {
+        return UserService().getPosibleLinks(maleForFemaleInImposibleAgeRange.Uid).then(users => {
+          expect(users.length).to.equal(0)
         })
       })
     })
