@@ -21,12 +21,14 @@ export default function UserService() {
     return correctness
   }
 
-  const getSexualPosibleMatches = (ref, gender, uid, search) => {
-    return ref.orderByChild(`interests/${gender}`).equalTo(true).once('value')
+  const getSexualPosibleMatches = (ref, actualUser, search) => {
+    return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
       .then(users => {
         const usersArray = []
         users.forEach(queryUser => {
-          if (queryUser.key !== uid && search.includes(queryUser.val().gender)) {
+          if (queryUser.key !== actualUser.Uid &&
+              validateAges(queryUser.val(), actualUser) &&
+              search.includes(queryUser.val().gender)) {
             const user = queryUser.val()
             user.id = queryUser.key
             usersArray.push(user)
@@ -36,19 +38,26 @@ export default function UserService() {
       })
   }
 
-  const getFriendPosibleMatches = (ref, actualUserId) => {
+  const getFriendPosibleMatches = (ref, actualUser) => {
     return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
         const usersArray = []
         users.forEach(queryUser => {
-          if (queryUser.key !== actualUserId) {
-            const user = queryUser.val()
+          const user = queryUser.val()
+          if (queryUser.key !== actualUser.Uid && validateAges(queryUser.val(), actualUser)) {
             user.id = queryUser.key
             usersArray.push(user)
           }
         })
         return usersArray
       })
+  }
+
+  const validateAges = (user1, user2) => {
+    return user2.range.minAge <= user1.age &&
+      user1.range.minAge <= user2.age &&
+      user2.range.maxAge >= user1.age &&
+      user1.range.maxAge >= user2.age
   }
 
   function getSearchInterests(actualUser) {
@@ -85,19 +94,19 @@ export default function UserService() {
     },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
-      let gender
+      let actualUser
       let search
       // Busca usuario actual
       return ref.child(actualUserUid).once('value')
-        .then(actualUser => {
-          gender = actualUser.val().gender
-          search = getSearchInterests(actualUser)
+        .then(user => {
+          actualUser = user.val()
+          search = getSearchInterests(user)
         })
         .then(() => {
           if (!search.includes(FRIENDS)) {
-            return getSexualPosibleMatches(ref, gender, actualUserUid, search)
+            return getSexualPosibleMatches(ref, actualUser, search)
           }
-          return getFriendPosibleMatches(ref, actualUserUid)
+          return getFriendPosibleMatches(ref, actualUser)
         })
     }
   }
