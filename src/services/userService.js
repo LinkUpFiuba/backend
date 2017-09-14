@@ -28,6 +28,7 @@ export default function UserService() {
         users.forEach(queryUser => {
           if (queryUser.key !== actualUser.Uid &&
               validateAges(queryUser.val(), actualUser) &&
+              !queryUser.val().invisibleMode &&
               search.includes(queryUser.val().gender)) {
             const user = queryUser.val()
             user.id = queryUser.key
@@ -44,7 +45,9 @@ export default function UserService() {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid && validateAges(queryUser.val(), actualUser)) {
+          if (queryUser.key !== actualUser.Uid &&
+              !queryUser.val().invisibleMode &&
+              validateAges(queryUser.val(), actualUser)) {
             user.id = queryUser.key
             usersArray.push(user)
           }

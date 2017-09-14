@@ -3,6 +3,7 @@ export const maleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -20,6 +21,7 @@ export const femaleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -37,6 +39,7 @@ export const maleSearchForMale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -54,6 +57,7 @@ export const maleSearchForFemale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -71,6 +75,7 @@ export const maleSearchForFemaleAndMale = id => {
     Uid: id,
     gender: 'male',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -88,6 +93,7 @@ export const femaleSearchForMale = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
@@ -104,6 +110,7 @@ export const femaleSearchForMaleInAgeRange = id => {
   return {
     Uid: id,
     gender: 'female',
+    invisibleMode: false,
     age: 25,
     range: {
       minAge: 20,
@@ -121,6 +128,7 @@ export const maleSearchForFemaleInAgeRange = id => {
   return {
     Uid: id,
     gender: 'male',
+    invisibleMode: false,
     age: 28,
     range: {
       minAge: 20,
@@ -138,6 +146,7 @@ export const maleSearchForFemaleInImposibleAgeRange = id => {
   return {
     Uid: id,
     gender: 'male',
+    invisibleMode: false,
     age: 28,
     range: {
       minAge: 0,
@@ -155,6 +164,7 @@ export const femaleSearchForFemale = id => {
   return {
     Uid: id,
     gender: 'female',
+    invisibleMode: false,
     age: 99,
     range: {
       minAge: 50,
@@ -172,6 +182,7 @@ export const femaleSearchForFemaleAndMale = id => {
   return {
     Uid: id,
     gender: 'female',
+    invisibleMode: false,
     age: 99,
     range: {
       minAge: 50,
@@ -181,6 +192,42 @@ export const femaleSearchForFemaleAndMale = id => {
       'male': true,
       'female': true,
       'friends': false
+    }
+  }
+}
+
+export const femaleSearchForFemaleInvisibleMode = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: true,
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': true,
+      'friends': false
+    }
+  }
+}
+
+export const femaleSearchForFriendsInvisibleMode = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: true,
+    age: 99,
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': false,
+      'friends': true
     }
   }
 }
