@@ -38,7 +38,7 @@ app.get('/users', (request, response) => {
   Administrator().auth().verifyIdToken(request.get('token'))
     .then(decodedToken => {
       const uid = decodedToken.uid
-      UserService().getAllUsers(uid).then(users => response.json(users))
+      UserService().getPosibleLinks(uid).then(users => response.json(users))
     })
     .catch(error => {
       response.status(401)
