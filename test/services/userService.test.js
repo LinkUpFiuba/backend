@@ -5,12 +5,13 @@ import UserService from '../../src/services/userService'
 // import Database from '../../src/services/gateway/database'
 import FirebaseServer from 'firebase-server'
 import {
+  anotherSolariFemaleSearchForFemaleInPosition3,
   femaleSearchForFemale, femaleSearchForFemaleAndMale, femaleSearchForFemaleInvisibleMode,
-  femaleSearchForFriends, femaleSearchForFriendsInvisibleMode, femaleSearchForMale,
-  femaleSearchForMaleInAgeRange, maleSearchForFemale,
+  femaleSearchForFriends, femaleSearchForFriendsFarFromOthers, femaleSearchForFriendsInvisibleMode,
+  femaleSearchForMale, femaleSearchForMaleInAgeRange, maleSearchForFemale,
   maleSearchForFemaleAndMale, maleSearchForFemaleInAgeRange, maleSearchForFemaleInImposibleAgeRange,
   maleSearchForFriends,
-  maleSearchForMale
+  maleSearchForMale, solariFemaleSearchForFemaleInPosition3, solariFemaleSearchForFriends
 } from './usersFactory'
 
 chai.use(chaiAsPromised)
@@ -35,6 +36,11 @@ describe('UserService', () => {
     const id13 = '13'
     const id14 = '14'
     const id15 = '15'
+    const id16 = '16'
+    const id17 = '17'
+    const id18 = '18'
+    const id19 = '19'
+    const id20 = '20'
     const maleForFriends = maleSearchForFriends(id1)
     const maleForFriends2 = maleSearchForFriends(id4)
     const femaleForFriends = femaleSearchForFriends(id2)
@@ -50,6 +56,11 @@ describe('UserService', () => {
     const maleForFemaleInImposibleAgeRange = maleSearchForFemaleInImposibleAgeRange(id13)
     const femaleForFemaleInvisibleMode = femaleSearchForFemaleInvisibleMode(id14)
     const femaleForFriendsInvisibleMode = femaleSearchForFriendsInvisibleMode(id15)
+    const femaleForFriendsFarFromOthers = femaleSearchForFriendsFarFromOthers(id16)
+    const solariFemaleForFriends = solariFemaleSearchForFriends(id17)
+    const solariFemaleForFriends2 = solariFemaleSearchForFriends(id18)
+    const solariFemaleForFemaleInPosition3 = solariFemaleSearchForFemaleInPosition3(id19)
+    const anotherSolariFemaleForFemaleInPosition3 = anotherSolariFemaleSearchForFemaleInPosition3(id20)
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -72,7 +83,12 @@ describe('UserService', () => {
           [id12]: maleForFemaleInAgeRange,
           [id13]: maleForFemaleInImposibleAgeRange,
           [id14]: femaleForFemaleInvisibleMode,
-          [id15]: femaleForFriendsInvisibleMode
+          [id15]: femaleForFriendsInvisibleMode,
+          [id16]: femaleForFriendsFarFromOthers,
+          [id17]: solariFemaleForFriends,
+          [id18]: solariFemaleForFriends2,
+          [id19]: solariFemaleForFemaleInPosition3,
+          [id20]: anotherSolariFemaleForFemaleInPosition3
         }
       }
       server = new FirebaseServer(5000, 'localhost.firebaseio.test', users)
@@ -174,6 +190,7 @@ describe('UserService', () => {
       })
     })
 
+    // No se prueba que a los otros no les aparezcan, por que ya esta testeado arriba
     describe('Test for invisible mode', () => {
       it('Female for female can search like always', () => {
         return UserService().getPosibleLinks(femaleForFemaleInvisibleMode.Uid).then(users => {
@@ -182,12 +199,35 @@ describe('UserService', () => {
         })
       })
 
-      it('Female for female can search like always', () => {
+      it('Female for friends can search like always', () => {
         return UserService().getPosibleLinks(femaleForFriendsInvisibleMode.Uid).then(users => {
           expect(users.length).to.equal(3)
           expect(searchForUser(users, femaleForFriends)).to.be.true
           expect(searchForUser(users, maleForFriends)).to.be.true
           expect(searchForUser(users, maleForFriends2)).to.be.true
+        })
+      })
+    })
+
+    // No se prueba que a los otros no les aparezcan, por que ya esta testeado arriba
+    describe('Test for distance filter', () => {
+      it('Female for friends too far from others gets nothing', () => {
+        return UserService().getPosibleLinks(femaleForFriendsFarFromOthers.Uid).then(users => {
+          expect(users.length).to.equal(0)
+        })
+      })
+
+      it('Female for female search only one within the range (different locations)', () => {
+        return UserService().getPosibleLinks(solariFemaleForFemaleInPosition3.Uid).then(users => {
+          expect(users.length).to.equal(1)
+          expect(searchForUser(users, anotherSolariFemaleForFemaleInPosition3)).to.be.true
+        })
+      })
+
+      it('Solari female for friends only find one friend in same spot', () => {
+        return UserService().getPosibleLinks(solariFemaleForFriends.Uid).then(users => {
+          expect(users.length).to.equal(1)
+          expect(searchForUser(users, solariFemaleForFriends2)).to.be.true
         })
       })
     })
