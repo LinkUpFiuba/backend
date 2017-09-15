@@ -8,6 +8,7 @@ export default function UserService() {
   const FRIENDS = 'friends'
   const MALE = 'male'
   const FEMALE = 'female'
+  const USERS_PER_REQUEST = 5
 
   const validateUser = user => {
     const correctness = {}
@@ -27,12 +28,12 @@ export default function UserService() {
       .then(users => {
         const usersArray = []
         users.forEach(queryUser => {
+          const user = queryUser.val()
           if (queryUser.key !== actualUser.Uid &&
-              validateAges(queryUser.val(), actualUser) &&
-              validateDistance(queryUser.val(), actualUser) &&
-            search.includes(queryUser.val().gender)) {
-            const user = queryUser.val()
-            user.id = queryUser.key
+              validateAges(user, actualUser) &&
+              validateDistance(user, actualUser) &&
+              !user.invisibleMode &&
+              search.includes(user.gender)) {
             usersArray.push(user)
           }
         })
@@ -47,9 +48,9 @@ export default function UserService() {
         users.forEach(queryUser => {
           const user = queryUser.val()
           if (queryUser.key !== actualUser.Uid &&
-            validateDistance(queryUser.val(), actualUser) &&
-            validateAges(queryUser.val(), actualUser)) {
-            user.id = queryUser.key
+              !user.invisibleMode &&
+              validateDistance(user, actualUser) &&
+              validateAges(user, actualUser)) {
             usersArray.push(user)
           }
         })
@@ -116,6 +117,9 @@ export default function UserService() {
             return getSexualPosibleMatches(ref, actualUser, search)
           }
           return getFriendPosibleMatches(ref, actualUser)
+        })
+        .then(users => {
+          return users.slice(0, USERS_PER_REQUEST - 1)
         })
     }
   }
