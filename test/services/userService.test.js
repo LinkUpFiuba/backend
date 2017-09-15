@@ -2,6 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before, after } from 'mocha'
 import UserService from '../../src/services/userService'
+// import Database from '../../src/services/gateway/database'
 import FirebaseServer from 'firebase-server'
 import {
   femaleSearchForFemale, femaleSearchForFemaleAndMale, femaleSearchForFemaleInvisibleMode,
@@ -15,7 +16,7 @@ import {
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-// De 50 para arriba no importa el ragno, los tests sobre la edad son por debjo de 50
+// De 50 para arriba no importa el rango, los tests sobre la edad son por debajo de 50
 describe('UserService', () => {
   describe('#getPosibleLinks(uid)', () => {
     let server
@@ -49,14 +50,9 @@ describe('UserService', () => {
     const maleForFemaleInImposibleAgeRange = maleSearchForFemaleInImposibleAgeRange(id13)
     const femaleForFemaleInvisibleMode = femaleSearchForFemaleInvisibleMode(id14)
     const femaleForFriendsInvisibleMode = femaleSearchForFriendsInvisibleMode(id15)
-    const serchForUser = (users, userForSearch) => {
-      let find = false
-      users.forEach(user => {
-        if (user.Uid === userForSearch.Uid) {
-          find = true
-        }
-      })
-      return find
+
+    const searchForUser = (users, userForSearch) => {
+      return users.map(user => user.Uid).includes(userForSearch.Uid)
     }
 
     before(() => {
@@ -83,17 +79,27 @@ describe('UserService', () => {
     })
 
     describe('Search for friends', () => {
+      // before(() => {
+      //   const users = {
+      //     [maleForFriends.Uid]: maleForFriends,
+      //     [femaleForFriends.Uid]: femaleForFriends,
+      //     [maleForFriends2.Uid]: maleForFriends2
+      //   }
+      //   const ref = Database('users')
+      //   ref.set(users)
+      // })
+
       it('returns all who search for friends, whatever sex', () => {
         return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
           expect(users.length).to.equal(2)
-          expect(serchForUser(users, femaleForFriends)).to.equal(true)
-          expect(serchForUser(users, maleForFriends2)).to.equal(true)
+          expect(searchForUser(users, femaleForFriends)).to.be.true
+          expect(searchForUser(users, maleForFriends2)).to.be.true
         })
       })
 
       it('male who search for female, does not find a female who search for friends', () => {
         return UserService().getPosibleLinks(maleForFemale.Uid).then(users => {
-          expect(serchForUser(users, femaleForFriends)).to.equal(false)
+          expect(searchForUser(users, femaleForFriends)).to.be.false
         })
       })
     })
@@ -102,53 +108,53 @@ describe('UserService', () => {
       it('male search for female', () => {
         return UserService().getPosibleLinks(maleForFemale.Uid).then(users => {
           expect(users.length).to.equal(2)
-          expect(serchForUser(users, femaleForMale)).to.equal(true)
+          expect(searchForUser(users, femaleForMale)).to.be.true
         })
       })
 
       it('male search for male', () => {
         return UserService().getPosibleLinks(maleForMale.Uid).then(users => {
           expect(users.length).to.equal(2)
-          expect(serchForUser(users, maleForMale2)).to.equal(true)
+          expect(searchForUser(users, maleForMale2)).to.be.true
         })
       })
 
       it('male search for male inverse', () => {
         return UserService().getPosibleLinks(maleForMale2.Uid).then(users => {
           expect(users.length).to.equal(2)
-          expect(serchForUser(users, maleForMale)).to.equal(true)
+          expect(searchForUser(users, maleForMale)).to.be.true
         })
       })
 
       it('male search for male and female', () => {
         return UserService().getPosibleLinks(maleForMaleAndFemale.Uid).then(users => {
           expect(users.length).to.equal(4)
-          expect(serchForUser(users, maleForMale2)).to.equal(true)
-          expect(serchForUser(users, maleForMale)).to.equal(true)
-          expect(serchForUser(users, femaleForMale)).to.equal(true)
-          expect(serchForUser(users, femaleForMaleAndFemale)).to.equal(true)
+          expect(searchForUser(users, maleForMale2)).to.be.true
+          expect(searchForUser(users, maleForMale)).to.be.true
+          expect(searchForUser(users, femaleForMale)).to.be.true
+          expect(searchForUser(users, femaleForMaleAndFemale)).to.be.true
         })
       })
 
       it('female search for male', () => {
         return UserService().getPosibleLinks(femaleForMale.Uid).then(users => {
-          expect(serchForUser(users, maleForFemale)).to.equal(true)
+          expect(searchForUser(users, maleForFemale)).to.be.true
         })
       })
 
       it('female search for female', () => {
         return UserService().getPosibleLinks(femaleForFemale.Uid).then(users => {
           expect(users.length).to.equal(1)
-          expect(serchForUser(users, femaleForMaleAndFemale)).to.equal(true)
+          expect(searchForUser(users, femaleForMaleAndFemale)).to.be.true
         })
       })
 
       it('female search for male and female', () => {
         return UserService().getPosibleLinks(femaleForMaleAndFemale.Uid).then(users => {
           expect(users.length).to.equal(3)
-          expect(serchForUser(users, femaleForFemale)).to.equal(true)
-          expect(serchForUser(users, maleForFemale)).to.equal(true)
-          expect(serchForUser(users, maleForMaleAndFemale)).to.equal(true)
+          expect(searchForUser(users, femaleForFemale)).to.be.true
+          expect(searchForUser(users, maleForFemale)).to.be.true
+          expect(searchForUser(users, maleForMaleAndFemale)).to.be.true
         })
       })
     })
@@ -157,7 +163,7 @@ describe('UserService', () => {
       it('male search for female within range', () => {
         return UserService().getPosibleLinks(maleForFemaleInAgeRange.Uid).then(users => {
           expect(users.length).to.equal(1)
-          expect(serchForUser(users, femaleForMaleInAgeRange)).to.equal(true)
+          expect(searchForUser(users, femaleForMaleInAgeRange)).to.be.true
         })
       })
 
@@ -172,16 +178,16 @@ describe('UserService', () => {
       it('Female for female can search like always', () => {
         return UserService().getPosibleLinks(femaleForFemaleInvisibleMode.Uid).then(users => {
           expect(users.length).to.equal(2)
-          expect(serchForUser(users, femaleForMaleAndFemale)).to.equal(true)
+          expect(searchForUser(users, femaleForMaleAndFemale)).to.be.true
         })
       })
 
       it('Female for female can search like always', () => {
         return UserService().getPosibleLinks(femaleForFriendsInvisibleMode.Uid).then(users => {
           expect(users.length).to.equal(3)
-          expect(serchForUser(users, femaleForFriends)).to.equal(true)
-          expect(serchForUser(users, maleForFriends)).to.equal(true)
-          expect(serchForUser(users, maleForFriends2)).to.equal(true)
+          expect(searchForUser(users, femaleForFriends)).to.be.true
+          expect(searchForUser(users, maleForFriends)).to.be.true
+          expect(searchForUser(users, maleForFriends2)).to.be.true
         })
       })
     })
