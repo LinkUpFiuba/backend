@@ -4,6 +4,11 @@ import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 
 export default function UserService() {
+  const FRIENDS = 'friends'
+  const MALE = 'male'
+  const FEMALE = 'female'
+  const USERS_PER_REQUEST = 5
+
   const validateUser = user => {
     const correctness = {}
     const v = new Validator.Validator()
@@ -15,6 +20,60 @@ export default function UserService() {
     }
     correctness.result = true
     return correctness
+  }
+
+  const getSexualPosibleMatches = (ref, actualUser, search) => {
+    return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
+      .then(users => {
+        const usersArray = []
+        users.forEach(queryUser => {
+          const user = queryUser.val()
+          if (queryUser.key !== actualUser.Uid &&
+              validateAges(user, actualUser) &&
+              !user.invisibleMode &&
+              search.includes(user.gender)) {
+            usersArray.push(user)
+          }
+        })
+        return usersArray
+      })
+  }
+
+  const getFriendPosibleMatches = (ref, actualUser) => {
+    return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
+      .then(users => {
+        const usersArray = []
+        users.forEach(queryUser => {
+          const user = queryUser.val()
+          if (queryUser.key !== actualUser.Uid &&
+              !user.invisibleMode &&
+              validateAges(user, actualUser)) {
+            usersArray.push(user)
+          }
+        })
+        return usersArray
+      })
+  }
+
+  const validateAges = (user1, user2) => {
+    return user2.range.minAge <= user1.age &&
+      user1.range.minAge <= user2.age &&
+      user2.range.maxAge >= user1.age &&
+      user1.range.maxAge >= user2.age
+  }
+
+  function getSearchInterests(actualUser) {
+    const search = []
+    if (actualUser.val().interests.male) {
+      search.push(MALE)
+    }
+    if (actualUser.val().interests.female) {
+      search.push(FEMALE)
+    }
+    if (actualUser.val().interests.friends) {
+      search.push(FRIENDS)
+    }
+    return search
   }
 
   return {
@@ -35,16 +94,25 @@ export default function UserService() {
         snap.forEach(childSnap => childSnap.val().name)
       })
     },
-    getAllUsers: () => {
-      return Database('users').once('value').then(snap => {
-        const usersArray = []
-        snap.forEach(childSnap => {
-          const user = childSnap.val()
-          user.id = childSnap.key
-          usersArray.push(user)
+    getPosibleLinks: actualUserUid => {
+      const ref = Database('users')
+      let actualUser
+      let search
+      // Busca usuario actual
+      return ref.child(actualUserUid).once('value')
+        .then(user => {
+          actualUser = user.val()
+          search = getSearchInterests(user)
         })
-        return usersArray
-      })
+        .then(() => {
+          if (!search.includes(FRIENDS)) {
+            return getSexualPosibleMatches(ref, actualUser, search)
+          }
+          return getFriendPosibleMatches(ref, actualUser)
+        })
+        .then(users => {
+          return users.slice(0, USERS_PER_REQUEST - 1)
+        })
     }
   }
 }
