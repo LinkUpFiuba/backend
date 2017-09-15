@@ -211,7 +211,7 @@ describe('UserService', () => {
         })
       })
 
-      it('Female for female search only one wihtin the range (differents location)', () => {
+      it('Female for female search only one within the range (different locations)', () => {
         return UserService().getPosibleLinks(solariFemaleForFemaleInPosition3.Uid).then(users => {
           expect(users.length).to.equal(1)
           expect(serchForUser(users, anotherSolariFemaleForFemaleInPosition3)).to.equal(true)

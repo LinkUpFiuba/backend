@@ -388,4 +388,3 @@ export const anotherSolariFemaleSearchForFemaleInPosition3 = id => {
     }
   }
 }
-
