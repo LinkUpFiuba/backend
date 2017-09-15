@@ -3,10 +3,15 @@ export const maleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
     invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
+    },
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
     },
     interests: {
       'male': false,
@@ -21,10 +26,15 @@ export const femaleSearchForFriends = id => {
     Uid: id,
     gender: 'female',
     age: 99,
+    maxDistance: 50,
     invisibleMode: false,
     range: {
       minAge: 50,
       maxAge: 100
+    },
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
     },
     interests: {
       'male': false,
@@ -40,6 +50,11 @@ export const maleSearchForMale = id => {
     gender: 'male',
     age: 99,
     invisibleMode: false,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -58,6 +73,11 @@ export const maleSearchForFemale = id => {
     gender: 'male',
     age: 99,
     invisibleMode: false,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -76,6 +96,11 @@ export const maleSearchForFemaleAndMale = id => {
     gender: 'male',
     age: 99,
     invisibleMode: false,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -94,6 +119,11 @@ export const femaleSearchForMale = id => {
     gender: 'female',
     age: 99,
     invisibleMode: false,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -112,6 +142,11 @@ export const femaleSearchForMaleInAgeRange = id => {
     gender: 'female',
     invisibleMode: false,
     age: 25,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 20,
       maxAge: 30
@@ -130,6 +165,11 @@ export const maleSearchForFemaleInAgeRange = id => {
     gender: 'male',
     invisibleMode: false,
     age: 28,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 20,
       maxAge: 25
@@ -148,6 +188,11 @@ export const maleSearchForFemaleInImposibleAgeRange = id => {
     gender: 'male',
     invisibleMode: false,
     age: 28,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 0,
       maxAge: 10
@@ -166,6 +211,11 @@ export const femaleSearchForFemale = id => {
     gender: 'female',
     invisibleMode: false,
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -184,6 +234,11 @@ export const femaleSearchForFemaleAndMale = id => {
     gender: 'female',
     invisibleMode: false,
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -202,6 +257,11 @@ export const femaleSearchForFemaleInvisibleMode = id => {
     gender: 'female',
     invisibleMode: true,
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -220,6 +280,11 @@ export const femaleSearchForFriendsInvisibleMode = id => {
     gender: 'female',
     invisibleMode: true,
     age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 52.518611,
+      longitude: 13.408056
+    },
     range: {
       minAge: 50,
       maxAge: 100
@@ -228,6 +293,98 @@ export const femaleSearchForFriendsInvisibleMode = id => {
       'male': false,
       'female': false,
       'friends': true
+    }
+  }
+}
+
+export const femaleSearchForFriendsFarFromOthers = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: true,
+    age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 0,
+      longitude: 0
+    },
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': false,
+      'friends': true
+    }
+  }
+}
+
+export const solariFemaleSearchForFriends = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: false,
+    age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 1,
+      longitude: 1
+    },
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': false,
+      'friends': true
+    }
+  }
+}
+
+export const solariFemaleSearchForFemaleInPosition3 = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: false,
+    age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 3,
+      longitude: 3
+    },
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': true,
+      'friends': false
+    }
+  }
+}
+
+export const anotherSolariFemaleSearchForFemaleInPosition3 = id => {
+  return {
+    Uid: id,
+    gender: 'female',
+    invisibleMode: false,
+    age: 99,
+    maxDistance: 50,
+    location: {
+      latitude: 3.1,
+      longitude: 3.4
+    },
+    range: {
+      minAge: 50,
+      maxAge: 100
+    },
+    interests: {
+      'male': false,
+      'female': true,
+      'friends': false
     }
   }
 }
