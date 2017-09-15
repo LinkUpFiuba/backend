@@ -4,8 +4,9 @@ import { describe, it, before, after } from 'mocha'
 import UserService from '../../src/services/userService'
 import FirebaseServer from 'firebase-server'
 import {
-  femaleSearchForFemale, femaleSearchForFemaleAndMale,
-  femaleSearchForFriends, femaleSearchForMale, femaleSearchForMaleInAgeRange, maleSearchForFemale,
+  femaleSearchForFemale, femaleSearchForFemaleAndMale, femaleSearchForFemaleInvisibleMode,
+  femaleSearchForFriends, femaleSearchForFriendsInvisibleMode, femaleSearchForMale,
+  femaleSearchForMaleInAgeRange, maleSearchForFemale,
   maleSearchForFemaleAndMale, maleSearchForFemaleInAgeRange, maleSearchForFemaleInImposibleAgeRange,
   maleSearchForFriends,
   maleSearchForMale
@@ -31,6 +32,8 @@ describe('UserService', () => {
     const id11 = '11'
     const id12 = '12'
     const id13 = '13'
+    const id14 = '14'
+    const id15 = '15'
     const maleForFriends = maleSearchForFriends(id1)
     const maleForFriends2 = maleSearchForFriends(id4)
     const femaleForFriends = femaleSearchForFriends(id2)
@@ -44,7 +47,8 @@ describe('UserService', () => {
     const femaleForMaleInAgeRange = femaleSearchForMaleInAgeRange(id11)
     const maleForFemaleInAgeRange = maleSearchForFemaleInAgeRange(id12)
     const maleForFemaleInImposibleAgeRange = maleSearchForFemaleInImposibleAgeRange(id13)
-
+    const femaleForFemaleInvisibleMode = femaleSearchForFemaleInvisibleMode(id14)
+    const femaleForFriendsInvisibleMode = femaleSearchForFriendsInvisibleMode(id15)
     const serchForUser = (users, userForSearch) => {
       let find = false
       users.forEach(user => {
@@ -70,7 +74,9 @@ describe('UserService', () => {
           [id10]: femaleForMaleAndFemale,
           [id11]: femaleForMaleInAgeRange,
           [id12]: maleForFemaleInAgeRange,
-          [id13]: maleForFemaleInImposibleAgeRange
+          [id13]: maleForFemaleInImposibleAgeRange,
+          [id14]: femaleForFemaleInvisibleMode,
+          [id15]: femaleForFriendsInvisibleMode
         }
       }
       server = new FirebaseServer(5000, 'localhost.firebaseio.test', users)
@@ -158,6 +164,24 @@ describe('UserService', () => {
       it('male search for female in an imposible range gets nothing', () => {
         return UserService().getPosibleLinks(maleForFemaleInImposibleAgeRange.Uid).then(users => {
           expect(users.length).to.equal(0)
+        })
+      })
+    })
+
+    describe('Test for invisible mode', () => {
+      it('Female for female can search like always', () => {
+        return UserService().getPosibleLinks(femaleForFemaleInvisibleMode.Uid).then(users => {
+          expect(users.length).to.equal(2)
+          expect(serchForUser(users, femaleForMaleAndFemale)).to.equal(true)
+        })
+      })
+
+      it('Female for female can search like always', () => {
+        return UserService().getPosibleLinks(femaleForFriendsInvisibleMode.Uid).then(users => {
+          expect(users.length).to.equal(3)
+          expect(serchForUser(users, femaleForFriends)).to.equal(true)
+          expect(serchForUser(users, maleForFriends)).to.equal(true)
+          expect(serchForUser(users, maleForFriends2)).to.equal(true)
         })
       })
     })
