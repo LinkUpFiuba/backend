@@ -9,6 +9,12 @@ export default function UserService() {
   const MALE = 'male'
   const FEMALE = 'female'
   const USERS_PER_REQUEST = 5
+  const A = 1406.25
+  const B = 1
+  const C = 12.5
+  const D = -12.5
+  const DISTANCE_WEIGHT = 0.6
+  const INTERESTS_WEIGHT = 0.6
 
   const validateUser = user => {
     const correctness = {}
@@ -25,6 +31,8 @@ export default function UserService() {
 
   const validateDistance = (user1, user2) => {
     const distance = geolib.getDistance(user1.location, user2.location) / 1000
+    // We include the distance in the user in order to show it in the frontend
+    user1.distance = distance
     return distance <= user1.maxDistance && distance <= user2.maxDistance
   }
 
@@ -36,12 +44,36 @@ export default function UserService() {
   }
 
   const validateExclusion = (user, actualUser) => (
-    // Exclude the user who made the request and also by age, distance and if the user has invisble mode on
+    // Exclude the user who made the request and also by age, distance and if the user has invisible mode on
     user.Uid !== actualUser.Uid &&
       validateAges(user, actualUser) &&
       validateDistance(user, actualUser) &&
       !user.invisibleMode
   )
+
+  const getCommonInterests = (user, actualUser) => {
+    // Esta boludez es simplemente para que no se queje el linter de que no los uso
+    return (user === actualUser) ? [] : []
+  }
+
+  const calculateMatchingScore = (user, actualUser) => {
+    // Here we should use @fede's service to find commonInterests
+    const commonInterests = getCommonInterests(user, actualUser).length
+    // We include the amount of common interests in the user in order to show it in the frontend
+    user.commonInterests = commonInterests
+    const distanceScore = (A / ((user.distance / B) + C)) + D
+    const interestsScore = Math.min(commonInterests * 10, 100)
+    return DISTANCE_WEIGHT * distanceScore + INTERESTS_WEIGHT * interestsScore
+  }
+
+  const orderByMatchingAlgorithm = (users, actualUser) => {
+    users.map(user => {
+      user.matchingScore = calculateMatchingScore(user, actualUser)
+    })
+    // Descending order
+    users.sort((user1, user2) => user2.matchingScore - user1.matchingScore)
+    return users
+  }
 
   const getSexualPosibleMatches = (ref, actualUser, search) => {
     return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
@@ -85,10 +117,6 @@ export default function UserService() {
     return search
   }
 
-  const orderByMatchingAlgorithm = users => {
-    return users
-  }
-
   return {
     createUser: user => {
       const usersRef = Database('users')
@@ -123,7 +151,7 @@ export default function UserService() {
           return getFriendPosibleMatches(ref, actualUser)
         })
         .then(users => {
-          const orderedUsers = orderByMatchingAlgorithm(users)
+          const orderedUsers = orderByMatchingAlgorithm(users, actualUser)
           return orderedUsers.slice(0, USERS_PER_REQUEST - 1)
         })
     }
