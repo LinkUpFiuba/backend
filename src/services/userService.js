@@ -29,7 +29,7 @@ export default function UserService() {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
+          if (user.Uid !== actualUser.Uid &&
               validateAges(user, actualUser) &&
               validateDistance(user, actualUser) &&
               !user.invisibleMode &&
@@ -47,7 +47,7 @@ export default function UserService() {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
+          if (user.Uid !== actualUser.Uid &&
               !user.invisibleMode &&
               validateDistance(user, actualUser) &&
               validateAges(user, actualUser)) {
@@ -70,7 +70,7 @@ export default function UserService() {
       user1.range.maxAge >= user2.age
   }
 
-  function getSearchInterests(actualUser) {
+  const getSearchInterests = actualUser => {
     const search = []
     if (actualUser.val().interests.male) {
       search.push(MALE)
@@ -82,6 +82,10 @@ export default function UserService() {
       search.push(FRIENDS)
     }
     return search
+  }
+
+  const orderByMatchingAlgorithm = users => {
+    return users
   }
 
   return {
@@ -105,21 +109,21 @@ export default function UserService() {
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
       let actualUser
-      let search
       // Busca usuario actual
       return ref.child(actualUserUid).once('value')
         .then(user => {
           actualUser = user.val()
-          search = getSearchInterests(user)
+          return getSearchInterests(user)
         })
-        .then(() => {
+        .then(search => {
           if (!search.includes(FRIENDS)) {
             return getSexualPosibleMatches(ref, actualUser, search)
           }
           return getFriendPosibleMatches(ref, actualUser)
         })
         .then(users => {
-          return users.slice(0, USERS_PER_REQUEST - 1)
+          const orderedUsers = orderByMatchingAlgorithm(users)
+          return orderedUsers.slice(0, USERS_PER_REQUEST - 1)
         })
     }
   }
