@@ -45,7 +45,7 @@ export class User {
     return this
   }
 
-  invisible() {
+  invisibleModeOn() {
     this.user.invisibleMode = true
     return this
   }

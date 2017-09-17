@@ -28,7 +28,7 @@ describe('UserService', () => {
     const maleForFemaleInAgeRange = new User().male().likesFemale().age(35).ageRange(25, 35).get()
     const maleForFemaleInImposibleAgeRange = new User().female().likesMale().age(35).ageRange(60, 70).get()
 
-    const femaleForMaleInvisibleMode = new User().female().likesMale().invisible().get()
+    const femaleForMaleInvisibleMode = new User().female().likesMale().invisibleModeOn().get()
 
     const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).get()
     const solariFemaleForFriends = new User().female().likesFemale().withLocation(1, 1).get()
@@ -196,52 +196,62 @@ describe('UserService', () => {
     })
 
     describe('Test for distance filter', () => {
-      before(() => {
-        const users = {
-          [maleForFriends.Uid]: maleForFriends,
-          [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers
-        }
-        const ref = Database('users')
-        ref.set(users)
-      })
+      describe('when users are far from each other', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
 
-      it('Female for friends too far from others gets nothing', () => {
-        return UserService().getPosibleLinks(femaleForFriendsFarFromOthers.Uid).then(users => {
-          expect(users.length).to.equal(0)
+        it('Female for friends too far from others gets nothing', () => {
+          return UserService().getPosibleLinks(femaleForFriendsFarFromOthers.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+
+        it('Male for friends gets nothing', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
         })
       })
 
-      it('Male for friends gets nothing', () => {
-        return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
-          expect(users.length).to.equal(0)
+      describe('when users are close', () => {
+        before(() => {
+          const users = {
+            [solariFemaleForFemaleInPosition3.Uid]: solariFemaleForFemaleInPosition3,
+            [anotherSolariFemaleForFemaleInPosition3.Uid]: anotherSolariFemaleForFemaleInPosition3
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
+
+        it('Female for female search only one within the range (different locations)', () => {
+          return UserService().getPosibleLinks(solariFemaleForFemaleInPosition3.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, anotherSolariFemaleForFemaleInPosition3)).to.be.true
+          })
         })
       })
 
-      it('Female for female search only one within the range (different locations)', () => {
-        const users = {
-          [solariFemaleForFemaleInPosition3.Uid]: solariFemaleForFemaleInPosition3,
-          [anotherSolariFemaleForFemaleInPosition3.Uid]: anotherSolariFemaleForFemaleInPosition3
-        }
-        const ref = Database('users')
-        ref.set(users)
-
-        return UserService().getPosibleLinks(solariFemaleForFemaleInPosition3.Uid).then(users => {
-          expect(users.length).to.equal(1)
-          expect(searchForUser(users, anotherSolariFemaleForFemaleInPosition3)).to.be.true
+      describe('when they are in the same spot', () => {
+        before(() => {
+          const users = {
+            [solariFemaleForFriends.Uid]: solariFemaleForFriends,
+            [solariFemaleForFriends2.Uid]: solariFemaleForFriends2
+          }
+          const ref = Database('users')
+          ref.set(users)
         })
-      })
 
-      it('Solari female for friends only find one friend in same spot', () => {
-        const users = {
-          [solariFemaleForFriends.Uid]: solariFemaleForFriends,
-          [solariFemaleForFriends2.Uid]: solariFemaleForFriends2
-        }
-        const ref = Database('users')
-        ref.set(users)
-
-        return UserService().getPosibleLinks(solariFemaleForFriends.Uid).then(users => {
-          expect(users.length).to.equal(1)
-          expect(searchForUser(users, solariFemaleForFriends2)).to.be.true
+        it('Solari female for friends only find one friend', () => {
+          return UserService().getPosibleLinks(solariFemaleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, solariFemaleForFriends2)).to.be.true
+          })
         })
       })
     })
