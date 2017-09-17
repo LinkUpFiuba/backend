@@ -1,390 +1,87 @@
-export const maleSearchForFriends = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    age: 99,
-    maxDistance: 50,
-    invisibleMode: false,
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    interests: {
-      'male': false,
-      'female': false,
-      'friends': true
-    }
-  }
-}
+export class User {
+  static id = 0
 
-export const femaleSearchForFriends = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    age: 99,
-    maxDistance: 50,
-    invisibleMode: false,
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    interests: {
-      'male': false,
-      'female': false,
-      'friends': true
+  constructor() {
+    this.user = {
+      Uid: User.id.toString(),
+      gender: undefined,
+      age: 23,
+      maxDistance: 50,
+      invisibleMode: false,
+      range: {
+        minAge: 18,
+        maxAge: 28
+      },
+      location: {
+        latitude: 20,
+        longitude: 20
+      },
+      interests: {
+        male: false,
+        female: false,
+        friends: false
+      }
     }
+    User.id += 1
   }
-}
 
-export const maleSearchForMale = id => {
-  return {
-    Uid: id,
-    gender: 'male',
-    age: 99,
-    invisibleMode: false,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': true,
-      'female': false,
-      'friends': false
-    }
+  male() {
+    this.user.gender = 'male'
+    return this
   }
-}
 
-export const maleSearchForFemale = id => {
-  return {
-    Uid: id,
-    gender: 'male',
-    age: 99,
-    invisibleMode: false,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
-    }
+  female() {
+    this.user.gender = 'female'
+    return this
   }
-}
 
-export const maleSearchForFemaleAndMale = id => {
-  return {
-    Uid: id,
-    gender: 'male',
-    age: 99,
-    invisibleMode: false,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': true,
-      'female': true,
-      'friends': false
-    }
+  age(age) {
+    this.user.age = age
+    return this
   }
-}
 
-export const femaleSearchForMale = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    age: 99,
-    invisibleMode: false,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': true,
-      'female': false,
-      'friends': false
-    }
+  maxDistance(distance) {
+    this.user.maxDistance = distance
+    return this
   }
-}
 
-export const femaleSearchForMaleInAgeRange = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 25,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 20,
-      maxAge: 30
-    },
-    interests: {
-      'male': true,
-      'female': false,
-      'friends': false
-    }
+  invisibleModeOn() {
+    this.user.invisibleMode = true
+    return this
   }
-}
 
-export const maleSearchForFemaleInAgeRange = id => {
-  return {
-    Uid: id,
-    gender: 'male',
-    invisibleMode: false,
-    age: 28,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 20,
-      maxAge: 25
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
+  ageRange(min, max) {
+    this.user.range = {
+      minAge: min,
+      maxAge: max
     }
+    return this
   }
-}
 
-export const maleSearchForFemaleInImposibleAgeRange = id => {
-  return {
-    Uid: id,
-    gender: 'male',
-    invisibleMode: false,
-    age: 28,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 0,
-      maxAge: 10
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
-    }
+  likesMale() {
+    this.user.interests.male = true
+    return this
   }
-}
 
-export const femaleSearchForFemale = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
-    }
+  likesFemale() {
+    this.user.interests.female = true
+    return this
   }
-}
 
-export const femaleSearchForFemaleAndMale = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': true,
-      'female': true,
-      'friends': false
-    }
+  likesFriends() {
+    this.user.interests.friends = true
+    return this
   }
-}
 
-export const femaleSearchForFemaleInvisibleMode = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: true,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
+  withLocation(lat, long) {
+    this.user.location = {
+      latitude: lat,
+      longitude: long
     }
+    return this
   }
-}
 
-export const femaleSearchForFriendsInvisibleMode = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: true,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 52.518611,
-      longitude: 13.408056
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': false,
-      'friends': true
-    }
-  }
-}
-
-export const femaleSearchForFriendsFarFromOthers = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: true,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 0,
-      longitude: 0
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': false,
-      'friends': true
-    }
-  }
-}
-
-export const solariFemaleSearchForFriends = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 1,
-      longitude: 1
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': false,
-      'friends': true
-    }
-  }
-}
-
-export const solariFemaleSearchForFemaleInPosition3 = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 3,
-      longitude: 3
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
-    }
-  }
-}
-
-export const anotherSolariFemaleSearchForFemaleInPosition3 = id => {
-  return {
-    Uid: id,
-    gender: 'female',
-    invisibleMode: false,
-    age: 99,
-    maxDistance: 50,
-    location: {
-      latitude: 3.1,
-      longitude: 3.4
-    },
-    range: {
-      minAge: 50,
-      maxAge: 100
-    },
-    interests: {
-      'male': false,
-      'female': true,
-      'friends': false
-    }
+  get() {
+    return this.user
   }
 }
