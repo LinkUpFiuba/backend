@@ -23,17 +23,33 @@ export default function UserService() {
     return correctness
   }
 
+  const validateDistance = (user1, user2) => {
+    const distance = geolib.getDistance(user1.location, user2.location) / 1000
+    return distance <= user1.maxDistance && distance <= user2.maxDistance
+  }
+
+  const validateAges = (user1, user2) => {
+    return user2.range.minAge <= user1.age &&
+      user1.range.minAge <= user2.age &&
+      user2.range.maxAge >= user1.age &&
+      user1.range.maxAge >= user2.age
+  }
+
+  const validateExclusion = (user, actualUser) => (
+    // Exclude the user who made the request and also by age, distance and if the user has invisble mode on
+    user.Uid !== actualUser.Uid &&
+      validateAges(user, actualUser) &&
+      validateDistance(user, actualUser) &&
+      !user.invisibleMode
+  )
+
   const getSexualPosibleMatches = (ref, actualUser, search) => {
     return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
       .then(users => {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (user.Uid !== actualUser.Uid &&
-              validateAges(user, actualUser) &&
-              validateDistance(user, actualUser) &&
-              !user.invisibleMode &&
-              search.includes(user.gender)) {
+          if (validateExclusion(user, actualUser) && search.includes(user.gender)) {
             usersArray.push(user)
           }
         })
@@ -47,27 +63,12 @@ export default function UserService() {
         const usersArray = []
         users.forEach(queryUser => {
           const user = queryUser.val()
-          if (user.Uid !== actualUser.Uid &&
-              !user.invisibleMode &&
-              validateDistance(user, actualUser) &&
-              validateAges(user, actualUser)) {
+          if (validateExclusion(user, actualUser)) {
             usersArray.push(user)
           }
         })
         return usersArray
       })
-  }
-
-  const validateDistance = (user1, user2) => {
-    const distance = geolib.getDistance(user1.location, user2.location) / 1000
-    return distance <= user1.maxDistance && distance <= user2.maxDistance
-  }
-
-  const validateAges = (user1, user2) => {
-    return user2.range.minAge <= user1.age &&
-      user1.range.minAge <= user2.age &&
-      user2.range.maxAge >= user1.age &&
-      user1.range.maxAge >= user2.age
   }
 
   const getSearchInterests = actualUser => {
