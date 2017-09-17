@@ -4,15 +4,7 @@ import { describe, it, before, after } from 'mocha'
 import UserService from '../../src/services/userService'
 // import Database from '../../src/services/gateway/database'
 import FirebaseServer from 'firebase-server'
-import {
-  anotherSolariFemaleSearchForFemaleInPosition3,
-  femaleSearchForFemale, femaleSearchForFemaleAndMale, femaleSearchForFemaleInvisibleMode,
-  femaleSearchForFriends, femaleSearchForFriendsFarFromOthers, femaleSearchForFriendsInvisibleMode,
-  femaleSearchForMale, femaleSearchForMaleInAgeRange, maleSearchForFemale,
-  maleSearchForFemaleAndMale, maleSearchForFemaleInAgeRange, maleSearchForFemaleInImposibleAgeRange,
-  maleSearchForFriends,
-  maleSearchForMale, solariFemaleSearchForFemaleInPosition3, solariFemaleSearchForFriends
-} from './usersFactory'
+import { User } from './usersFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -21,46 +13,27 @@ const expect = chai.expect
 describe('UserService', () => {
   describe('#getPosibleLinks(uid)', () => {
     let server
-    const id1 = '1'
-    const id2 = '2'
-    const id3 = '3'
-    const id4 = '4'
-    const id5 = '5'
-    const id6 = '6'
-    const id7 = '7'
-    const id8 = '8'
-    const id9 = '9'
-    const id10 = '10'
-    const id11 = '11'
-    const id12 = '12'
-    const id13 = '13'
-    const id14 = '14'
-    const id15 = '15'
-    const id16 = '16'
-    const id17 = '17'
-    const id18 = '18'
-    const id19 = '19'
-    const id20 = '20'
-    const maleForFriends = maleSearchForFriends(id1)
-    const maleForFriends2 = maleSearchForFriends(id4)
-    const femaleForFriends = femaleSearchForFriends(id2)
-    const maleForFemale = maleSearchForFemale(id3)
-    const femaleForMale = femaleSearchForMale(id5)
-    const maleForMale = maleSearchForMale(id6)
-    const maleForMale2 = maleSearchForMale(id7)
-    const maleForMaleAndFemale = maleSearchForFemaleAndMale(id8)
-    const femaleForFemale = femaleSearchForFemale(id9)
-    const femaleForMaleAndFemale = femaleSearchForFemaleAndMale(id10)
-    const femaleForMaleInAgeRange = femaleSearchForMaleInAgeRange(id11)
-    const maleForFemaleInAgeRange = maleSearchForFemaleInAgeRange(id12)
-    const maleForFemaleInImposibleAgeRange = maleSearchForFemaleInImposibleAgeRange(id13)
-    const femaleForFemaleInvisibleMode = femaleSearchForFemaleInvisibleMode(id14)
-    const femaleForFriendsInvisibleMode = femaleSearchForFriendsInvisibleMode(id15)
-    const femaleForFriendsFarFromOthers = femaleSearchForFriendsFarFromOthers(id16)
-    const solariFemaleForFriends = solariFemaleSearchForFriends(id17)
-    const solariFemaleForFriends2 = solariFemaleSearchForFriends(id18)
-    const solariFemaleForFemaleInPosition3 = solariFemaleSearchForFemaleInPosition3(id19)
-    const anotherSolariFemaleForFemaleInPosition3 = anotherSolariFemaleSearchForFemaleInPosition3(id20)
+    const maleForFriends = new User().male().likesFriends().get()
+    const maleForFriends2 = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const maleForFemale = new User().male().likesFemale().get()
+    const femaleForMale = new User().female().likesMale().get()
+    const maleForMale = new User().male().likesMale().get()
+    const maleForMale2 = new User().male().likesMale().get()
+    const maleForMaleAndFemale = new User().male().likesMale().likesFemale().get()
+    const femaleForFemale = new User().female().likesFemale().get()
+    const femaleForMaleAndFemale = new User().female().likesMale().likesFemale().get()
+    const femaleForMaleInAgeRange = new User().female().likesMale().age(30).ageRange(35, 45).get()
+    const maleForFemaleInAgeRange = new User().male().likesFemale().age(40).ageRange(25, 35).get()
+    const maleForFemaleInImposibleAgeRange = new User().female().likesMale().age(35).ageRange(60, 70).get()
+    const femaleForFemaleInvisibleMode = new User().female().likesFemale().invisible().get()
+    const femaleForFriendsInvisibleMode = new User().female().likesFriends().invisible().get()
+    const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).get()
+    const solariFemaleForFriends = new User().female().likesFemale().withLocation(1, 1).get()
+    const solariFemaleForFriends2 = new User().female().likesFemale().withLocation(1, 1).get()
+    const solariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3, 3).get()
+    // eslint-disable-next-line max-len
+    const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get()
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -69,33 +42,40 @@ describe('UserService', () => {
     before(() => {
       const users = {
         users: {
-          [id1]: maleForFriends,
-          [id2]: femaleForFriends,
-          [id3]: maleForFemale,
-          [id4]: maleForFriends2,
-          [id5]: femaleForMale,
-          [id6]: maleForMale,
-          [id7]: maleForMale2,
-          [id8]: maleForMaleAndFemale,
-          [id9]: femaleForFemale,
-          [id10]: femaleForMaleAndFemale,
-          [id11]: femaleForMaleInAgeRange,
-          [id12]: maleForFemaleInAgeRange,
-          [id13]: maleForFemaleInImposibleAgeRange,
-          [id14]: femaleForFemaleInvisibleMode,
-          [id15]: femaleForFriendsInvisibleMode,
-          [id16]: femaleForFriendsFarFromOthers,
-          [id17]: solariFemaleForFriends,
-          [id18]: solariFemaleForFriends2,
-          [id19]: solariFemaleForFemaleInPosition3,
-          [id20]: anotherSolariFemaleForFemaleInPosition3
+          [maleForFriends.Uid]: maleForFriends,
+          [femaleForFriends.Uid]: femaleForFriends,
+          [maleForFemale.Uid]: maleForFemale,
+          [maleForFriends2.Uid]: maleForFriends2,
+          [femaleForMale.Uid]: femaleForMale,
+          [maleForMale.Uid]: maleForMale,
+          [maleForMale2.Uid]: maleForMale2,
+          [maleForMaleAndFemale.Uid]: maleForMaleAndFemale,
+          [femaleForFemale.Uid]: femaleForFemale,
+          [femaleForMaleAndFemale.Uid]: femaleForMaleAndFemale,
+          [femaleForMaleInAgeRange.Uid]: femaleForMaleInAgeRange,
+          [maleForFemaleInAgeRange.Uid]: maleForFemaleInAgeRange,
+          [maleForFemaleInImposibleAgeRange.Uid]: maleForFemaleInImposibleAgeRange,
+          [femaleForFemaleInvisibleMode.Uid]: femaleForFemaleInvisibleMode,
+          [femaleForFriendsInvisibleMode.Uid]: femaleForFriendsInvisibleMode,
+          [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers,
+          [solariFemaleForFriends.Uid]: solariFemaleForFriends,
+          [solariFemaleForFriends2.Uid]: solariFemaleForFriends2,
+          [solariFemaleForFemaleInPosition3.Uid]: solariFemaleForFemaleInPosition3,
+          [anotherSolariFemaleForFemaleInPosition3.Uid]: anotherSolariFemaleForFemaleInPosition3
         }
       }
       server = new FirebaseServer(5000, 'localhost.firebaseio.test', users)
     })
 
     describe('Search for friends', () => {
+      // let user
       // before(() => {
+      //   const maleForFriends = new User().male().likesFriends().get()
+      //   console.log(maleForFriends)
+      //   const femaleForFriends = new User().female().likesFriends().get()
+      //   console.log(femaleForFriends)
+      //   const maleForFriends2 = new User().male().likesFriends().get()
+      //   user = maleForFriends
       //   const users = {
       //     [maleForFriends.Uid]: maleForFriends,
       //     [femaleForFriends.Uid]: femaleForFriends,
