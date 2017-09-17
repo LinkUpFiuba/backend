@@ -41,20 +41,35 @@ export default function UserService() {
       })
   }
 
+  const getLinks = actualUser => {
+    const linksRef = Database('links')
+    return linksRef.child(actualUser.Uid).once('value')
+      .then(links => {
+        const uidLinks = []
+        links.forEach(child => {
+          uidLinks.push(child.key)
+        })
+        return uidLinks
+      })
+  }
+
   const getFriendPosibleMatches = (ref, actualUser) => {
     return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
-        const usersArray = []
-        users.forEach(queryUser => {
-          const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
+        return getLinks(actualUser).then(links => {
+          const usersArray = []
+          users.forEach(queryUser => {
+            const user = queryUser.val()
+            if (queryUser.key !== actualUser.Uid &&
               !user.invisibleMode &&
+              !links.includes(user.Uid) &&
               validateDistance(user, actualUser) &&
               validateAges(user, actualUser)) {
-            usersArray.push(user)
-          }
+              usersArray.push(user)
+            }
+          })
+          return usersArray
         })
-        return usersArray
       })
   }
 

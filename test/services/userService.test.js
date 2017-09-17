@@ -256,6 +256,91 @@ describe('UserService', () => {
       })
     })
 
+    describe('Test for link filter', () => {
+      describe('when there they already liked', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male For friends does not find female for friends because they have already liked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+      describe('when there they already liked and there is another', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male For friends does not find female for friends because they have already liked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, maleForFriends2)).to.be.true
+          })
+        })
+      })
+
+      describe('when there all liked with each other', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [maleForFriends2.Uid]: {
+              [maleForFriends.Uid]: true,
+              [femaleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male For friends does find nobody', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+    })
+
     after(() => {
       server.close(console.log('- Firebase server closed -'))
     })
