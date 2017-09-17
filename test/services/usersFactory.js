@@ -6,7 +6,7 @@ export class User {
       Uid: User.id.toString(),
       gender: undefined,
       age: 23,
-      maxDistance: 50,
+      maxDistance: 100,
       invisibleMode: false,
       range: {
         minAge: 18,

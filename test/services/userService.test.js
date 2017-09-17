@@ -32,11 +32,18 @@ describe('UserService', () => {
 
     const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).maxDistance(50).get() // eslint-disable-line max-len
     const femaleForFriendsCloseToAnother = new User().female().likesFriends().withLocation(0.2, 0.2).maxDistance(50).get() // eslint-disable-line max-len
-    const maleForFriendsCloseButNotEnoughToTheAnothers = new User().male().likesFriends().withLocation(0.4, 0.4).maxDistance(50).get() // eslint-disable-line max-len
+    const maleForFriendsCloseButNotEnoughToTheOthers = new User().male().likesFriends().withLocation(0.4, 0.4).maxDistance(50).get() // eslint-disable-line max-len
     const solariFemaleForFriends = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFriends2 = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3, 3).get()
     const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get() // eslint-disable-line max-len
+
+    const maleForFemaleInSomePosition = new User().male().likesFemale().withLocation(0, 0).get()
+    const femaleForMaleInSamePosition = new User().female().likesMale().withLocation(0, 0).get()
+    const femaleForMaleNearMale = new User().female().likesMale().withLocation(0.1, 0.1).get()
+    const femaleForMaleNearMaleButNotMuch = new User().female().likesMale().withLocation(0.2, 0.2).get()
+    const femaleForMaleNearMaleButNotSoMuch = new User().female().likesMale().withLocation(0.3, 0.3).get()
+    const femaleForMaleNearMaleButFar = new User().female().likesMale().withLocation(0.67308, 0.6).get() // 100km far
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -203,7 +210,7 @@ describe('UserService', () => {
             [maleForFriends.Uid]: maleForFriends,
             [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers,
             [femaleForFriendsCloseToAnother.Uid]: femaleForFriendsCloseToAnother,
-            [maleForFriendsCloseButNotEnoughToTheAnothers.Uid]: maleForFriendsCloseButNotEnoughToTheAnothers
+            [maleForFriendsCloseButNotEnoughToTheOthers.Uid]: maleForFriendsCloseButNotEnoughToTheOthers
           }
           const ref = Database('users')
           ref.set(users)
@@ -257,6 +264,66 @@ describe('UserService', () => {
             expect(searchForUser(users, solariFemaleForFriends2)).to.be.true
           })
         })
+      })
+    })
+
+    describe('Test for matching algorithm', () => {
+      describe('when they have nothing in common', () => {
+        before(() => {
+          // In the database they are not ordered by distance
+          const users = {
+            [maleForFemaleInSomePosition.Uid]: maleForFemaleInSomePosition,
+            [femaleForMaleNearMaleButNotSoMuch.Uid]: femaleForMaleNearMaleButNotSoMuch,
+            [femaleForMaleInSamePosition.Uid]: femaleForMaleInSamePosition,
+            [femaleForMaleNearMaleButNotMuch.Uid]: femaleForMaleNearMaleButNotMuch,
+            [femaleForMaleNearMale.Uid]: femaleForMaleNearMale,
+            [femaleForMaleNearMaleButFar.Uid]: femaleForMaleNearMaleButFar
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
+
+        it('orders by distance', () => {
+          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+            expect(users.length).to.equal(5)
+            expect(users[0].Uid).to.equal(femaleForMaleInSamePosition.Uid)
+            expect(users[1].Uid).to.equal(femaleForMaleNearMale.Uid)
+            expect(users[2].Uid).to.equal(femaleForMaleNearMaleButNotMuch.Uid)
+            expect(users[3].Uid).to.equal(femaleForMaleNearMaleButNotSoMuch.Uid)
+            expect(users[4].Uid).to.equal(femaleForMaleNearMaleButFar.Uid)
+          })
+        })
+
+        it('the user in the same spot has the best score', () => {
+          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+            expect(users[0].matchingScore).to.equal(60)
+          })
+        })
+
+        it('the furthest user has the worst score', () => {
+          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+            expect(users[4].matchingScore).to.equal(0)
+          })
+        })
+
+        it('users have the distance property', () => {
+          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+            expect(users[0]).to.have.property('distance')
+          })
+        })
+      })
+
+      describe('when they are in the same place', () => {
+        // TODO: Complete this when using the interestsService
+        it('users have the commonInterests property', () => {
+          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+            expect(users[0]).to.have.property('commonInterests')
+          })
+        })
+      })
+
+      describe('when they have something in common and are in different places', () => {
+        // TODO: Complete this when using the interestsService
       })
     })
 

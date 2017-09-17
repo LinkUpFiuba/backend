@@ -152,7 +152,7 @@ export default function UserService() {
         })
         .then(users => {
           const orderedUsers = orderByMatchingAlgorithm(users, actualUser)
-          return orderedUsers.slice(0, USERS_PER_REQUEST - 1)
+          return orderedUsers.slice(0, USERS_PER_REQUEST)
         })
     }
   }
