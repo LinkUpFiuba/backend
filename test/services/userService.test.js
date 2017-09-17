@@ -30,12 +30,13 @@ describe('UserService', () => {
 
     const femaleForMaleInvisibleMode = new User().female().likesMale().invisibleModeOn().get()
 
-    const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).get()
+    const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).maxDistance(50).get() // eslint-disable-line max-len
+    const femaleForFriendsCloseToAnother = new User().female().likesFriends().withLocation(0.2, 0.2).maxDistance(50).get() // eslint-disable-line max-len
+    const maleForFriendsCloseButNotEnoughToTheAnothers = new User().male().likesFriends().withLocation(0.4, 0.4).maxDistance(50).get() // eslint-disable-line max-len
     const solariFemaleForFriends = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFriends2 = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3, 3).get()
-    // eslint-disable-next-line max-len
-    const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get()
+    const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get() // eslint-disable-line max-len
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -200,15 +201,18 @@ describe('UserService', () => {
         before(() => {
           const users = {
             [maleForFriends.Uid]: maleForFriends,
-            [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers
+            [femaleForFriendsFarFromOthers.Uid]: femaleForFriendsFarFromOthers,
+            [femaleForFriendsCloseToAnother.Uid]: femaleForFriendsCloseToAnother,
+            [maleForFriendsCloseButNotEnoughToTheAnothers.Uid]: maleForFriendsCloseButNotEnoughToTheAnothers
           }
           const ref = Database('users')
           ref.set(users)
         })
 
-        it('Female for friends too far from others gets nothing', () => {
+        it('Female for friends too far from others gets only the ones included in maxDistance', () => {
           return UserService().getPosibleLinks(femaleForFriendsFarFromOthers.Uid).then(users => {
-            expect(users.length).to.equal(0)
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, femaleForFriendsCloseToAnother)).to.be.true
           })
         })
 
