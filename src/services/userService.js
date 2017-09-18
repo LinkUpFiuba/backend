@@ -45,7 +45,8 @@ export default function UserService() {
   }
 
   const validateExclusion = (user, actualUser, links, unlinks) => (
-    // Exclude the user who made the request and also by age, distance and if the user has invisible mode on
+    // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
+    // or if they already liked or unliked
     user.Uid !== actualUser.Uid &&
       validateAges(user, actualUser) &&
       validateDistance(user, actualUser) &&
