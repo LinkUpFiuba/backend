@@ -3,6 +3,7 @@ import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 import geolib from 'geolib'
+import InterestsService from './interestsService'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -51,14 +52,8 @@ export default function UserService() {
       !user.invisibleMode
   )
 
-  const getCommonInterests = (user, actualUser) => {
-    // Esta boludez es simplemente para que no se queje el linter de que no los uso
-    return (user === actualUser) ? [] : []
-  }
-
   const calculateMatchingScore = (user, actualUser) => {
-    // Here we should use @fede's service to find commonInterests
-    const commonInterests = getCommonInterests(user, actualUser).length
+    const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList).length
     // We include the amount of common interests in the user in order to show it in the frontend
     user.commonInterests = commonInterests
     // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like

@@ -4,7 +4,7 @@ import { describe, it, before, after } from 'mocha'
 import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import FirebaseServer from 'firebase-server'
-import { User } from './usersFactory'
+import { User, Interests } from './usersFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -44,6 +44,15 @@ describe('UserService', () => {
     const femaleForMaleNearMaleButNotMuch = new User().female().likesMale().withLocation(0.2, 0.2).get()
     const femaleForMaleNearMaleButNotSoMuch = new User().female().likesMale().withLocation(0.3, 0.3).get()
     const femaleForMaleNearMaleButFar = new User().female().likesMale().withLocation(0.67308, 0.6).get() // 100km far
+
+    // The 'withLocation(20.90326, 20)' is in order to the distanceScore to be 0
+    const maleForFemaleWithManyInterests = new User().male().likesFemale().withManyInterests().withLocation(20.90326, 20).get() // eslint-disable-line max-len
+    const femaleForMaleWithManyInterests = new User().female().likesMale().withManyInterests().get()
+    const femaleForMaleWithSomeInterests = new User().female().likesMale().withSomeInterests().get()
+    const femaleForMaleWithOneInterest = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).get() // eslint-disable-line max-len
+    const femaleForMaleWithTwoInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).get() // eslint-disable-line max-len
+    const femaleForMaleWithThreeInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).get() // eslint-disable-line max-len
+    const femaleForMaleWithFourInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).withInterest(Interests.lopilatoInterest).get() // eslint-disable-line max-len
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -314,9 +323,46 @@ describe('UserService', () => {
       })
 
       describe('when they are in the same place', () => {
-        // TODO: Complete this when using the interestsService
+        before(() => {
+          // In the database they are not ordered by interests count
+          const users = {
+            [maleForFemaleWithManyInterests.Uid]: maleForFemaleWithManyInterests,
+            [femaleForMaleWithSomeInterests.Uid]: femaleForMaleWithSomeInterests,
+            [femaleForMaleWithThreeInterests.Uid]: femaleForMaleWithThreeInterests,
+            [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest,
+            [femaleForMaleWithManyInterests.Uid]: femaleForMaleWithManyInterests,
+            [femaleForMaleWithFourInterests.Uid]: femaleForMaleWithFourInterests,
+            [femaleForMaleWithTwoInterests.Uid]: femaleForMaleWithTwoInterests
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
+
+        it('orders by interests', () => {
+          return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
+            expect(users.length).to.equal(5)
+            expect(users[0].Uid).to.equal(femaleForMaleWithManyInterests.Uid)
+            expect(users[1].Uid).to.equal(femaleForMaleWithSomeInterests.Uid)
+            expect(users[2].Uid).to.equal(femaleForMaleWithFourInterests.Uid)
+            expect(users[3].Uid).to.equal(femaleForMaleWithThreeInterests.Uid)
+            expect(users[4].Uid).to.equal(femaleForMaleWithTwoInterests.Uid)
+          })
+        })
+
+        it('user with 11 interests in common has the best score', () => {
+          return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
+            expect(users[0].matchingScore).to.equal(0.4 * 10 * 10)
+          })
+        })
+
+        it('user with four interests in common has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
+            expect(users[2].matchingScore).to.equal(0.4 * 4 * 10)
+          })
+        })
+
         it('users have the commonInterests property', () => {
-          return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+          return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
             expect(users[0]).to.have.property('commonInterests')
           })
         })
