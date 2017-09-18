@@ -27,6 +27,7 @@
     "firebase": "^4.3.1",
     "firebase-admin": "^5.2.1",
     "firebase-token-generator": "^2.0.0",
+    "geolib": "^2.0.23",
     "jsonschema": "^1.2.0",
     "node-fetch": "^1.7.2"
   },
