@@ -71,6 +71,8 @@ describe('UserService', () => {
           [maleForFriends2.Uid]: maleForFriends2,
           [maleForFemale.Uid]: maleForFemale
         }
+        Database('unlinks').set({})
+        Database('links').set({})
         const ref = Database('users')
         ref.set(users)
       })
@@ -102,6 +104,8 @@ describe('UserService', () => {
           [maleForMaleAndFemale.Uid]: maleForMaleAndFemale
         }
         const ref = Database('users')
+        Database('unlinks').set({})
+        Database('links').set({})
         ref.set(users)
       })
 
@@ -166,6 +170,11 @@ describe('UserService', () => {
 
     describe('Test age range', () => {
       before(() => {
+        Database('unlinks').set({})
+        Database('links').set({})
+      })
+
+      before(() => {
         const users = {
           [maleForFemaleInAgeRange.Uid]: maleForFemaleInAgeRange,
           [femaleForMaleInAgeRange.Uid]: femaleForMaleInAgeRange,
@@ -191,6 +200,11 @@ describe('UserService', () => {
 
     describe('Test for invisible mode', () => {
       before(() => {
+        Database('unlinks').set({})
+        Database('links').set({})
+      })
+
+      before(() => {
         const users = {
           [femaleForMaleInvisibleMode.Uid]: femaleForMaleInvisibleMode,
           [maleForFemale.Uid]: maleForFemale
@@ -214,6 +228,11 @@ describe('UserService', () => {
     })
 
     describe('Test for distance filter', () => {
+      before(() => {
+        Database('unlinks').set({})
+        Database('links').set({})
+      })
+
       describe('when users are far from each other', () => {
         before(() => {
           const users = {
@@ -277,7 +296,212 @@ describe('UserService', () => {
       })
     })
 
+    describe('Test for unlink filter', () => {
+      before(() => {
+        Database('links').set({})
+      })
+
+      describe('when they have already unliked', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends
+          }
+          const unlinks = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('unlinks').set(unlinks)
+        })
+
+        it('Male for friends does not find female for friends because they have already unliked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+
+      describe('when they have already unliked and there is another', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const unlinks = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('unlinks').set(unlinks)
+        })
+
+        it('Male for friends does not find female for friends because they have already unliked but finds male with whom he has not liked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, maleForFriends2)).to.be.true
+          })
+        })
+      })
+
+      describe('when they have all unliked with each other', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const unlinks = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [maleForFriends2.Uid]: {
+              [maleForFriends.Uid]: true,
+              [femaleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('unlinks').set(unlinks)
+        })
+
+        it('Male for friends does find nobody', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+    })
+
+    describe('Test for link filter', () => {
+      before(() => {
+        Database('unlinks').set({})
+      })
+
+      describe('when they have already liked', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male for friends does not find female for friends because they have already liked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+      describe('when one like me but I have not liked him yet', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Female for friends finds male for friends ', () => {
+          return UserService().getPosibleLinks(femaleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+          })
+        })
+      })
+      describe('when they have already liked and there is another', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male for friends does not find female for friends because they have already liked but finds male with whom he has not liked', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, maleForFriends2)).to.be.true
+          })
+        })
+      })
+
+      describe('when they have all liked with each other', () => {
+        before(() => {
+          const users = {
+            [maleForFriends.Uid]: maleForFriends,
+            [femaleForFriends.Uid]: femaleForFriends,
+            [maleForFriends2.Uid]: maleForFriends2
+          }
+          const links = {
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [femaleForFriends.Uid]: {
+              [maleForFriends.Uid]: true,
+              [maleForFriends2.Uid]: true
+            },
+            [maleForFriends2.Uid]: {
+              [maleForFriends.Uid]: true,
+              [femaleForFriends.Uid]: true
+            }
+          }
+          Database('users').set(users)
+          Database('links').set(links)
+        })
+
+        it('Male for friends does find nobody', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+    })
+
     describe('Test for matching algorithm', () => {
+      before(() => {
+        Database('unlinks').set({})
+        Database('links').set({})
+      })
+
       describe('when they have nothing in common', () => {
         before(() => {
           // In the database they are not ordered by distance
