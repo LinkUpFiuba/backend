@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before, after } from 'mocha'
@@ -30,13 +31,13 @@ describe('UserService', () => {
 
     const femaleForMaleInvisibleMode = new User().female().likesMale().invisibleModeOn().get()
 
-    const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).maxDistance(50).get() // eslint-disable-line max-len
-    const femaleForFriendsCloseToAnother = new User().female().likesFriends().withLocation(0.2, 0.2).maxDistance(50).get() // eslint-disable-line max-len
-    const maleForFriendsCloseButNotEnoughToTheOthers = new User().male().likesFriends().withLocation(0.4, 0.4).maxDistance(50).get() // eslint-disable-line max-len
+    const femaleForFriendsFarFromOthers = new User().female().likesFriends().withLocation(0, 0).maxDistance(50).get()
+    const femaleForFriendsCloseToAnother = new User().female().likesFriends().withLocation(0.2, 0.2).maxDistance(50).get()
+    const maleForFriendsCloseButNotEnoughToTheOthers = new User().male().likesFriends().withLocation(0.4, 0.4).maxDistance(50).get()
     const solariFemaleForFriends = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFriends2 = new User().female().likesFemale().withLocation(1, 1).get()
     const solariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3, 3).get()
-    const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get() // eslint-disable-line max-len
+    const anotherSolariFemaleForFemaleInPosition3 = new User().female().likesFemale().withLocation(3.1, 3.4).get()
 
     const maleForFemaleInSomePosition = new User().male().likesFemale().withLocation(0, 0).get()
     const femaleForMaleInSamePosition = new User().female().likesMale().withLocation(0, 0).get()
@@ -46,13 +47,13 @@ describe('UserService', () => {
     const femaleForMaleNearMaleButFar = new User().female().likesMale().withLocation(0.67308, 0.6).get() // 100km far
 
     // The 'withLocation(20.90326, 20)' is in order to the distanceScore to be 0
-    const maleForFemaleWithManyInterests = new User().male().likesFemale().withManyInterests().withLocation(20.90326, 20).get() // eslint-disable-line max-len
+    const maleForFemaleWithManyInterests = new User().male().likesFemale().withManyInterests().withLocation(20.90326, 20).get()
     const femaleForMaleWithManyInterests = new User().female().likesMale().withManyInterests().get()
     const femaleForMaleWithSomeInterests = new User().female().likesMale().withSomeInterests().get()
-    const femaleForMaleWithOneInterest = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).get() // eslint-disable-line max-len
-    const femaleForMaleWithTwoInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).get() // eslint-disable-line max-len
-    const femaleForMaleWithThreeInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).get() // eslint-disable-line max-len
-    const femaleForMaleWithFourInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).withInterest(Interests.lopilatoInterest).get() // eslint-disable-line max-len
+    const femaleForMaleWithOneInterest = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).get()
+    const femaleForMaleWithTwoInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).get()
+    const femaleForMaleWithThreeInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).get()
+    const femaleForMaleWithFourInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).withInterest(Interests.lopilatoInterest).get()
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -366,10 +367,6 @@ describe('UserService', () => {
             expect(users[0]).to.have.property('commonInterests')
           })
         })
-      })
-
-      describe('when they have something in common and are in different places', () => {
-        // TODO: Complete this when using the interestsService
       })
     })
 
