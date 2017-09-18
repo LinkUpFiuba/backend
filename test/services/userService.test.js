@@ -1,9 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, it, before, after } from 'mocha'
+import { describe, it, before } from 'mocha'
 import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
-import FirebaseServer from 'firebase-server'
 import { User } from './usersFactory'
 
 chai.use(chaiAsPromised)
@@ -11,7 +10,6 @@ const expect = chai.expect
 
 describe('UserService', () => {
   describe('#getPosibleLinks(uid)', () => {
-    let server
     const maleForFriends = new User().male().likesFriends().get()
     const maleForFriends2 = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
@@ -40,10 +38,6 @@ describe('UserService', () => {
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
     }
-
-    before(() => {
-      server = new FirebaseServer(5000, 'localhost.firebaseio.test', {})
-    })
 
     describe('Search for friends', () => {
       before(() => {
@@ -453,10 +447,6 @@ describe('UserService', () => {
           })
         })
       })
-    })
-
-    after(() => {
-      server.close(console.log('- Firebase server closed -'))
     })
   })
 })

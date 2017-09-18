@@ -11,7 +11,7 @@
     "start": "nodemon src/index.js --exec babel-node",
     "build": "babel src -d dist",
     "serve": "node dist/index.js",
-    "test": "MOCKFIREBASE_DB_URL='ws://localhost.firebaseio.test:5000' mocha --compilers js:babel-register --recursive 'test/*/*.js'",
+    "test": "MOCKFIREBASE_DB_URL='ws://localhost.firebaseio.test:5000' mocha --compilers js:babel-register 'test/config/before.js' 'test/*/*.test.js'; mocha --compilers js:babel-register 'test/config/after.js'",
     "clean": "rm -rf dist"
   },
   "dependencies": {

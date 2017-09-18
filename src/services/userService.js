@@ -3,6 +3,7 @@ import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 import geolib from 'geolib'
+import LinkService from '../../src/services/linkService'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -26,8 +27,8 @@ export default function UserService() {
   const getSexualPosibleMatches = (ref, actualUser, search) => {
     return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
       .then(users => {
-        return getLinks(actualUser).then(links => {
-          return getUnlinks(actualUser).then(unlinks => {
+        return LinkService().getLinks(actualUser).then(links => {
+          return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
@@ -47,35 +48,11 @@ export default function UserService() {
       })
   }
 
-  const getLinks = actualUser => {
-    const linksRef = Database('links')
-    return linksRef.child(actualUser.Uid).once('value')
-      .then(links => {
-        const uidLinks = []
-        links.forEach(child => {
-          uidLinks.push(child.key)
-        })
-        return uidLinks
-      })
-  }
-
-  const getUnlinks = actualUser => {
-    const unlinksRef = Database('unlinks')
-    return unlinksRef.child(actualUser.Uid).once('value')
-      .then(unLinks => {
-        const uidUnLinks = []
-        unLinks.forEach(child => {
-          uidUnLinks.push(child.key)
-        })
-        return uidUnLinks
-      })
-  }
-
   const getFriendPosibleMatches = (ref, actualUser) => {
     return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
-        return getLinks(actualUser).then(links => {
-          return getUnlinks(actualUser).then(unlinks => {
+        return LinkService().getLinks(actualUser).then(links => {
+          return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
