@@ -26,35 +26,71 @@ export default function UserService() {
   const getSexualPosibleMatches = (ref, actualUser, search) => {
     return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
       .then(users => {
-        const usersArray = []
-        users.forEach(queryUser => {
-          const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
-              validateAges(user, actualUser) &&
-              validateDistance(user, actualUser) &&
-              !user.invisibleMode &&
-              search.includes(user.gender)) {
-            usersArray.push(user)
-          }
+        return getLinks(actualUser).then(links => {
+          return getUnlinks(actualUser).then(unlinks => {
+            const usersArray = []
+            users.forEach(queryUser => {
+              const user = queryUser.val()
+              if (queryUser.key !== actualUser.Uid &&
+                validateAges(user, actualUser) &&
+                validateDistance(user, actualUser) &&
+                !unlinks.includes(user.Uid) &&
+                !links.includes(user.Uid) &&
+                !user.invisibleMode &&
+                search.includes(user.gender)) {
+                usersArray.push(user)
+              }
+            })
+            return usersArray
+          })
         })
-        return usersArray
+      })
+  }
+
+  const getLinks = actualUser => {
+    const linksRef = Database('links')
+    return linksRef.child(actualUser.Uid).once('value')
+      .then(links => {
+        const uidLinks = []
+        links.forEach(child => {
+          uidLinks.push(child.key)
+        })
+        return uidLinks
+      })
+  }
+
+  const getUnlinks = actualUser => {
+    const unlinksRef = Database('unlinks')
+    return unlinksRef.child(actualUser.Uid).once('value')
+      .then(unLinks => {
+        const uidUnLinks = []
+        unLinks.forEach(child => {
+          uidUnLinks.push(child.key)
+        })
+        return uidUnLinks
       })
   }
 
   const getFriendPosibleMatches = (ref, actualUser) => {
     return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
-        const usersArray = []
-        users.forEach(queryUser => {
-          const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
-              !user.invisibleMode &&
-              validateDistance(user, actualUser) &&
-              validateAges(user, actualUser)) {
-            usersArray.push(user)
-          }
+        return getLinks(actualUser).then(links => {
+          return getUnlinks(actualUser).then(unlinks => {
+            const usersArray = []
+            users.forEach(queryUser => {
+              const user = queryUser.val()
+              if (queryUser.key !== actualUser.Uid &&
+                !user.invisibleMode &&
+                !unlinks.includes(user.Uid) &&
+                !links.includes(user.Uid) &&
+                validateDistance(user, actualUser) &&
+                validateAges(user, actualUser)) {
+                usersArray.push(user)
+              }
+            })
+            return usersArray
+          })
         })
-        return usersArray
       })
   }
 
