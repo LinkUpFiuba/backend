@@ -44,7 +44,7 @@ export default function UserService() {
       user1.range.maxAge >= user2.age
   }
 
-  const validateExclusion = (user, actualUser, links, unlinks) => (
+  const validateFilters = (user, actualUser, links, unlinks) => (
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
     // or if they already liked or unliked
     user.Uid !== actualUser.Uid &&
@@ -87,7 +87,7 @@ export default function UserService() {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateExclusion(user, actualUser, links, unlinks) && search.includes(user.gender)) {
+              if (validateFilters(user, actualUser, links, unlinks) && search.includes(user.gender)) {
                 usersArray.push(user)
               }
             })
@@ -129,7 +129,7 @@ export default function UserService() {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateExclusion(user, actualUser, links, unlinks)) {
+              if (validateFilters(user, actualUser, links, unlinks)) {
                 usersArray.push(user)
               }
             })
