@@ -521,6 +521,52 @@ describe('UserService', () => {
       })
     })
 
+    describe('Test for response fields', () => {
+      describe('Test for commonInterests field', () => {
+        before(() => {
+          Database('unlinks').set({})
+          Database('links').set({})
+        })
+
+        describe('when they have nothing in common', () => {
+          before(() => {
+            const users = {
+              [maleForFemaleInSomePosition.Uid]: maleForFemaleInSomePosition,
+              [femaleForMaleNearMale.Uid]: femaleForMaleNearMale
+            }
+            const ref = Database('users')
+            ref.set(users)
+          })
+
+          it('commonInterests is empty', () => {
+            return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
+              expect(users.length).to.equal(1)
+              expect(users[0].commonInterests).to.be.an('array').that.is.empty
+            })
+          })
+        })
+
+        describe('when they have one thing in common', () => {
+          before(() => {
+            const users = {
+              [maleForFemaleWithManyInterests.Uid]: maleForFemaleWithManyInterests,
+              [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
+            }
+            const ref = Database('users')
+            ref.set(users)
+          })
+
+          it('commonInterests has one interest', () => {
+            return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
+              expect(users.length).to.equal(1)
+              expect(users[0].commonInterests).to.be.an('array')
+              expect(users[0].commonInterests[0].id).to.be.equal(femaleForMaleWithOneInterest.likesList[0].id)
+            })
+          })
+        })
+      })
+    })
+
     describe('Test for matching algorithm', () => {
       before(() => {
         Database('unlinks').set({})
