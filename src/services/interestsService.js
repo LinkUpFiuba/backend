@@ -9,7 +9,7 @@ export default function InterestsService() {
       const commonInterests = []
       for (const key in interests2) {
         const value = interests2[key]
-        if (interests1[value.id] !== undefined) {
+        if (interests1Dict[value.id] !== undefined) {
           commonInterests.push(value)
         }
       }
