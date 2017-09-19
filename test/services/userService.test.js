@@ -7,7 +7,6 @@ import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from './usersFactory'
 
-
 chai.use(chaiAsPromised)
 const expect = chai.expect
 

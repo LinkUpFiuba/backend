@@ -115,28 +115,6 @@ export default function UserService() {
         })
       })
   }
-
-  const getSearchInterests = actualUser => {
-        const usersArray = []
-        users.forEach(queryUser => {
-          const user = queryUser.val()
-          if (queryUser.key !== actualUser.Uid &&
-              !user.invisibleMode &&
-              validateAges(user, actualUser)) {
-            usersArray.push(user)
-          }
-        })
-        return usersArray
-      })
-  }
-
-  const validateAges = (user1, user2) => {
-    return user2.range.minAge <= user1.age &&
-      user1.range.minAge <= user2.age &&
-      user2.range.maxAge >= user1.age &&
-      user1.range.maxAge >= user2.age
-  }
-
   function getSearchInterests(actualUser) {
     const search = []
     if (actualUser.val().interests.male) {
