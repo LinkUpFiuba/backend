@@ -34,7 +34,7 @@ describe('LinkService', () => {
       })
     })
 
-    describe('when the user has more then one unlink', () => {
+    describe('when the user has more than one unlink', () => {
       before(() => {
         const unlinks = {
           [maleForFriends.Uid]: {
