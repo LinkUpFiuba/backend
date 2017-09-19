@@ -116,7 +116,7 @@ export default function UserService() {
       })
   }
 
-  const getSearchInterests = actualUser => {
+  function getSearchInterests(actualUser) {
     const search = []
     if (actualUser.val().interests.male) {
       search.push(MALE)
