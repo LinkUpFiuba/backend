@@ -1,3 +1,4 @@
+
 /* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -5,6 +6,7 @@ import { describe, it, before } from 'mocha'
 import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from './usersFactory'
+
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
