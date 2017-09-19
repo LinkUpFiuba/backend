@@ -3,6 +3,7 @@ import Validator from 'jsonschema'
 import userSchema from './schemas/userSchema'
 import Promise from 'bluebird'
 import geolib from 'geolib'
+import LinkService from './linkService'
 import InterestsService from './interestsService'
 
 export default function UserService() {
@@ -82,8 +83,8 @@ export default function UserService() {
   const getSexualPosibleMatches = (ref, actualUser, search) => {
     return ref.orderByChild(`interests/${actualUser.gender}`).equalTo(true).once('value')
       .then(users => {
-        return getLinks(actualUser).then(links => {
-          return getUnlinks(actualUser).then(unlinks => {
+        return LinkService().getLinks(actualUser).then(links => {
+          return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
@@ -97,35 +98,11 @@ export default function UserService() {
       })
   }
 
-  const getLinks = actualUser => {
-    const linksRef = Database('links')
-    return linksRef.child(actualUser.Uid).once('value')
-      .then(links => {
-        const uidLinks = []
-        links.forEach(child => {
-          uidLinks.push(child.key)
-        })
-        return uidLinks
-      })
-  }
-
-  const getUnlinks = actualUser => {
-    const unlinksRef = Database('unlinks')
-    return unlinksRef.child(actualUser.Uid).once('value')
-      .then(unLinks => {
-        const uidUnLinks = []
-        unLinks.forEach(child => {
-          uidUnLinks.push(child.key)
-        })
-        return uidUnLinks
-      })
-  }
-
   const getFriendPosibleMatches = (ref, actualUser) => {
     return ref.orderByChild(`interests/${FRIENDS}`).equalTo(true).once('value')
       .then(users => {
-        return getLinks(actualUser).then(links => {
-          return getUnlinks(actualUser).then(unlinks => {
+        return LinkService().getLinks(actualUser).then(links => {
+          return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
@@ -174,6 +151,7 @@ export default function UserService() {
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
       let actualUser
+      let userSearch
       // Busca usuario actual
       return ref.child(actualUserUid).once('value')
         .then(user => {
@@ -181,8 +159,19 @@ export default function UserService() {
           return getSearchInterests(user)
         })
         .then(search => {
+          userSearch = search
           if (!search.includes(FRIENDS)) {
             return getSexualPosibleMatches(ref, actualUser, search)
+          }
+          return getFriendPosibleMatches(ref, actualUser)
+        })
+        .then(users => {
+          if (users.length > 0) {
+            return users
+          }
+          LinkService().deleteUnlinks(actualUser)
+          if (!userSearch.includes(FRIENDS)) {
+            return getSexualPosibleMatches(ref, actualUser, userSearch)
           }
           return getFriendPosibleMatches(ref, actualUser)
         })

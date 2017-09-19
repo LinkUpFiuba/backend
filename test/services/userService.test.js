@@ -1,10 +1,9 @@
 /* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, it, before, after } from 'mocha'
+import { describe, it, before } from 'mocha'
 import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
-import FirebaseServer from 'firebase-server'
 import { User, Interests } from './usersFactory'
 
 chai.use(chaiAsPromised)
@@ -12,10 +11,10 @@ const expect = chai.expect
 
 describe('UserService', () => {
   describe('#getPosibleLinks(uid)', () => {
-    let server
     const maleForFriends = new User().male().likesFriends().get()
     const maleForFriends2 = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
+    const femaleForFriends2 = new User().female().likesFriends().get()
 
     const maleForFemale = new User().male().likesFemale().get()
     const femaleForMale = new User().female().likesMale().get()
@@ -58,10 +57,6 @@ describe('UserService', () => {
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
     }
-
-    before(() => {
-      server = new FirebaseServer(5000, 'localhost.firebaseio.test', {})
-    })
 
     describe('Search for friends', () => {
       before(() => {
@@ -305,7 +300,8 @@ describe('UserService', () => {
         before(() => {
           const users = {
             [maleForFriends.Uid]: maleForFriends,
-            [femaleForFriends.Uid]: femaleForFriends
+            [femaleForFriends.Uid]: femaleForFriends,
+            [femaleForFriends2.Uid]: femaleForFriends2
           }
           const unlinks = {
             [maleForFriends.Uid]: {
@@ -321,7 +317,8 @@ describe('UserService', () => {
 
         it('Male for friends does not find female for friends because they have already unliked', () => {
           return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
-            expect(users.length).to.equal(0)
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, femaleForFriends2)).to.be.true
           })
         })
       })
@@ -351,14 +348,41 @@ describe('UserService', () => {
             expect(searchForUser(users, maleForFriends2)).to.be.true
           })
         })
+
+        describe('when they have already unliked', () => {
+          before(() => {
+            const users = {
+              [maleForFriends.Uid]: maleForFriends,
+              [femaleForFriends.Uid]: femaleForFriends
+            }
+            const unlinks = {
+              [maleForFriends.Uid]: {
+                [femaleForFriends.Uid]: true
+              },
+              [femaleForFriends.Uid]: {
+                [maleForFriends.Uid]: true
+              }
+            }
+            Database('users').set(users)
+            Database('unlinks').set(unlinks)
+          })
+
+          it('Male for friends finds female for friends because the unlikes were deleted because there were no more users to show', () => {
+            return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+              expect(users.length).to.equal(1)
+              expect(searchForUser(users, femaleForFriends)).to.be.true
+            })
+          })
+        })
       })
 
-      describe('when they have all unliked with each other', () => {
+      describe('when they have all unliked with each other (and there is a new one)', () => {
         before(() => {
           const users = {
             [maleForFriends.Uid]: maleForFriends,
             [femaleForFriends.Uid]: femaleForFriends,
-            [maleForFriends2.Uid]: maleForFriends2
+            [maleForFriends2.Uid]: maleForFriends2,
+            [femaleForFriends2.Uid]: femaleForFriends2
           }
           const unlinks = {
             [maleForFriends.Uid]: {
@@ -378,9 +402,10 @@ describe('UserService', () => {
           Database('unlinks').set(unlinks)
         })
 
-        it('Male for friends does find nobody', () => {
+        it('Male for friends does find only the new one', () => {
           return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
-            expect(users.length).to.equal(0)
+            expect(users.length).to.equal(1)
+            expect(searchForUser(users, femaleForFriends2)).to.be.true
           })
         })
       })
@@ -592,10 +617,6 @@ describe('UserService', () => {
           })
         })
       })
-    })
-
-    after(() => {
-      server.close(console.log('- Firebase server closed -'))
     })
   })
 })
