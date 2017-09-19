@@ -57,8 +57,8 @@ export default function UserService() {
   )
 
   const calculateMatchingScore = (user, actualUser) => {
-    const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList).length
-    // We include the amount of common interests in the user in order to show it in the frontend
+    const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
+    // We include  common interests in the user in order to show it in the frontend
     user.commonInterests = commonInterests
     // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
     // a 1/x function, so that less distance goes with a better score. All the constants are given to have
@@ -67,7 +67,7 @@ export default function UserService() {
     // After that, we weight the scores with a defined value.
     // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
     const distanceScore = (A / ((user.distance / B) + C)) + D
-    const interestsScore = Math.min(commonInterests * 10, 100)
+    const interestsScore = Math.min(commonInterests.length * 10, 100)
     return DISTANCE_WEIGHT * distanceScore + INTERESTS_WEIGHT * interestsScore
   }
 
