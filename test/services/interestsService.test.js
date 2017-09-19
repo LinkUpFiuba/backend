@@ -1,7 +1,6 @@
-/* eslint-disable no-undef,no-unused-expressions */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, it } from 'mocha'
+import { describe, before, it } from 'mocha'
 import { Interest } from './interestsFactory'
 import InterestsService from '../../src/services/interestsService'
 
@@ -19,6 +18,7 @@ describe('interestsService', () => {
       bocaInterest = new Interest('boca').get()
       adminInterest = new Interest('admin').get()
     })
+
     describe('when do not have any interests in common', () => {
       let interests1
       let interests2

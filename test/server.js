@@ -1,15 +1,15 @@
 import FirebaseServer from 'firebase-server'
 
-export class Server {
+export class TestServer {
   static server = undefined
 
   constructor() {
-    if (Server.server === undefined) {
-      Server.server = new FirebaseServer(5000, 'localhost.firebaseio.test', {})
+    if (TestServer.server === undefined) {
+      TestServer.server = new FirebaseServer(5000, 'localhost.firebaseio.test', {})
     }
   }
 
   get = () => {
-    return Server.server
+    return TestServer.server
   }
 }

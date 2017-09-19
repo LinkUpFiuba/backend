@@ -1,4 +1,4 @@
-import { Server } from '../server'
+import { TestServer } from '../server'
 
-const server = new Server().get()
+const server = new TestServer().get()
 server.close(console.log('Server closed'))

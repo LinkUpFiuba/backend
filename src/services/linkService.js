@@ -26,9 +26,9 @@ export default function LinkService() {
         })
     },
 
-    deleteUnlinks: user => {
+    deleteUnlinks: actualUser => {
       const unlinksRef = Database('unlinks')
-      return unlinksRef.child(user.Uid).remove()
+      return unlinksRef.child(actualUser.Uid).remove()
     }
   }
 }

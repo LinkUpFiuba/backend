@@ -1,3 +1,3 @@
-import { Server } from '../server'
+import { TestServer } from '../server'
 
-new Server().get()
+new TestServer().get()

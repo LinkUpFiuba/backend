@@ -14,7 +14,7 @@ describe('LinkService', () => {
     const maleForFriends2 = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
 
-    describe('when there the user has one unlink', () => {
+    describe('when the user has one unlink', () => {
       before(() => {
         const unlinks = {
           [maleForFriends.Uid]: {
@@ -34,7 +34,7 @@ describe('LinkService', () => {
       })
     })
 
-    describe('when there the user has more then one unlink', () => {
+    describe('when the user has more then one unlink', () => {
       before(() => {
         const unlinks = {
           [maleForFriends.Uid]: {
@@ -55,7 +55,7 @@ describe('LinkService', () => {
       })
     })
 
-    describe('when there the user has not any unlink', () => {
+    describe('when the user has not any unlink', () => {
       before(() => {
         const unlinks = {
           [maleForFriends.Uid]: {
@@ -65,7 +65,7 @@ describe('LinkService', () => {
         ref.set(unlinks)
       })
 
-      it('Delete two unlinks', () => {
+      it('Deletes nothing', () => {
         return LinkService().deleteUnlinks(maleForFriends).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
@@ -74,7 +74,7 @@ describe('LinkService', () => {
       })
     })
 
-    describe('when there the user has never put any unlink', () => {
+    describe('when the user has never put any unlink', () => {
       before(() => {
         const unlinks = {
         }
@@ -82,7 +82,7 @@ describe('LinkService', () => {
         ref.set(unlinks)
       })
 
-      it('Delete two unlinks', () => {
+      it('Deletes nothing', () => {
         return LinkService().deleteUnlinks(maleForFriends).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
