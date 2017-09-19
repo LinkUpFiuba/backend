@@ -115,7 +115,6 @@ export default function UserService() {
         })
       })
   }
-
   function getSearchInterests(actualUser) {
     const search = []
     if (actualUser.val().interests.male) {
