@@ -34,13 +34,6 @@ export default function LinkService() {
     detectLinks: () => {
       console.log('Starting to detect links')
       const linksRef = Database('links')
-      // linksRef.on('child_changed', userSnapshot => {
-      //   console.log(userSnapshot.key, userSnapshot.val())
-      //   console.log(userSnapshot.toJSON())
-      //   userSnapshot.on('child_added', itemSnapshot => {
-      //     console.log(`${itemSnapshot.val()}`)
-      //   })
-      // })
 
       // This works if we put a timestamp instead of a true for the links table
       linksRef.on('child_changed', link => {
@@ -52,6 +45,8 @@ export default function LinkService() {
         // esto no funcionaria porque solo "atenderia" a la ultima. Si en cambio los eventos se "encolan"
         // haciendo que entren 2 eventos distintos con los cambios en la base hasta ese momento, esto si funca
         // De todas formas, sigo investigando a ver si hay algo mejor para hacer.
+        // Otra forma de solucionar esto, es tener un valor dentro de cada user que indique el ultimo
+        // timestamp que proceso, y filtrar los timestamps mayores a este para procesar (y actualizarlo)
         // Order them by timestamp
         likedUsers = Object.keys(likedUsers).sort((a, b) => likedUsers[b] - likedUsers[a])
         console.log(`\tLiked user: ${likedUsers[0]}`)
