@@ -42,13 +42,19 @@ export default function LinkService() {
       //   })
       // })
 
-      // Esto funciona, pero no se puede determinar cual fue el usuario al cual likeo (trae todos ¯\_(ツ)_/¯)
+      // This works if we put a timestamp instead of a true for the links table
       linksRef.on('child_changed', link => {
         console.log('A child has changed!')
         console.log(`Liking user: ${link.key}`)
-        link.forEach(child => {
-          console.log(`\tPossible liked user: ${child.key}`)
-        })
+        let likedUsers = link.val()
+        // El problema que le veo a esto es que no se como se maneja firebase si entran varios changes.
+        // O sea, si es posible que en el child_changed se genere cuando cambiaron 2 cosas casi simultaneas,
+        // esto no funcionaria porque solo "atenderia" a la ultima. Si en cambio los eventos se "encolan"
+        // haciendo que entren 2 eventos distintos con los cambios en la base hasta ese momento, esto si funca
+        // De todas formas, sigo investigando a ver si hay algo mejor para hacer.
+        // Order them by timestamp
+        likedUsers = Object.keys(likedUsers).sort((a, b) => likedUsers[b] - likedUsers[a])
+        console.log(`\tLiked user: ${likedUsers[0]}`)
       })
 
       // Listen to users that has never made a link, so the first time they will create their key in the db
@@ -63,6 +69,7 @@ export default function LinkService() {
         })
       })
       // This is in order not to trigger events when the server starts
+      // See: https://stackoverflow.com/questions/18270995/how-to-retrieve-only-new-data
       linksRef.once('value', () => {
         newItems = true
       })
