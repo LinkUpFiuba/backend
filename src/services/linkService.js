@@ -51,14 +51,20 @@ export default function LinkService() {
         })
       })
 
-      // No se por que esto se ejecuta cuando arranca el server tambien, pero mas alla de eso, funca
+      // Listen to users that has never made a link, so the first time they will create their key in the db
+      let newItems = false
       linksRef.on('child_added', link => {
+        if (!newItems) return
         console.log('A child has been added!')
         console.log(`Liking user: ${link.key}`)
         // Although we know there should be only one user here, we must do a forEach
         link.forEach(child => {
           console.log(`\tLiked user: ${child.key}`)
         })
+      })
+      // This is in order not to trigger events when the server starts
+      linksRef.once('value', () => {
+        newItems = true
       })
     }
   }
