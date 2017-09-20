@@ -54,7 +54,8 @@ app.post('/getToken', (request, response) => {
     .catch(error => response.json({ error: error }))
 })
 
-LinkService().detectLinks()
+// LinkService().detectLinks()
+LinkService().detectLinks2()
 
 app.listen(app.get('port'), () => {
   console.log(`Node app is running on port ${port}`)

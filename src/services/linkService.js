@@ -57,7 +57,8 @@ export default function LinkService() {
         linkedUsers = Object.keys(linkedUsers).sort((a, b) => linkedUsers[b] - linkedUsers[a])
         const linkedUser = linkedUsers[0]
         console.log(`\tLinked user: ${linkedUser}`)
-        console.log(`\tIs there a match? ${checkLink(linkingUser, linkedUser).then(value => console.log(value))}`)
+        checkLink(linkingUser, linkedUser)
+          .then(newMatch => console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`))
       })
 
       // Listen to users that has never made a link, so the first time they will create their key in the db
@@ -73,12 +74,40 @@ export default function LinkService() {
           linkedUser = child.key
           console.log(`\tLiked user: ${linkedUser}`)
         })
-        console.log(`\tIs there a match? ${checkLink(linkingUser, linkedUser).then(value => console.log(value))}`)
+        checkLink(linkingUser, linkedUser)
+          .then(newMatch => console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`))
       })
       // This is in order not to trigger events when the server starts
       // See: https://stackoverflow.com/questions/18270995/how-to-retrieve-only-new-data
       linksRef.once('value', () => {
         newItems = true
+      })
+    },
+
+    detectLinks2: () => {
+      console.log('Starting to detect links2')
+      const possibleMatchesRef = Database('possibleMatches')
+
+      possibleMatchesRef.on('child_added', possibleMatch => {
+        console.log('A child has been added!')
+        const linkingUser = possibleMatch.child('linkingUser').val()
+        console.log(`\tLinking user: ${linkingUser}`)
+        const linkedUser = possibleMatch.child('linkedUser').val()
+        console.log(`\tLinked user: ${linkedUser}`)
+        checkLink(linkingUser, linkedUser)
+          .then(newMatch => {
+            if (newMatch) {
+              const matchesRef = Database('matches')
+              matchesRef.child(`${linkedUser}/${linkingUser}`)
+            }
+            console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
+          })
+          .then(() => {
+            possibleMatchesRef.child(possibleMatch.key).remove()
+          })
+          .then(() => {
+            console.log('Possible match removed!')
+          })
       })
     }
   }
