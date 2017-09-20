@@ -6,6 +6,21 @@ export default function LinkService() {
     return linksRef.child(`${linkedUser}/${linkingUser}`).once('value').then(snapshot => snapshot.exists())
   }
 
+  const checkLink2 = (linkingUser, linkedUser) => {
+    const linksRef = Database('links')
+    return linksRef.child(`${linkedUser}/${linkingUser}`).once('value')
+      .then(snapshot => {
+        const newMatch = snapshot.exists()
+        console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
+        if (newMatch) {
+          const matchesRef = Database('matches')
+          matchesRef.child(`${linkedUser}/${linkingUser}`).set({ read: false }).then(() => {
+            return matchesRef.child(`${linkingUser}/${linkedUser}`).set({ read: false })
+          })
+        }
+      })
+  }
+
   return {
     getLinks: actualUser => {
       const linksRef = Database('links')
@@ -94,14 +109,7 @@ export default function LinkService() {
         console.log(`\tLinking user: ${linkingUser}`)
         const linkedUser = possibleMatch.child('linkedUser').val()
         console.log(`\tLinked user: ${linkedUser}`)
-        checkLink(linkingUser, linkedUser)
-          .then(newMatch => {
-            if (newMatch) {
-              const matchesRef = Database('matches')
-              matchesRef.child(`${linkedUser}/${linkingUser}`)
-            }
-            console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
-          })
+        checkLink2(linkingUser, linkedUser)
           .then(() => {
             possibleMatchesRef.child(possibleMatch.key).remove()
           })
