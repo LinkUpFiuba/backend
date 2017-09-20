@@ -14,8 +14,13 @@ export default function LinkService() {
         console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
         if (newMatch) {
           const matchesRef = Database('matches')
-          matchesRef.child(`${linkedUser}/${linkingUser}`).set({ read: false }).then(() => {
-            return matchesRef.child(`${linkingUser}/${linkedUser}`).set({ read: false })
+          const matchesToCreate = {}
+          matchesToCreate[`${linkedUser}/${linkingUser}/read`] = false
+          matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
+          return matchesRef.update(matchesToCreate).then(() => {
+            console.log('\tMatch successfully created!')
+          }).catch(() => {
+            console.log('\tMatch could not be created :(')
           })
         }
       })
@@ -110,9 +115,7 @@ export default function LinkService() {
         const linkedUser = possibleMatch.child('linkedUser').val()
         console.log(`\tLinked user: ${linkedUser}`)
         checkLink2(linkingUser, linkedUser)
-          .then(() => {
-            possibleMatchesRef.child(possibleMatch.key).remove()
-          })
+          .then(() => possibleMatchesRef.child(possibleMatch.key).remove())
           .then(() => {
             console.log('Possible match removed!')
           })
