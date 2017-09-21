@@ -16,7 +16,7 @@ export default function LinkService() {
           matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
           return matchesRef.update(matchesToCreate).then(() => {
             console.log('\tMatch successfully created!')
-            PushNotificationService().sendMatchPush()
+            return PushNotificationService().sendMatchPush(linkingUser, linkedUser)
           }).catch(() => {
             console.log('\tMatch could not be created :(')
           })
