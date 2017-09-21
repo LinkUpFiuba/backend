@@ -132,16 +132,6 @@ describe('LinkService', () => {
         })
       })
 
-      // This test is only to ensure that the each time the possible match is created. Maybe it could be removed
-      it('the possible match is already created', () => {
-        const possibleMatchesRef = Database('possibleMatches')
-
-        return possibleMatchesRef.once('value').then(possibleMatches => {
-          expect(possibleMatches.exists()).to.be.true
-          expect(possibleMatches.val()).not.to.be.null
-        })
-      })
-
       // This test should be also use when both users have linked
       it('removes the possible match', () => {
         const possibleMatchesRef = Database('possibleMatches')
