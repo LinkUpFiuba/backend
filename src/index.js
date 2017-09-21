@@ -54,7 +54,6 @@ app.post('/getToken', (request, response) => {
     .catch(error => response.json({ error: error }))
 })
 
-// LinkService().detectLinks()
 LinkService().detectLinks()
 
 app.listen(app.get('port'), () => {
