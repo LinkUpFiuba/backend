@@ -22,6 +22,20 @@ export default function LinkService() {
       })
   }
 
+  const onChildAdded = possibleMatch => {
+    const possibleMatchesRef = Database('possibleMatches')
+    console.log('A possible match was detected!')
+    const linkingUser = possibleMatch.child('linkingUser').val()
+    console.log(`\tLinking user: ${linkingUser}`)
+    const linkedUser = possibleMatch.child('linkedUser').val()
+    console.log(`\tLinked user: ${linkedUser}`)
+    return checkLink(linkingUser, linkedUser)
+      .then(() => possibleMatchesRef.child(possibleMatch.key).remove())
+      .then(() => {
+        console.log('Possible match removed!')
+      })
+  }
+
   return {
     getLinks: actualUser => {
       const linksRef = Database('links')
@@ -57,16 +71,7 @@ export default function LinkService() {
       const possibleMatchesRef = Database('possibleMatches')
 
       possibleMatchesRef.on('child_added', possibleMatch => {
-        console.log('A possible match was detected!')
-        const linkingUser = possibleMatch.child('linkingUser').val()
-        console.log(`\tLinking user: ${linkingUser}`)
-        const linkedUser = possibleMatch.child('linkedUser').val()
-        console.log(`\tLinked user: ${linkedUser}`)
-        checkLink(linkingUser, linkedUser)
-          .then(() => possibleMatchesRef.child(possibleMatch.key).remove())
-          .then(() => {
-            console.log('Possible match removed!')
-          })
+        onChildAdded(possibleMatch)
       })
     }
   }
