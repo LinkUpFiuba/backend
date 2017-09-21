@@ -132,7 +132,6 @@ describe('LinkService', () => {
         })
       })
 
-      // This test should be also use when both users have linked
       it('removes the possible match', () => {
         const possibleMatchesRef = Database('possibleMatches')
 
