@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, it, before } from 'mocha'
+import { describe, it, before, beforeEach } from 'mocha'
 import LinkService from '../../src/services/linkService'
 import { User } from './usersFactory'
 import Database from '../../src/services/gateway/database'
@@ -92,7 +92,7 @@ describe('LinkService', () => {
     })
   })
 
-  describe('#detectLinks()', () => {
+  describe('#onChildAdded()', () => {
     const user1 = new User().get()
     const user2 = new User().get()
 
@@ -107,7 +107,7 @@ describe('LinkService', () => {
         linksRef.set(links)
       })
 
-      it('does not create the match', () => {
+      beforeEach(() => {
         const possibleMatch = {
           aUniqueId: {
             linkingUser: user1.Uid,
@@ -115,51 +115,46 @@ describe('LinkService', () => {
           }
         }
         const possibleMatchesRef = Database('possibleMatches')
-        const matchesRef = Database('matches')
         possibleMatchesRef.set(possibleMatch)
-        return matchesRef.child(`aUniqueId/${user1.Uid}`).once('value').then(match => {
-          expect(match.exists()).to.be.false
-          expect(match.val()).to.be.null
+      })
+
+      it('does not create the match', () => {
+        const possibleMatchesRef = Database('possibleMatches')
+
+        return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
+          return LinkService().onChildAdded(possibleMatch).then(() => {
+            const matchesRef = Database('matches')
+            return matchesRef.child(`${user1.Uid}/${user2.Uid}`).once('value').then(match => {
+              expect(match.exists()).to.be.false
+              expect(match.val()).to.be.null
+            })
+          })
         })
       })
 
-      // // This test should be also use when both users have linked
-      // it('removes the possible match', () => {
-      //   const possibleMatch = {
-      //     aUniqueId: {
-      //       linkingUser: user1.Uid,
-      //       linkedUser: user2.Uid
-      //     }
-      //   }
-      //   const possibleMatchesRef = Database('possibleMatches')
-      //   possibleMatchesRef.set(possibleMatch)
-      //   //   .then(() => {
-      //   //     return possibleMatchesRef.once('child_removed').then(possibleMatch => {
-      //   //       console.log('Child removed!')
-      //   //       expect(true).to.be.false
-      //   //       // expect(possibleMatch.key).to.equal('aUniqueId')
-      //   //     })
-      //   //   })
-      //
-      //   // Not working
-      //   // return possibleMatchesRef.once('child_removed').then(possibleMatch => {
-      //   //   console.log('Child removed!')
-      //   //   expect(possibleMatch.key).to.equal('aUniqueId')
-      //   // })
-      //
-      //   // Not working
-      //   // return setTimeout(() => {
-      //   //   console.log('In timeout')
-      //   //   return possibleMatchesRef.once('value').then(possibleMatches => {
-      //   //     expect(possibleMatches.val()).to.be.null
-      //   //   })
-      //   // }, 5000)
-      //
-      //   // Working but needs to wait until it's removed to pass the expect
-      //   // return possibleMatchesRef.once('value').then(possibleMatches => {
-      //   //   expect(possibleMatches.val()).to.be.null
-      //   // })
-      // })
+      // This test is only to ensure that the each time the possible match is created. Maybe it could be removed
+      it('the possible match is already created', () => {
+        const possibleMatchesRef = Database('possibleMatches')
+
+        return possibleMatchesRef.once('value').then(possibleMatches => {
+          expect(possibleMatches.exists()).to.be.true
+          expect(possibleMatches.val()).not.to.be.null
+        })
+      })
+
+      // This test should be also use when both users have linked
+      it('removes the possible match', () => {
+        const possibleMatchesRef = Database('possibleMatches')
+
+        return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
+          return LinkService().onChildAdded(possibleMatch).then(() => {
+            return possibleMatchesRef.once('value').then(possibleMatches => {
+              expect(possibleMatches.exists()).to.be.false
+              expect(possibleMatches.val()).to.be.null
+            })
+          })
+        })
+      })
     })
 
     describe('when both users have linked each other', () => {
@@ -176,21 +171,44 @@ describe('LinkService', () => {
         linksRef.set(links)
       })
 
-      // it('creates the match', () => {
-      //   const possibleMatch = {
-      //     aUniqueId: {
-      //       linkingUser: user1.Uid,
-      //       linkedUser: user2.Uid
-      //     }
-      //   }
-      //   const possibleMatchesRef = Database('possibleMatches')
-      //   const matchesRef = Database('matches')
-      //   return possibleMatchesRef.set(possibleMatch).then(() => {
-      //     return matchesRef.once('child_added').then(matches => {
-      //       expect(matches.val()).not.to.be.null
-      //     })
-      //   })
-      // })
+      beforeEach(() => {
+        const possibleMatch = {
+          aUniqueId: {
+            linkingUser: user1.Uid,
+            linkedUser: user2.Uid
+          }
+        }
+        const possibleMatchesRef = Database('possibleMatches')
+        possibleMatchesRef.set(possibleMatch)
+      })
+
+      it('creates the match', () => {
+        const possibleMatchesRef = Database('possibleMatches')
+
+        return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
+          return LinkService().onChildAdded(possibleMatch).then(() => {
+            const matchesRef = Database('matches')
+            return matchesRef.child(`${user1.Uid}/${user2.Uid}`).once('value').then(match => {
+              expect(match.exists()).to.be.true
+              expect(match.val()).not.to.be.null
+              expect(match.val().read).to.be.false
+            })
+          })
+        })
+      })
+
+      it('removes the possible match', () => {
+        const possibleMatchesRef = Database('possibleMatches')
+
+        return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
+          return LinkService().onChildAdded(possibleMatch).then(() => {
+            return possibleMatchesRef.once('value').then(possibleMatches => {
+              expect(possibleMatches.exists()).to.be.false
+              expect(possibleMatches.val()).to.be.null
+            })
+          })
+        })
+      })
     })
   })
 })

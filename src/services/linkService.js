@@ -66,6 +66,11 @@ export default function LinkService() {
       return unlinksRef.child(actualUser.Uid).remove()
     },
 
+    // This is just for test purposes
+    onChildAdded: possibleMatch => {
+      return onChildAdded(possibleMatch)
+    },
+
     detectLinks: () => {
       console.log('Starting to detect links')
       const possibleMatchesRef = Database('possibleMatches')
