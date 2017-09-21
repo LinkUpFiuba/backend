@@ -55,7 +55,7 @@ app.post('/getToken', (request, response) => {
 })
 
 // LinkService().detectLinks()
-LinkService().detectLinks2()
+LinkService().detectLinks()
 
 app.listen(app.get('port'), () => {
   console.log(`Node app is running on port ${port}`)
