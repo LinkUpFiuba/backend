@@ -5,10 +5,10 @@ export default function LinkService() {
     const linksRef = Database('links')
     return linksRef.child(`${linkedUser}/${linkingUser}`).once('value')
       .then(snapshot => {
-        const newMatch = snapshot.exists()
+        const isNewMatch = snapshot.exists()
         // Create push notification!
-        console.log(`${newMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
-        if (newMatch) {
+        console.log(`${isNewMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
+        if (isNewMatch) {
           const matchesRef = Database('matches')
           const matchesToCreate = {}
           matchesToCreate[`${linkedUser}/${linkingUser}/read`] = false
