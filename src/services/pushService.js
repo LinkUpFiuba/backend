@@ -13,7 +13,7 @@ export const PushNotificationService = () => {
     const payload = {
       notification: {
         title: 'Nuevo link!',
-        body: `${user2.name} también quiere linkear con vos! Chateale! 😉`,
+        body: `${user2.name} también quiere linkear con vos! Sé el primero en iniciar la conversación! 😉`,
         clickAction: 'com.google.firebase.MESSAGING_EVENT'
       },
       data: {
@@ -32,14 +32,13 @@ export const PushNotificationService = () => {
 
   return {
     sendMatchPush: (user1, user2) => {
-      let userOne
-      let userTwo
+      let firstUser
       return getUser(user1).then(user => {
-        userOne = user
-        return getUser(user2).then(user => {
-          userTwo = user
-          return sendMatchPush(userOne, userTwo).then(() => {
-            return sendMatchPush(userTwo, userOne)
+        firstUser = user
+        return getUser(user2).then(secondUser => {
+          // Here we send the match push notification personalized for each user
+          return sendMatchPush(firstUser, secondUser).then(() => {
+            return sendMatchPush(secondUser, firstUser)
           })
         })
       })
