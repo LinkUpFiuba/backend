@@ -22,12 +22,16 @@ export const PushNotificationService = () => {
       }
     }
     return Messaging().sendToDevice(user1.tokenFCM, payload)
-      .then(response => {
-        console.log(`Successfully sent message to user ${user1.Uid}:`, response)
-      })
-      .catch(error => {
-        console.log(`Error sending message to user ${user1.Uid}:`, error)
-      })
+  }
+
+  const onError = (user, error) => {
+    console.log(`Error sending message to user ${user.Uid}:`, error)
+    return error
+  }
+
+  const onSuccess = (user, response) => {
+    console.log(`Successfully sent message to user ${user.Uid}:`, response)
+    return response
   }
 
   return {
@@ -37,9 +41,20 @@ export const PushNotificationService = () => {
         firstUser = user
         return getUser(user2).then(secondUser => {
           // Here we send the match push notification personalized for each user
-          return sendMatchPush(firstUser, secondUser).then(() => {
-            return sendMatchPush(secondUser, firstUser)
-          })
+          return sendMatchPush(firstUser, secondUser)
+            .then(response => {
+              onSuccess(firstUser, response)
+              return sendMatchPush(secondUser, firstUser)
+                .then(response => {
+                  return onSuccess(secondUser, response)
+                })
+                .catch(error => {
+                  return onError(secondUser, error)
+                })
+            })
+            .catch(error => {
+              return onError(firstUser, error)
+            })
         })
       })
     }

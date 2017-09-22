@@ -23,7 +23,7 @@
     "no-await-in-loop": "error",
     "no-console": "warn",
     "no-sync": "error",
-    "no-unused-vars": ["error", { "ignoreRestSiblings" : true }],
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }],
     "no-var": "error",
     "object-curly-spacing": ["error", "always"],
     "prefer-const": "error",
