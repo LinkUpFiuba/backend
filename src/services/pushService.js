@@ -13,7 +13,8 @@ export const PushNotificationService = () => {
     const payload = {
       notification: {
         title: 'Nuevo link!',
-        body: `${user2.name} también quiere linkear con vos! Chateale! 😉`
+        body: `${user2.name} también quiere linkear con vos! Chateale! 😉`,
+        clickAction: 'com.google.firebase.MESSAGING_EVENT'
       },
       data: {
         name: user2.name,
