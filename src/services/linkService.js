@@ -1,5 +1,5 @@
 import Database from './gateway/database'
-import { PushNotificationService } from './pushService'
+import { PushNotificationService } from './pushNotificationService'
 
 export default function LinkService() {
   const checkLink = (linkingUser, linkedUser) => {
