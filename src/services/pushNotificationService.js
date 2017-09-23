@@ -17,6 +17,7 @@ export const PushNotificationService = () => {
         clickAction: 'com.google.firebase.MESSAGING_EVENT'
       },
       data: {
+        Uid: user2.Uid,
         name: user2.name,
         photo: user2.photoUrl
       }
