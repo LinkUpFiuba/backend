@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
 import LinkService from './services/linkService'
+import { ChatService } from './services/chatService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -56,6 +57,7 @@ app.post('/getToken', (request, response) => {
 
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
+  ChatService().detectNewMessages()
 }
 
 app.listen(app.get('port'), () => {

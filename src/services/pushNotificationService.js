@@ -25,6 +25,17 @@ export const PushNotificationService = () => {
     return Messaging().sendToDevice(user1.tokenFCM, payload)
   }
 
+  const sendNewMessagePush = (user1, user2, message) => {
+    const payload = {
+      notification: {
+        title: user2.name,
+        body: message.message
+        // clickAction: 'com.google.firebase.MESSAGING_EVENT'
+      }
+    }
+    return Messaging().sendToDevice(user1.tokenFCM, payload)
+  }
+
   const onError = (user, error) => {
     console.log(`Error sending message to user ${user.Uid}:`, error)
     return error
@@ -52,6 +63,22 @@ export const PushNotificationService = () => {
                 .catch(error => {
                   return onError(secondUser, error)
                 })
+            })
+            .catch(error => {
+              return onError(firstUser, error)
+            })
+        })
+      })
+    },
+    sendNewMessagePush: (user1, user2, message) => {
+      let firstUser
+      return getUser(user1).then(user => {
+        firstUser = user
+        return getUser(user2).then(secondUser => {
+          // Here we send the new message push notification to the user who didn't send the message
+          return sendNewMessagePush(firstUser, secondUser, message)
+            .then(response => {
+              return onSuccess(firstUser, response)
             })
             .catch(error => {
               return onError(firstUser, error)
