@@ -58,7 +58,9 @@ app.post('/getToken', (request, response) => {
     .catch(error => response.json({ error: error }))
 })
 
-LinkService().detectLinks()
+if (process.env.ENVIRONMENT === 'production') {
+  LinkService().detectLinks()
+}
 
 app.listen(app.get('port'), () => {
   console.log(`Node app is running on port ${port}`)

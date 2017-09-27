@@ -1,4 +1,5 @@
 import Database from './gateway/database'
+import { PushNotificationService } from './pushNotificationService'
 
 export default function LinkService() {
   const checkLink = (linkingUser, linkedUser) => {
@@ -15,6 +16,7 @@ export default function LinkService() {
           matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
           return matchesRef.update(matchesToCreate).then(() => {
             console.log('\tMatch successfully created!')
+            return PushNotificationService().sendMatchPush(linkingUser, linkedUser)
           }).catch(() => {
             console.log('\tMatch could not be created :(')
           })
