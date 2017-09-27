@@ -4,6 +4,7 @@ import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
 import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
+import LinkService from './services/linkService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -52,6 +53,10 @@ app.post('/getToken', (request, response) => {
     .then(user => response.json({ user: user }))
     .catch(error => response.json({ error: error }))
 })
+
+if (process.env.ENVIRONMENT === 'production') {
+  LinkService().detectLinks()
+}
 
 app.listen(app.get('port'), () => {
   console.log(`Node app is running on port ${port}`)

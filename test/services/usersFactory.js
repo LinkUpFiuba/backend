@@ -18,6 +18,7 @@ export class User {
         latitude: 20,
         longitude: 20
       },
+      tokenFCM: 'some-token-fcm',
       interests: {
         male: false,
         female: false,
