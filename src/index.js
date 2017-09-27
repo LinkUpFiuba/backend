@@ -31,6 +31,10 @@ app.get('/users/:id', (request, response) => {
   UserService().getUser(request.params.id).then(users => response.json(users))
 })
 
+app.get('/complaints', (request, response) => {
+    ComplaintService().then(users => response.json(users))
+})
+
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
     response.status(400)
