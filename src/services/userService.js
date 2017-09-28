@@ -56,19 +56,17 @@ export default function UserService() {
   const validateBlocking = (user1, user2) => {
     return isBlocked(user1, user2).then(block1 => {
       return isBlocked(user2, user1).then(block2 => {
-        console.log(block1, block2)
-        return block1 || block2
+        return !block1 && !block2
       })
     })
   }
 
   const validateFilters = (user, actualUser, links, unlinks) => (
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
-    // or if they already linked or unlinked, or if the actualUser is blocked for user (or viceversa)
+    // or if they already linked or unlinked
     user.Uid !== actualUser.Uid &&
       validateAges(user, actualUser) &&
       validateDistance(user, actualUser) &&
-      validateBlocking(user, actualUser) &&
       !user.invisibleMode &&
       !unlinks.includes(user.Uid) &&
       !links.includes(user.Uid)
@@ -147,6 +145,10 @@ export default function UserService() {
     return search
   }
 
+  const filterAsync = (array, filter, actualUser) =>
+    Promise.all(array.map(entry => filter(actualUser, entry)))
+      .then(bits => array.filter(_entry => bits.shift()))
+
   return {
     createUser: user => {
       const usersRef = Database('users')
@@ -191,6 +193,11 @@ export default function UserService() {
             return getSexualPosibleMatches(ref, actualUser, userSearch)
           }
           return getFriendPosibleMatches(ref, actualUser)
+        })
+        .then(users => {
+          // Filter users that have blocked each other
+          const nonBlockedUsers = filterAsync(users, validateBlocking, actualUser)
+          return nonBlockedUsers
         })
         .then(users => {
           const orderedUsers = orderByMatchingAlgorithm(users, actualUser)

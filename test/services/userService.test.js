@@ -580,7 +580,7 @@ describe('UserService', () => {
         usersRef.set(users)
       })
 
-      describe('when they are not blocked each other', () => {
+      describe('when they have not blocked each other', () => {
         before(() => {
           const blocksRef = Database('blocks')
           blocksRef.set({})
@@ -594,7 +594,7 @@ describe('UserService', () => {
         })
       })
 
-      describe('when one of the blocked the other', () => {
+      describe('when one of them blocked the other', () => {
         before(() => {
           const blocksRef = Database('blocks')
           blocksRef.set({
