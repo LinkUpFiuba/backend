@@ -3,7 +3,6 @@ export class Complaint {
 
     constructor() {
       this.complaint = {
-        name: 'name',
         denouncerUser: 'uid',
         message: 'message',
         state: 'pending',

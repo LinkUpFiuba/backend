@@ -12,7 +12,6 @@ const expect = chai.expect
 describe('complaintService', () => {
   describe('getComplaintsCountForUsers', () => {
     const maleForFriends = new User().male().likesFriends().get()
-    const maleForFriends2 = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
     const pendingComplaint = new Complaint().pending().get()
     const approvedComplaint = new Complaint().approved().get()
@@ -21,8 +20,7 @@ describe('complaintService', () => {
     before(() => {
       const users = {
         [maleForFriends.Uid]: maleForFriends,
-        [femaleForFriends.Uid]: femaleForFriends,
-        [maleForFriends2.Uid]: maleForFriends2
+        [femaleForFriends.Uid]: femaleForFriends
       }
       Database('users').set(users)
     })
@@ -33,8 +31,8 @@ describe('complaintService', () => {
       })
 
       it('should return no complaints', () => {
-        return ComplaintService().getComplaintsCountForUsers().then(complatins => {
-          expect(complatins.length).to.equal(0)
+        return ComplaintService().getComplaintsCountForUsers().then(complaints => {
+          expect(complaints.length).to.equal(0)
         })
       })
     })
@@ -49,10 +47,10 @@ describe('complaintService', () => {
         Database('complaints').set(complaints)
       })
 
-      it('should return on complaint', () => {
-        return ComplaintService().getComplaintsCountForUsers().then(complatins => {
-          expect(complatins.length).to.equal(1)
-          expect(complatins[0].pending).to.equal(1)
+      it('should return one complaint', () => {
+        return ComplaintService().getComplaintsCountForUsers().then(complaints => {
+          expect(complaints.length).to.equal(1)
+          expect(complaints[0].pending).to.equal(1)
         })
       })
     })
@@ -68,9 +66,9 @@ describe('complaintService', () => {
       })
 
       it('should return zero complaints in pending', () => {
-        return ComplaintService().getComplaintsCountForUsers().then(complatins => {
-          expect(complatins.length).to.equal(1)
-          expect(complatins[0].pending).to.equal(0)
+        return ComplaintService().getComplaintsCountForUsers().then(complaints => {
+          expect(complaints.length).to.equal(1)
+          expect(complaints[0].pending).to.equal(0)
         })
       })
     })
@@ -87,9 +85,9 @@ describe('complaintService', () => {
       })
 
       it('should return two complaint in one user', () => {
-        return ComplaintService().getComplaintsCountForUsers().then(complatins => {
-          expect(complatins.length).to.equal(1)
-          expect(complatins[0].pending).to.equal(2)
+        return ComplaintService().getComplaintsCountForUsers().then(complaints => {
+          expect(complaints.length).to.equal(1)
+          expect(complaints[0].pending).to.equal(2)
         })
       })
     })
@@ -108,8 +106,10 @@ describe('complaintService', () => {
       })
 
       it('should return two complaints (one in each user)', () => {
-        return ComplaintService().getComplaintsCountForUsers().then(complatins => {
-          expect(complatins.length).to.equal(2)
+        return ComplaintService().getComplaintsCountForUsers().then(complaints => {
+          expect(complaints.length).to.equal(2)
+          expect(complaints[0].pending).to.equal(1)
+          expect(complaints[1].pending).to.equal(1)
         })
       })
     })

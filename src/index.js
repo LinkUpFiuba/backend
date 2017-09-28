@@ -33,6 +33,7 @@ app.get('/users/:id', (request, response) => {
 })
 
 app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
 })
 
