@@ -143,9 +143,7 @@ export default function UserService() {
     },
     getUser: id => {
       const usersRef = Database('users')
-      return usersRef.orderByKey().equalTo(id).once('value', snap => {
-        snap.forEach(childSnap => childSnap.val().name)
-      })
+      return usersRef.child(id).once('value').then(user => user.val())
     },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')

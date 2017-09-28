@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
 import LinkService from './services/linkService'
+import ComplaintService from './services/complaintService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -32,7 +33,7 @@ app.get('/users/:id', (request, response) => {
 })
 
 app.get('/complaints', (request, response) => {
-    ComplaintService().then(users => response.json(users))
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
 })
 
 app.get('/users', (request, response) => {
