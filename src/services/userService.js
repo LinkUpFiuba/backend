@@ -45,12 +45,30 @@ export default function UserService() {
       user1.range.maxAge >= user2.age
   }
 
+  const isBlocked = (blockingUser, blockedUser) => {
+    const blocksRef = Database('blocks')
+    return blocksRef.child(`${blockingUser.Uid}/${blockedUser.Uid}`).once('value')
+      .then(block => {
+        return block.exists()
+      })
+  }
+
+  const validateBlocking = (user1, user2) => {
+    return isBlocked(user1, user2).then(block1 => {
+      return isBlocked(user2, user1).then(block2 => {
+        console.log(block1, block2)
+        return block1 || block2
+      })
+    })
+  }
+
   const validateFilters = (user, actualUser, links, unlinks) => (
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
-    // or if they already liked or unliked
+    // or if they already linked or unlinked, or if the actualUser is blocked for user (or viceversa)
     user.Uid !== actualUser.Uid &&
       validateAges(user, actualUser) &&
       validateDistance(user, actualUser) &&
+      validateBlocking(user, actualUser) &&
       !user.invisibleMode &&
       !unlinks.includes(user.Uid) &&
       !links.includes(user.Uid)

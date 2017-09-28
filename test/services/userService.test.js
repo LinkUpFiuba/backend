@@ -568,6 +568,56 @@ describe('UserService', () => {
       })
     })
 
+    describe('Test for blocking filter', () => {
+      before(() => {
+        Database('unlinks').set({})
+        Database('links').set({})
+        const users = {
+          [maleForFriends.Uid]: maleForFriends,
+          [femaleForFriends.Uid]: femaleForFriends
+        }
+        const usersRef = Database('users')
+        usersRef.set(users)
+      })
+
+      describe('when they are not blocked each other', () => {
+        before(() => {
+          const blocksRef = Database('blocks')
+          blocksRef.set({})
+        })
+
+        it('they can be found each other', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(users[0].Uid).to.equal(femaleForFriends.Uid)
+          })
+        })
+      })
+
+      describe('when one of the blocked the other', () => {
+        before(() => {
+          const blocksRef = Database('blocks')
+          blocksRef.set({
+            [maleForFriends.Uid]: {
+              [femaleForFriends.Uid]: true
+            }
+          })
+        })
+
+        it('the blocking user cannot find the blocked user', () => {
+          return UserService().getPosibleLinks(maleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+
+        it('the blocked user cannot find the blocking user', () => {
+          return UserService().getPosibleLinks(femaleForFriends.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+    })
+
     describe('Test for matching algorithm', () => {
       before(() => {
         Database('unlinks').set({})
