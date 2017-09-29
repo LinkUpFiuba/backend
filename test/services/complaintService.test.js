@@ -114,4 +114,92 @@ describe('complaintService', () => {
       })
     })
   })
+
+  describe('getComplaintsForUser', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const pendingComplaint = new Complaint().pending().denouncerUser(femaleForFriends.Uid).get()
+    const approvedComplaint = new Complaint().approved().denouncerUser(femaleForFriends.Uid).get()
+    const pendingComplaint2 = new Complaint().pending().denouncerUser(femaleForFriends.Uid).get()
+
+    before(() => {
+      const users = {
+        [maleForFriends.Uid]: maleForFriends,
+        [femaleForFriends.Uid]: femaleForFriends
+      }
+      Database('users').set(users)
+    })
+
+    describe('No complaints', () => {
+      before(() => {
+        Database('complaints').set({})
+      })
+
+      it('should return no complaints', () => {
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
+          expect(response.complaints.length).to.equal(0)
+        })
+      })
+
+      it('should return the same user', () => {
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
+          expect(response.user.Uid).to.equal(maleForFriends.Uid)
+        })
+      })
+    })
+
+    describe('One complaint in pending', () => {
+      before(() => {
+        const complaints = {
+          [maleForFriends.Uid]: {
+            [pendingComplaint.id]: pendingComplaint
+          }
+        }
+        Database('complaints').set(complaints)
+      })
+
+      it('should return one complaint', () => {
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
+          expect(response.complaints.length).to.equal(1)
+          expect(response.complaints[0].complaintId).to.equal(pendingComplaint.id.toString())
+        })
+      })
+    })
+
+    describe('One complaint in approved', () => {
+      before(() => {
+        const complaints = {
+          [maleForFriends.Uid]: {
+            [approvedComplaint.id]: approvedComplaint
+          }
+        }
+        Database('complaints').set(complaints)
+      })
+
+      it('should return one complaint', () => {
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
+          expect(response.complaints.length).to.equal(1)
+          expect(response.complaints[0].complaintId).to.equal(approvedComplaint.id.toString())
+        })
+      })
+    })
+
+    describe('two complaint in pending for same user', () => {
+      before(() => {
+        const complaints = {
+          [maleForFriends.Uid]: {
+            [pendingComplaint.id]: pendingComplaint,
+            [pendingComplaint2.id]: pendingComplaint2
+          }
+        }
+        Database('complaints').set(complaints)
+      })
+
+      it('should return two complaint in one user', () => {
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
+          expect(response.complaints.length).to.equal(2)
+        })
+      })
+    })
+  })
 })

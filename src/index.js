@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import express from 'express'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
@@ -34,6 +35,10 @@ app.get('/users/:id', (request, response) => {
 
 app.get('/complaints', (request, response) => {
   ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
+app.get('/complaints/:userUid', (request, response) => {
+  ComplaintService().getComplaintsForUser(request.params.userUid).then(complaints => response.json(complaints))
 })
 
 app.get('/users', (request, response) => {

@@ -3,7 +3,7 @@ export class Complaint {
 
     constructor() {
       this.complaint = {
-        denouncerUser: 'uid',
+        idReporting: 'uid',
         message: 'message',
         state: 'pending',
         id: Complaint.id
@@ -27,7 +27,7 @@ export class Complaint {
     }
 
     denouncerUser(denouncerUserUid) {
-      this.complaint.denouncerUser = denouncerUserUid
+      this.complaint.idReporting = denouncerUserUid
       return this
     }
 

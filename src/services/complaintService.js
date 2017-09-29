@@ -39,6 +39,40 @@ export default function ComplaintService() {
         .then(() => {
           return Promise.all(promisesArray).then(() => complaintsArray)
         })
+    },
+
+    getComplaintsForUser: userUid => {
+      const response = {}
+      const complaintsRef = Database('complaints')
+      const promisesArray = []
+      const complaintsArray = []
+      return UserService().getUser(userUid)
+        .then(user => {
+          response.user = user
+        })
+        .then(() => {
+          return complaintsRef.child(userUid).once('value')
+            .then(complaints => {
+              complaints.forEach(complaint => {
+                const reportingUserUid = complaint.val().idReporting
+                promisesArray.push(UserService().getUser(reportingUserUid).then(user => {
+                  complaintsArray.push({
+                    complaintId: complaint.key,
+                    userName: user.name,
+                    age: user.age,
+                    sex: user.gender,
+                    ...complaint.val()
+                  })
+                }))
+              })
+            })
+        })
+        .then(() => {
+          return Promise.all(promisesArray).then(() => {
+            response.complaints = complaintsArray
+            return response
+          })
+        })
     }
   }
 }
