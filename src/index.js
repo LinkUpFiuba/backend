@@ -34,11 +34,19 @@ app.get('/users/:id', (request, response) => {
 })
 
 app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
 })
 
 app.get('/complaints/:userUid', (request, response) => {
-  ComplaintService().getComplaintsForUser(request.params.userUid).then(complaints => response.json(complaints))
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsForUser(request.params.userUid)
+    .then(complaints => {
+      UserService().getUser(request.params.userUid)
+        .then(user => {
+          response.json({ user: user, complaints: complaints })
+        })
+    })
 })
 
 app.get('/users', (request, response) => {

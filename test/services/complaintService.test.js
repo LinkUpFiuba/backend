@@ -136,14 +136,8 @@ describe('complaintService', () => {
       })
 
       it('should return no complaints', () => {
-        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
-          expect(response.complaints.length).to.equal(0)
-        })
-      })
-
-      it('should return the same user', () => {
-        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
-          expect(response.user.Uid).to.equal(maleForFriends.Uid)
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(complaints => {
+          expect(complaints.length).to.equal(0)
         })
       })
     })
@@ -159,9 +153,9 @@ describe('complaintService', () => {
       })
 
       it('should return one complaint', () => {
-        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
-          expect(response.complaints.length).to.equal(1)
-          expect(response.complaints[0].complaintId).to.equal(pendingComplaint.id.toString())
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(complaints => {
+          expect(complaints.length).to.equal(1)
+          expect(complaints[0].complaintId).to.equal(pendingComplaint.id.toString())
         })
       })
     })
@@ -177,9 +171,9 @@ describe('complaintService', () => {
       })
 
       it('should return one complaint', () => {
-        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
-          expect(response.complaints.length).to.equal(1)
-          expect(response.complaints[0].complaintId).to.equal(approvedComplaint.id.toString())
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(complaints => {
+          expect(complaints.length).to.equal(1)
+          expect(complaints[0].complaintId).to.equal(approvedComplaint.id.toString())
         })
       })
     })
@@ -196,8 +190,8 @@ describe('complaintService', () => {
       })
 
       it('should return two complaint in one user', () => {
-        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(response => {
-          expect(response.complaints.length).to.equal(2)
+        return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(complaints => {
+          expect(complaints.length).to.equal(2)
         })
       })
     })
