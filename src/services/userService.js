@@ -45,16 +45,35 @@ export default function UserService() {
       user1.range.maxAge >= user2.age
   }
 
-  const validateFilters = (user, actualUser, links, unlinks) => (
+  const isBlocked = (blockingUser, blockedUser) => {
+    const blocksRef = Database('blocks')
+    return blocksRef.child(`${blockingUser.Uid}/${blockedUser.Uid}`).once('value')
+      .then(block => {
+        return block.exists()
+      })
+  }
+
+  const validateBlocking = (user1, user2) => {
+    return isBlocked(user1, user2).then(block1 => {
+      return isBlocked(user2, user1).then(block2 => {
+        return !block1 && !block2
+      })
+    })
+  }
+
+  const validateFilters = (user, actualUser, links, unlinks) => {
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
-    // or if they already liked or unliked
-    user.Uid !== actualUser.Uid &&
-      validateAges(user, actualUser) &&
-      validateDistance(user, actualUser) &&
-      !user.invisibleMode &&
-      !unlinks.includes(user.Uid) &&
-      !links.includes(user.Uid)
-  )
+    // or if they already linked or unlinked
+    return validateBlocking(user, actualUser).then(validateBlocking => {
+      return user.Uid !== actualUser.Uid &&
+        validateAges(user, actualUser) &&
+        validateDistance(user, actualUser) &&
+        validateBlocking &&
+        !user.invisibleMode &&
+        !unlinks.includes(user.Uid) &&
+        !links.includes(user.Uid)
+    })
+  }
 
   const calculateMatchingScore = (user, actualUser) => {
     const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
@@ -86,13 +105,18 @@ export default function UserService() {
         return LinkService().getLinks(actualUser).then(links => {
           return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
+            const promisesArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateFilters(user, actualUser, links, unlinks) && search.includes(user.gender)) {
-                usersArray.push(user)
-              }
+              promisesArray.push(
+                validateFilters(user, actualUser, links, unlinks).then(validateFilters => {
+                  if (validateFilters && search.includes(user.gender)) {
+                    usersArray.push(user)
+                  }
+                })
+              )
             })
-            return usersArray
+            return Promise.all(promisesArray).then(() => usersArray)
           })
         })
       })
@@ -104,13 +128,18 @@ export default function UserService() {
         return LinkService().getLinks(actualUser).then(links => {
           return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
+            const promisesArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateFilters(user, actualUser, links, unlinks)) {
-                usersArray.push(user)
-              }
+              promisesArray.push(
+                validateFilters(user, actualUser, links, unlinks).then(validateFilters => {
+                  if (validateFilters) {
+                    usersArray.push(user)
+                  }
+                })
+              )
             })
-            return usersArray
+            return Promise.all(promisesArray).then(() => usersArray)
           })
         })
       })
