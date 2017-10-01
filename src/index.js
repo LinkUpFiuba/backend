@@ -49,6 +49,17 @@ app.get('/complaints/:userUid', (request, response) => {
     })
 })
 
+app.put('/complaints/:userUid/complaint/:complaintUid/reject', (request, response) => {
+  const userUid = request.params.userUid
+  const complaintUid = request.params.complaintUid
+  ComplaintService().rejectComplaint(userUid, complaintUid)
+    .then(complaint => response.json(complaint))
+    .catch(() => {
+      response.status(404)
+      response.json({ message: 'Could not find complaint with that Uid and that user' })
+    })
+})
+
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
     response.status(400)

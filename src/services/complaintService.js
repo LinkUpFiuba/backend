@@ -65,6 +65,25 @@ export default function ComplaintService() {
             return complaintsArray
           })
         })
+    },
+
+    rejectComplaint: (userUid, complaintUid) => {
+      const complaintsRef = Database('complaints')
+      const update = {}
+      update[`/${userUid}/${complaintUid}/state`] = 'rejected'
+      return complaintsRef.child(userUid).child(complaintUid).once('value')
+        .then(complaint => {
+          console.log(complaint.val())
+          if (complaint.val() === null) {
+            return Promise.reject(new Error('Complaint was not found'))
+          }
+          return complaintsRef.update(update).then(() => {
+            return complaintsRef.child(userUid).child(complaintUid).once('value')
+              .then(complaint => {
+                return complaint.val()
+              })
+          })
+        })
     }
   }
 }
