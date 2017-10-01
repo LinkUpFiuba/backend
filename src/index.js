@@ -49,7 +49,8 @@ app.get('/complaints/:userUid', (request, response) => {
     })
 })
 
-app.put('/complaints/:userUid/complaint/:complaintUid/reject', (request, response) => {
+app.post('/complaints/:userUid/complaint/:complaintUid/reject', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
   const userUid = request.params.userUid
   const complaintUid = request.params.complaintUid
   ComplaintService().rejectComplaint(userUid, complaintUid)
