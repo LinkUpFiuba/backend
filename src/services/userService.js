@@ -146,13 +146,13 @@ export default function UserService() {
   }
   function getSearchInterests(actualUser) {
     const search = []
-    if (actualUser.val().interests.male) {
+    if (actualUser.interests.male) {
       search.push(MALE)
     }
-    if (actualUser.val().interests.female) {
+    if (actualUser.interests.female) {
       search.push(FEMALE)
     }
-    if (actualUser.val().interests.friends) {
+    if (actualUser.interests.friends) {
       search.push(FRIENDS)
     }
     return search
@@ -182,7 +182,7 @@ export default function UserService() {
       return ref.child(actualUserUid).once('value')
         .then(user => {
           actualUser = user.val()
-          return getSearchInterests(user)
+          return getSearchInterests(actualUser)
         })
         .then(search => {
           userSearch = search

@@ -1,5 +1,6 @@
 import Database from './gateway/database'
 import UserService from './userService'
+import Administrator from './gateway/administrator'
 
 export default function ComplaintService() {
   const calculatePending = complaintsForUser => {
@@ -71,18 +72,30 @@ export default function ComplaintService() {
       const complaintsRef = Database('complaints')
       const update = {}
       update[`/${userUid}/${complaintUid}/state`] = 'rejected'
-      return complaintsRef.child(userUid).child(complaintUid).once('value')
-        .then(complaint => {
-          console.log(complaint.val())
-          if (complaint.val() === null) {
+      return complaintsRef.child(`${userUid}/${complaintUid}`).once('value')
+        .then(response => {
+          const complaint = response.val()
+          if (complaint === null) {
             return Promise.reject(new Error('Complaint was not found'))
           }
-          return complaintsRef.update(update).then(() => {
-            return complaintsRef.child(userUid).child(complaintUid).once('value')
-              .then(complaint => {
-                return complaint.val()
-              })
-          })
+          return complaintsRef.update(update)
+        })
+    },
+
+    acceptComplaint: (userUid, complaintUid) => {
+      const complaintsRef = Database('complaints')
+      const update = {}
+      update[`/${userUid}/${complaintUid}/state`] = 'accepted'
+      return complaintsRef.child(`${userUid}/${complaintUid}`).once('value')
+        .then(response => {
+          const complaint = response.val()
+          if (complaint === null) {
+            return Promise.reject(new Error('Complaint was not found'))
+          }
+          return Administrator().auth().updateUser(userUid, { disabled: true })
+            .then(() => {
+              return complaintsRef.update(update)
+            })
         })
     }
   }
