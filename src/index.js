@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import express from 'express'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
@@ -5,6 +6,7 @@ import bodyParser from 'body-parser'
 import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
 import LinkService from './services/linkService'
+import ComplaintService from './services/complaintService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -29,6 +31,22 @@ app.post('/users', (request, response) => {
 
 app.get('/users/:id', (request, response) => {
   UserService().getUser(request.params.id).then(users => response.json(users))
+})
+
+app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
+app.get('/complaints/:userUid', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsForUser(request.params.userUid)
+    .then(complaints => {
+      UserService().getUser(request.params.userUid)
+        .then(user => {
+          response.json({ user: user, complaints: complaints })
+        })
+    })
 })
 
 app.get('/users', (request, response) => {
