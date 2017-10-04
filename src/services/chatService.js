@@ -31,9 +31,12 @@ export const ChatService = () => {
         const childRef = ref.child(`${user1}/${user2}`)
         childRef.on('child_added', realMessage => {
           const message = realMessage.val()
-          console.log(`\t\tNew message "${message.message}" from ${message.userId} to ${user1} or ${user2}`)
-          if (newMessages) {
-            sendPush(user1, user2, message)
+          if (realMessage.key !== 'blocked') {
+            // Este console se puede mover adentro del if
+            console.log(`\t\tNew message "${message.message}" from ${message.userId} to ${message.userId !== user1 ? user1 : user2}`)
+            if (newMessages) {
+              sendPush(user1, user2, message)
+            }
           }
         })
       })
