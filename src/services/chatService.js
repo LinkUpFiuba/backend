@@ -20,15 +20,30 @@ export const ChatService = () => {
       console.log('A new message has been added!')
       const user1 = newMessage.key
       console.log(`User1: ${user1}`)
-      let user2 = ''
-      // TODO: Set the listener on first with that user, having others before (2)
+
+      // Set the listener on first chat with that user, having others before (2)
+      messagesRef.child(user1).on('child_added', chat => {
+        const user2 = chat.key
+        console.log(`\tUser2: ${user2}`)
+
+        const childRef = messagesRef.child(`${user1}/${user2}`)
+        childRef.on('child_added', realMessage => {
+          const message = realMessage.val()
+          if (realMessage.key !== 'blocked') {
+            console.log(`\t\tNew message "${message.message}" on new chat from ${message.userId} to ${message.userId !== user1 ? user1 : user2}`)
+            if (newMessages) {
+              sendPush(user1, user2, message)
+            }
+          }
+        })
+      })
+
       newMessage.forEach(child => {
-        user2 = child.key
+        const user2 = child.key
         console.log(`\tUser2: ${user2}`)
 
         // Set the listener on already existing chat (3)
-        const ref = Database('messages')
-        const childRef = ref.child(`${user1}/${user2}`)
+        const childRef = messagesRef.child(`${user1}/${user2}`)
         childRef.on('child_added', realMessage => {
           const message = realMessage.val()
           if (realMessage.key !== 'blocked') {
