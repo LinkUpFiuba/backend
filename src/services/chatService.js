@@ -2,37 +2,54 @@ import Database from './gateway/database'
 // import { PushNotificationService } from './pushNotificationService'
 
 export const ChatService = () => {
-  const onNewMessage = messagesRef => {
-    messagesRef.on('child_changed', newMessage => {
-      console.log('A new message has been added!')
-      const user1 = newMessage.key
-      console.log(`User1: ${user1}`)
-    })
+  const sendPush = (user1, user2, message) => {
+    if (message.userId !== user1) {
+      console.log(`\t\tSending new message "${message.message}" push notification to ${user1} from ${user2}`)
+      // PushNotificationService().sendNewMessagePush(user1, user2, messageInfo)
+    }
   }
 
+  // This method is called when the server starts, in order to set all listeners. There are 3 possibilities:
+  //   1 - The user has never chatted before (It's his first chat)
+  //   2 - The user has another chats, but with another users
+  //   3 - The user has already a chat with that user
   const onNewFirstMessage = messagesRef => {
     let newMessages = false
+    // Set the listener on first chat of a user (1)
     messagesRef.on('child_added', newMessage => {
-      if (!newMessages) return
       console.log('A new message has been added!')
       const user1 = newMessage.key
       console.log(`User1: ${user1}`)
       let user2 = ''
-      let messageInfo = { message: undefined }
-      // Although we know there should be only one user here, we must do a forEach
+      // let messageInfo = { message: undefined }
+      // TODO: Set the listener on first with that user, having others before (2)
       newMessage.forEach(child => {
         user2 = child.key
         console.log(`\tUser2: ${user2}`)
-        // Although we know there should be only one message here, we must do a forEach
-        child.forEach(message => {
-          messageInfo = message.val()
-          console.log(`\t\tMessage info: ${JSON.stringify(messageInfo, null, 4)}`)
+
+        // Set the listener on already existing chat (3)
+        const ref = Database('messages')
+        const childRef = ref.child(`${user1}/${user2}`)
+        // let newRealMessages = false
+        childRef.on('child_added', realMessage => {
+          const message = realMessage.val()
+          console.log(`\t\tNew message: ${message}`)
+          if (newMessages) {
+            sendPush(user1, user2, message)
+          }
         })
+        // childRef.once('value', () => {
+        //   newRealMessages = true
+        // })
+
+        // This is used only for real new chats, not for when the server starts
+        // child.forEach(message => {
+        //   messageInfo = message.val()
+        //   console.log(`\t\tMessage info: ${messageInfo}`)
+        // })
       })
-      if (messageInfo.userId !== user1) {
-        console.log(`Sending new message push notification to ${user1}`)
-        // PushNotificationService().sendNewMessagePush(user1, user2, messageInfo)
-      }
+      // This is in order not to send push notifications when server starts
+      // if (newMessages) sendPush(user1, user2, messageInfo)
     })
 
     // This is in order not to trigger events when the server starts
@@ -46,7 +63,6 @@ export const ChatService = () => {
     detectNewMessages: () => {
       console.log('Starting to detect new chat messages')
       const messagesRef = Database('messages')
-      onNewMessage(messagesRef)
       onNewFirstMessage(messagesRef)
     }
   }
