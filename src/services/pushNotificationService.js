@@ -19,7 +19,8 @@ export const PushNotificationService = () => {
       data: {
         Uid: user2.Uid,
         name: user2.name,
-        photo: user2.photoUrl
+        photo: user2.photoUrl,
+        type: 'match'
       }
     }
     return Messaging().sendToDevice(user1.tokenFCM, payload)
@@ -31,6 +32,9 @@ export const PushNotificationService = () => {
         title: user2.name,
         body: message.message
         // clickAction: 'com.google.firebase.MESSAGING_EVENT'
+      },
+      data: {
+        type: 'message'
       }
     }
     return Messaging().sendToDevice(user1.tokenFCM, payload)
