@@ -21,7 +21,6 @@ export const ChatService = () => {
       const user1 = newMessage.key
       console.log(`User1: ${user1}`)
       let user2 = ''
-      // let messageInfo = { message: undefined }
       // TODO: Set the listener on first with that user, having others before (2)
       newMessage.forEach(child => {
         user2 = child.key
@@ -30,26 +29,14 @@ export const ChatService = () => {
         // Set the listener on already existing chat (3)
         const ref = Database('messages')
         const childRef = ref.child(`${user1}/${user2}`)
-        // let newRealMessages = false
         childRef.on('child_added', realMessage => {
           const message = realMessage.val()
-          console.log(`\t\tNew message: ${message}`)
+          console.log(`\t\tNew message "${message.message}" from ${message.userId} to ${user1} or ${user2}`)
           if (newMessages) {
             sendPush(user1, user2, message)
           }
         })
-        // childRef.once('value', () => {
-        //   newRealMessages = true
-        // })
-
-        // This is used only for real new chats, not for when the server starts
-        // child.forEach(message => {
-        //   messageInfo = message.val()
-        //   console.log(`\t\tMessage info: ${messageInfo}`)
-        // })
       })
-      // This is in order not to send push notifications when server starts
-      // if (newMessages) sendPush(user1, user2, messageInfo)
     })
 
     // This is in order not to trigger events when the server starts
