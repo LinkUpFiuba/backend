@@ -5,7 +5,7 @@ export const ChatService = () => {
   const sendPush = (user1, user2, message) => {
     if (message.userId !== user1) {
       console.log(`\t\tSending new message "${message.message}" push notification to ${user1} from ${user2}`)
-      // PushNotificationService().sendNewMessagePush(user1, user2, messageInfo)
+      // PushNotificationService().sendNewMessagePush(user1, user2, message)
     }
   }
 
@@ -33,9 +33,7 @@ export const ChatService = () => {
               const message = child.val()
               if (child.key !== 'blocked') {
                 console.log(`\t\t2 - New message "${message.message}" on new chat from ${message.userId} to ${message.userId !== user1 ? user1 : user2}`)
-                if (newMessages) {
-                  sendPush(user1, user2, message)
-                }
+                if (newMessages) sendPush(user1, user2, message)
               }
             })
           }
@@ -44,17 +42,15 @@ export const ChatService = () => {
 
       newMessage.forEach(child => {
         const user2 = child.key
+        const childRef = messagesRef.child(`${user1}/${user2}`)
 
         // Set the listener on already existing chat (3)
-        const childRef = messagesRef.child(`${user1}/${user2}`)
         childRef.on('child_added', realMessage => {
           const message = realMessage.val()
           if (realMessage.key !== 'blocked') {
             // Este console se puede mover adentro del if
             console.log(`\t\t3 - A new message has arrive from two users (${user1} and ${user2}) that were chating: "${message.message}" from ${message.userId} to ${message.userId !== user1 ? user1 : user2}`)
-            if (newMessages) {
-              sendPush(user1, user2, message)
-            }
+            if (newMessages) sendPush(user1, user2, message)
           }
         })
       })
