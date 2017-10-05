@@ -9,7 +9,7 @@ export default function DisableUserService() {
   }
 
   return {
-    isUserDisabled: isUserDisabled ,
+    isUserDisabled: isUserDisabled,
 
     blockUser: userUid => {
       return Database('disabledUsers').child(userUid).set(true)
