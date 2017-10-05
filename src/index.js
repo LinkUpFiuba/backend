@@ -49,29 +49,29 @@ app.get('/complaints/:userUid', (request, response) => {
     })
 })
 
-app.post('/complaints/:userUid/complaint/:complaintUid/reject', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  const userUid = request.params.userUid
-  const complaintUid = request.params.complaintUid
-  ComplaintService().rejectComplaint(userUid, complaintUid)
-    .then(complaint => response.json(complaint))
-    .catch(() => {
-      response.status(404)
-      response.json({ message: 'Could not find complaint with that Uid and that user' })
-    })
-})
-
-app.post('/complaints/:userUid/complaint/:complaintUid/accept', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  const userUid = request.params.userUid
-  const complaintUid = request.params.complaintUid
-  ComplaintService().acceptComplaint(userUid, complaintUid)
-    .then(complaint => response.json(complaint))
-    .catch(() => {
-      response.status(404)
-      response.json({ message: 'Could not find complaint with that Uid and that user' })
-    })
-})
+// app.post('/complaints/:userUid/complaint/:complaintUid/reject', (request, response) => {
+//   response.header('Access-Control-Allow-Origin', '*')
+//   const userUid = request.params.userUid
+//   const complaintUid = request.params.complaintUid
+//   ComplaintService().rejectComplaint(userUid, complaintUid)
+//     .then(complaint => response.json(complaint))
+//     .catch(() => {
+//       response.status(404)
+//       response.json({ message: 'Could not find complaint with that Uid and that user' })
+//     })
+// })
+//
+// app.post('/complaints/:userUid/complaint/:complaintUid/accept', (request, response) => {
+//   response.header('Access-Control-Allow-Origin', '*')
+//   const userUid = request.params.userUid
+//   const complaintUid = request.params.complaintUid
+//   ComplaintService().acceptComplaint(userUid, complaintUid)
+//     .then(complaint => response.json(complaint))
+//     .catch(() => {
+//       response.status(404)
+//       response.json({ message: 'Could not find complaint with that Uid and that user' })
+//     })
+// })
 
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
