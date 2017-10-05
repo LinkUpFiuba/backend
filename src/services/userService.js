@@ -5,6 +5,7 @@ import Promise from 'bluebird'
 import geolib from 'geolib'
 import LinkService from './linkService'
 import InterestsService from './interestsService'
+import DisableUserService from './disableUserService'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -158,6 +159,14 @@ export default function UserService() {
     return search
   }
 
+  const translateCondition = function(isDisabled) {
+    let condition = 'Active'
+    if (isDisabled) {
+      condition = 'Disabled'
+    }
+    return condition
+  }
+
   return {
     createUser: user => {
       const usersRef = Database('users')
@@ -170,9 +179,16 @@ export default function UserService() {
         age: user.age
       })
     },
-    getUser: id => {
+    getUser: uid => {
       const usersRef = Database('users')
-      return usersRef.child(id).once('value').then(user => user.val())
+      return usersRef.child(uid).once('value').then(user => {
+        return DisableUserService().isUserDisabled(uid).then(isDisabled => {
+          return {
+            ...user.val(),
+            condition: translateCondition(isDisabled)
+          }
+        })
+      })
     },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
