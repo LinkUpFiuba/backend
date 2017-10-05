@@ -13,6 +13,14 @@ describe('disableUserService', () => {
     const maleForFriends = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
 
+    before(() => {
+      const users = {
+        [maleForFriends.Uid]: maleForFriends,
+        [femaleForFriends.Uid]: femaleForFriends
+      }
+      Database('users').set(users)
+    })
+
     describe('No disabled users', () => {
       before(() => {
         Database('disabledUsers').set({})

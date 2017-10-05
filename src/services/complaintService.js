@@ -1,6 +1,5 @@
 import Database from './gateway/database'
 import UserService from './userService'
-import Administrator from './gateway/administrator'
 import DisableUserService from '../../src/services/disableUserService'
 
 export default function ComplaintService() {
@@ -78,7 +77,6 @@ export default function ComplaintService() {
               })
               const modifyStatus = {}
               modifyStatus[`/${userUid}/${complaint.key}/state/`] = 'seen'
-              console.log('update')
               updateComplaintsArray.push(Database('complaints').update(modifyStatus))
             }))
           })
@@ -87,37 +85,6 @@ export default function ComplaintService() {
           return Promise.all(promisesArray, updateComplaintsArray).then(() => {
             return complaintsArray
           })
-        })
-    },
-
-    rejectComplaint: (userUid, complaintUid) => {
-      const complaintsRef = Database('complaints')
-      const update = {}
-      update[`/${userUid}/${complaintUid}/state`] = 'seen'
-      return complaintsRef.child(`${userUid}/${complaintUid}`).once('value')
-        .then(response => {
-          const complaint = response.val()
-          if (complaint === null) {
-            return Promise.reject(new Error('Complaint was not found'))
-          }
-          return complaintsRef.update(update)
-        })
-    },
-
-    acceptComplaint: (userUid, complaintUid) => {
-      const complaintsRef = Database('complaints')
-      const update = {}
-      update[`/${userUid}/${complaintUid}/state`] = 'accepted'
-      return complaintsRef.child(`${userUid}/${complaintUid}`).once('value')
-        .then(response => {
-          const complaint = response.val()
-          if (complaint === null) {
-            return Promise.reject(new Error('Complaint was not found'))
-          }
-          return Administrator().auth().updateUser(userUid, { disabled: true })
-            .then(() => {
-              return complaintsRef.update(update)
-            })
         })
     }
   }

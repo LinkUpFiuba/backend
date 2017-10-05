@@ -116,7 +116,7 @@ describe('complaintService', () => {
     })
   })
 
-  describe.only('getComplaintsForUser && getComplaintsCountForUsers', () => {
+  describe('getComplaintsForUser && getComplaintsCountForUsers', () => {
     const maleForFriends = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
     const newComplaint = new Complaint().new().denouncerUser(femaleForFriends.Uid).get()

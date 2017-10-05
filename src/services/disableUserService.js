@@ -12,7 +12,13 @@ export default function DisableUserService() {
     isUserDisabled: isUserDisabled,
 
     blockUser: userUid => {
-      return Database('disabledUsers').child(userUid).set(true)
+      return Database('users').child(userUid).once('value')
+        .then(user => {
+          if (!user.exists()) {
+            return Promise.reject(new Error('That userUid is not disabled'))
+          }
+          return Database('disabledUsers').child(userUid).set(true)
+        })
     },
 
     unblockUser: userUid => {
