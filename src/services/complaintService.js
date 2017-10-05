@@ -3,15 +3,20 @@ import UserService from './userService'
 import Administrator from './gateway/administrator'
 
 export default function ComplaintService() {
-  const calculatePending = complaintsForUser => {
+  const TOTAL_INDEX = 0
+  const PENDING_INDEX = 1
+
+  const calculateCounts = complaintsForUser => {
     let pending = 0
+    let total = 0
     complaintsForUser.forEach(complaint => {
       const state = complaint.val().state
+      total++
       if (state === 'pending') {
         pending++
       }
     })
-    return pending
+    return [total, pending]
   }
 
   return {
@@ -24,13 +29,14 @@ export default function ComplaintService() {
           complaints.forEach(complaintsForUser => {
             promisesArray.push(UserService().getUser(complaintsForUser.key).then(user => {
               if (user) {
-                const pending = calculatePending(complaintsForUser)
+                const counts = calculateCounts(complaintsForUser)
                 const complaint = {
                   userName: user.name,
                   age: user.age,
                   sex: user.gender,
                   uid: user.Uid,
-                  pending: pending
+                  total: counts[TOTAL_INDEX],
+                  pending: counts[PENDING_INDEX]
                 }
                 complaintsArray.push(complaint)
               }
