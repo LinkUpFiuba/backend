@@ -159,12 +159,8 @@ export default function UserService() {
     return search
   }
 
-  const translateCondition = function(isDisabled) {
-    let condition = 'Active'
-    if (isDisabled) {
-      condition = 'Disabled'
-    }
-    return condition
+  const translateCondition = isDisabled => {
+    return isDisabled ? 'Disabled' : 'Active'
   }
 
   return {

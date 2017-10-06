@@ -56,7 +56,7 @@ app.post('/users/:userUid/disable', (request, response) => {
   DisableUserService().blockUser(userUid)
     .then(() => response.json())
     .catch(() => {
-      response.status(401)
+      response.status(404)
       return response.json({ message: 'That user was not found' })
     })
 })
@@ -67,7 +67,7 @@ app.post('/users/:userUid/enable', (request, response) => {
   DisableUserService().unblockUser(userUid)
     .then(() => response.json())
     .catch(() => {
-      response.status(401)
+      response.status(403)
       return response.json({ message: 'That user is no disabled' })
     })
 })
@@ -83,7 +83,7 @@ app.get('/users', (request, response) => {
       UserService().getPosibleLinks(uid).then(users => response.json(users))
     })
     .catch(error => {
-      response.status(401)
+      response.status(403)
       return response.json({ message: error })
     })
 })

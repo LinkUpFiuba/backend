@@ -16,7 +16,7 @@ export default function DisableUserService() {
       return Database('users').child(userUid).once('value')
         .then(user => {
           if (!user.exists()) {
-            return Promise.reject(new Error('That userUid is not disabled'))
+            return Promise.reject(new Error('That userUid does not exist'))
           }
           return AuthService().disableUser(userUid)
             .then(() => {

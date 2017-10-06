@@ -5,8 +5,7 @@ export default function DisableUserService() {
 
   return {
     disableUser: userUid => {
-      if (TEST_URL) {
-      } else {
+      if (!TEST_URL) {
         return Administrator().auth().updateUser(userUid, { disabled: true })
           .catch(() => {
             return new Promise(resolve => resolve())

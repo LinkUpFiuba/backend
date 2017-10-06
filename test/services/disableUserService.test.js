@@ -41,13 +41,12 @@ describe('disableUserService', () => {
           [femaleForFriends.Uid]: true
         }
         Database('disabledUsers').set(disabledUsers)
+        DisableUserService().blockUser(maleForFriends.Uid)
       })
 
       it('should save the user', () => {
-        return DisableUserService().blockUser(maleForFriends.Uid).then(() => {
-          return Database('disabledUsers').child(maleForFriends.Uid.toString()).once('value').then(result => {
-            expect(result.exists()).to.be.true
-          })
+        return Database('disabledUsers').child(maleForFriends.Uid.toString()).once('value').then(result => {
+          expect(result.exists()).to.be.true
         })
       })
 
@@ -87,7 +86,7 @@ describe('disableUserService', () => {
         Database('disabledUsers').set(disabledUsers)
       })
 
-      it('should deleted the user', () => {
+      it('should delete the user from disabledUsers', () => {
         return DisableUserService().unblockUser(femaleForFriends.Uid).then(() => {
           return Database('disabledUsers').child(femaleForFriends.Uid).once('value').then(result => {
             expect(result.exists()).to.be.false
@@ -103,17 +102,16 @@ describe('disableUserService', () => {
           [maleForFriends.Uid]: true
         }
         Database('disabledUsers').set(disabledUsers)
+        return DisableUserService().unblockUser(maleForFriends.Uid)
       })
 
       it('should delete the user', () => {
-        return DisableUserService().unblockUser(maleForFriends.Uid).then(() => {
-          return DisableUserService().isUserDisabled(maleForFriends.Uid).then(result => {
-            expect(result).to.be.false
-          })
+        return DisableUserService().isUserDisabled(maleForFriends.Uid).then(result => {
+          expect(result).to.be.false
         })
       })
 
-      it('should stillBeDisabled true', () => {
+      it('should still be disabled true', () => {
         return DisableUserService().isUserDisabled(femaleForFriends.Uid).then(result => {
           expect(result).to.be.true
         })

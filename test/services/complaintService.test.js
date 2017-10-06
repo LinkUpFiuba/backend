@@ -49,7 +49,6 @@ describe('complaintService', () => {
 
       it('should return one complaint', () => {
         return ComplaintService().getComplaintsCountForUsers().then(complaints => {
-          console.log(complaints)
           expect(complaints.length).to.equal(1)
           expect(complaints[0].new).to.equal(1)
         })
@@ -164,7 +163,6 @@ describe('complaintService', () => {
 
       it('should return two in total and zero in new', () => {
         return ComplaintService().getComplaintsForUser(maleForFriends.Uid).then(() => {
-          console.log(';temrinado el primero')
           return ComplaintService().getComplaintsCountForUsers().then(complaints => {
             expect(complaints.length).to.equal(1)
             expect(complaints[0].new).to.equal(0)

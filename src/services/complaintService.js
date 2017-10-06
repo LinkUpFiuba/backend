@@ -19,13 +19,10 @@ export default function ComplaintService() {
     return [total, newComplaint]
   }
 
-  const translateCondition = function(isDisabled) {
-    let condition = 'Active'
-    if (isDisabled) {
-      condition = 'Disabled'
-    }
-    return condition
+  const translateCondition = isDisabled => {
+    return isDisabled ? 'Disabled' : 'Active'
   }
+
   return {
     getComplaintsCountForUsers: () => {
       const complaintsRef = Database('complaints')
