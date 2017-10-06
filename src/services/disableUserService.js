@@ -1,4 +1,5 @@
 import Database from './gateway/database'
+import AuthService from './authService'
 
 export default function DisableUserService() {
   const isUserDisabled = userUid => {
@@ -17,7 +18,10 @@ export default function DisableUserService() {
           if (!user.exists()) {
             return Promise.reject(new Error('That userUid is not disabled'))
           }
-          return Database('disabledUsers').child(userUid).set(true)
+          return AuthService().disableUser(userUid)
+            .then(() => {
+              return Database('disabledUsers').child(userUid).set(true)
+            })
         })
     },
 
@@ -26,7 +30,10 @@ export default function DisableUserService() {
         if (!exists) {
           return Promise.reject(new Error('That userUid is not disabled'))
         }
-        return Database('disabledUsers').child(userUid).remove()
+        return AuthService().enableUser(userUid)
+          .then(() => {
+            return Database('disabledUsers').child(userUid).remove()
+          })
       })
     }
   }
