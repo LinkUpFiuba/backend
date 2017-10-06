@@ -585,7 +585,7 @@ describe('UserService', () => {
           Database('disabledUsers').set(disabledUsers)
         })
 
-        it('should return none user', () => {
+        it('should return no user', () => {
           return UserService().getPosibleLinks(femaleForMaleWithOneInterest.Uid).then(users => {
             expect(users.length).to.equal(0)
           })
@@ -635,7 +635,7 @@ describe('UserService', () => {
           Database('disabledUsers').set(disabledUsers)
         })
 
-        it('should return the enabled user', () => {
+        it('should return no users', () => {
           return UserService().getPosibleLinks(femaleForMaleWithOneInterest.Uid).then(users => {
             expect(users.length).to.equal(0)
           })

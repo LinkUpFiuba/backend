@@ -102,7 +102,7 @@ describe('disableUserService', () => {
           [maleForFriends.Uid]: true
         }
         Database('disabledUsers').set(disabledUsers)
-        return DisableUserService().unblockUser(maleForFriends.Uid)
+        DisableUserService().unblockUser(maleForFriends.Uid)
       })
 
       it('should delete the user', () => {
