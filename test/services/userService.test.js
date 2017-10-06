@@ -568,6 +568,81 @@ describe('UserService', () => {
       })
     })
 
+    describe('Test for disabled user', () => {
+      describe('when the only user is disabled', () => {
+        before(() => {
+          const users = {
+            [maleForFemaleWithManyInterests.Uid]: maleForFemaleWithManyInterests,
+            [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
+          }
+          const disabledUsers = {
+            [maleForFemaleWithManyInterests.Uid]: true
+          }
+          const ref = Database('users')
+          ref.set(users)
+          Database('unlinks').set({})
+          Database('links').set({})
+          Database('disabledUsers').set(disabledUsers)
+        })
+
+        it('should return none user', () => {
+          return UserService().getPosibleLinks(femaleForMaleWithOneInterest.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+
+      describe('when one user is disabled and other not', () => {
+        before(() => {
+          const users = {
+            [maleForFemaleWithManyInterests.Uid]: maleForFemaleWithManyInterests,
+            [maleForMaleAndFemale.Uid]: maleForMaleAndFemale,
+            [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
+          }
+          const disabledUsers = {
+            [maleForFemaleWithManyInterests.Uid]: true
+          }
+          const ref = Database('users')
+          ref.set(users)
+          Database('unlinks').set({})
+          Database('links').set({})
+          Database('disabledUsers').set(disabledUsers)
+        })
+
+        it('should return the enabled user', () => {
+          return UserService().getPosibleLinks(femaleForMaleWithOneInterest.Uid).then(users => {
+            expect(users.length).to.equal(1)
+            expect(users[0].Uid).to.equal(maleForMaleAndFemale.Uid)
+          })
+        })
+      })
+
+      describe('when two users are disabled', () => {
+        before(() => {
+          const users = {
+            [maleForFemaleWithManyInterests.Uid]: maleForFemaleWithManyInterests,
+            [maleForMaleAndFemale.Uid]: maleForMaleAndFemale,
+            [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
+          }
+          const disabledUsers = {
+            [maleForFemaleWithManyInterests.Uid]: true,
+            [maleForMaleAndFemale.Uid]: true
+          }
+          const ref = Database('users')
+          ref.set(users)
+          Database('unlinks').set({})
+          Database('links').set({})
+          Database('disabledUsers').set(disabledUsers)
+        })
+
+        it('should return the enabled user', () => {
+          return UserService().getPosibleLinks(femaleForMaleWithOneInterest.Uid).then(users => {
+            expect(users.length).to.equal(0)
+          })
+        })
+      })
+    })
+
     describe('Test for blocking filter', () => {
       before(() => {
         Database('unlinks').set({})

@@ -62,17 +62,20 @@ export default function UserService() {
     })
   }
 
-  const validateFilters = (user, actualUser, links, unlinks) => {
+  const validateFilters = (posibleUserForLink, actualUser, links, unlinks) => {
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
     // or if they already linked or unlinked
-    return validateBlocking(user, actualUser).then(validateBlocking => {
-      return user.Uid !== actualUser.Uid &&
-        validateAges(user, actualUser) &&
-        validateDistance(user, actualUser) &&
-        validateBlocking &&
-        !user.invisibleMode &&
-        !unlinks.includes(user.Uid) &&
-        !links.includes(user.Uid)
+    return validateBlocking(posibleUserForLink, actualUser).then(validateBlocking => {
+      return DisableUserService().isUserDisabled(posibleUserForLink.Uid).then(isDisabled => {
+        return posibleUserForLink.Uid !== actualUser.Uid &&
+          validateAges(posibleUserForLink, actualUser) &&
+          validateDistance(posibleUserForLink, actualUser) &&
+          validateBlocking &&
+          !isDisabled &&
+          !posibleUserForLink.invisibleMode &&
+          !unlinks.includes(posibleUserForLink.Uid) &&
+          !links.includes(posibleUserForLink.Uid)
+      })
     })
   }
 
@@ -145,6 +148,7 @@ export default function UserService() {
         })
       })
   }
+
   function getSearchInterests(actualUser) {
     const search = []
     if (actualUser.interests.male) {
