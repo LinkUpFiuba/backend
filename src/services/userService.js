@@ -5,6 +5,7 @@ import Promise from 'bluebird'
 import geolib from 'geolib'
 import LinkService from './linkService'
 import InterestsService from './interestsService'
+import DisableUserService from './disableUserService'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -61,17 +62,20 @@ export default function UserService() {
     })
   }
 
-  const validateFilters = (user, actualUser, links, unlinks) => {
+  const validateFilters = (posibleUserForLink, actualUser, links, unlinks) => {
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
     // or if they already linked or unlinked
-    return validateBlocking(user, actualUser).then(validateBlocking => {
-      return user.Uid !== actualUser.Uid &&
-        validateAges(user, actualUser) &&
-        validateDistance(user, actualUser) &&
-        validateBlocking &&
-        !user.invisibleMode &&
-        !unlinks.includes(user.Uid) &&
-        !links.includes(user.Uid)
+    return validateBlocking(posibleUserForLink, actualUser).then(validateBlocking => {
+      return DisableUserService().isUserDisabled(posibleUserForLink.Uid).then(isDisabled => {
+        return posibleUserForLink.Uid !== actualUser.Uid &&
+          validateAges(posibleUserForLink, actualUser) &&
+          validateDistance(posibleUserForLink, actualUser) &&
+          validateBlocking &&
+          !isDisabled &&
+          !posibleUserForLink.invisibleMode &&
+          !unlinks.includes(posibleUserForLink.Uid) &&
+          !links.includes(posibleUserForLink.Uid)
+      })
     })
   }
 
@@ -144,18 +148,23 @@ export default function UserService() {
         })
       })
   }
+
   function getSearchInterests(actualUser) {
     const search = []
-    if (actualUser.val().interests.male) {
+    if (actualUser.interests.male) {
       search.push(MALE)
     }
-    if (actualUser.val().interests.female) {
+    if (actualUser.interests.female) {
       search.push(FEMALE)
     }
-    if (actualUser.val().interests.friends) {
+    if (actualUser.interests.friends) {
       search.push(FRIENDS)
     }
     return search
+  }
+
+  const translateCondition = isDisabled => {
+    return isDisabled ? 'Disabled' : 'Active'
   }
 
   return {
@@ -170,9 +179,16 @@ export default function UserService() {
         age: user.age
       })
     },
-    getUser: id => {
+    getUser: uid => {
       const usersRef = Database('users')
-      return usersRef.child(id).once('value').then(user => user.val())
+      return usersRef.child(uid).once('value').then(user => {
+        return DisableUserService().isUserDisabled(uid).then(isDisabled => {
+          return {
+            ...user.val(),
+            condition: translateCondition(isDisabled)
+          }
+        })
+      })
     },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
@@ -182,7 +198,7 @@ export default function UserService() {
       return ref.child(actualUserUid).once('value')
         .then(user => {
           actualUser = user.val()
-          return getSearchInterests(user)
+          return getSearchInterests(actualUser)
         })
         .then(search => {
           userSearch = search
