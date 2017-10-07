@@ -93,8 +93,16 @@ describe('LinkService', () => {
   })
 
   describe('#onChildAdded()', () => {
-    const user1 = new User().get()
-    const user2 = new User().get()
+    const user1 = new User().male().get()
+    const user2 = new User().female().get()
+
+    before(() => {
+      const users = {
+        [user1.Uid]: user1,
+        [user2.Uid]: user2
+      }
+      Database('users').set(users)
+    })
 
     describe('when only one user has linked', () => {
       before(() => {
