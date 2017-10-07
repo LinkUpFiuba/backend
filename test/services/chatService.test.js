@@ -1,16 +1,13 @@
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before } from 'mocha'
 import { ChatService } from '../../src/services/chatService'
 import Database from '../../src/services/gateway/database'
 import { User } from './usersFactory'
 
-chai.use(chaiAsPromised)
-
 // This suite of test is not a real one. It's only for seeing in console if push notifications are sent
 // when they should, but it will no fail if it doesn't. Furthermore, they are more like integration tests,
-// as the tests are cumulative, since they all complete the same database. The way it is now, there's no
-// simple way of testing this but with console.log ¯\_(ツ)_/¯
+// as the tests are cumulative, since they all complete the same database. The way it is done (with events
+// on child_added), there's no simple way of testing this but with console.log, as it's everything triggered
+// asynchronously when the database changes ¯\_(ツ)_/¯
 
 describe('ChatService', () => {
   describe('#detectNewMessages', () => {
