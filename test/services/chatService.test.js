@@ -7,6 +7,10 @@ import { User } from './usersFactory'
 
 chai.use(chaiAsPromised)
 
+// This suite of test is not a real one. It's only for seeing in console if push notifications are sent
+// when they should, but it will no fail if it doesn't. The way it is now, there's no simple way of testing
+// this but with console.log ¯\_(ツ)_/¯
+
 describe('ChatService', () => {
   describe('#detectNewMessages', () => {
     const user1 = new User().male().get()
