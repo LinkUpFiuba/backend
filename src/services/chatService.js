@@ -1,11 +1,11 @@
 import Database from './gateway/database'
-// import { PushNotificationService } from './pushNotificationService'
+import { PushNotificationService } from './pushNotificationService'
 
 export const ChatService = () => {
   const sendPush = (user1, user2, message) => {
     if (message.userId !== user1) {
       console.log(`\t\tSending new message "${message.message}" push notification to ${user1} from ${user2}`)
-      // PushNotificationService().sendNewMessagePush(user1, user2, message)
+      PushNotificationService().sendNewMessagePush(user1, user2, message)
     }
   }
 

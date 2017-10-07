@@ -41,12 +41,12 @@ export const PushNotificationService = () => {
   }
 
   const onError = (user, error) => {
-    console.log(`Error sending message to user ${user.Uid}:`, error)
+    console.log(`Error sending push notification to user ${user.Uid}: ${error}`)
     return error
   }
 
   const onSuccess = (user, response) => {
-    console.log(`Successfully sent message to user ${user.Uid}:`, response)
+    console.log(`Successfully sent push notification to user ${user.Uid}`)
     return response
   }
 
