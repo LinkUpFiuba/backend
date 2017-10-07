@@ -10,6 +10,25 @@ import { User } from './usersFactory'
 // asynchronously when the database changes ¯\_(ツ)_/¯
 
 describe('ChatService', () => {
+  let uniqueId = 0
+  const newMessage = (sendingUser, text) => {
+    uniqueId += 1
+    const message = {
+      liked: false,
+      read: false,
+      message: text,
+      userId: sendingUser
+    }
+    return [uniqueId.toString(), message]
+  }
+
+  const newMessageWithUniqueId = (sendingUser, text) => {
+    const message = newMessage(sendingUser, text)
+    return {
+      [message[0]]: message[1]
+    }
+  }
+
   describe('#detectNewMessages', () => {
     const user1 = new User().male().get()
     const user2 = new User().female().get()
@@ -37,22 +56,16 @@ describe('ChatService', () => {
     it('should send push notification when a new user starts chating', () => {
       console.log('-------------------------------------------------------------------------------')
       messagesRef.child(`${user3.Uid}/${user1.Uid}`).set(newMessageWithUniqueId(user1.Uid, '1 - New user'))
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a new chat starts in a new user', () => {
       console.log('-------------------------------------------------------------------------------')
       messagesRef.child(`${user3.Uid}/${user2.Uid}`).set(newMessageWithUniqueId(user2.Uid, '2 - New chat'))
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a new chat starts in an old user', () => {
       console.log('-------------------------------------------------------------------------------')
       messagesRef.child(`${user1.Uid}/${user3.Uid}`).set(newMessageWithUniqueId(user3.Uid, '3 - New chat'))
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a new message arrives for a new user', () => {
@@ -62,24 +75,18 @@ describe('ChatService', () => {
 
       message = newMessage(user1.Uid, '4 - New message (2)')
       messagesRef.child(`${user3.Uid}/${user1.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a new message arrives in a new chat of old user', () => {
       console.log('-------------------------------------------------------------------------------')
       const message = newMessage(user3.Uid, '5 - New message')
       messagesRef.child(`${user1.Uid}/${user3.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a new message arrives in an old chat of old user', () => {
       console.log('-------------------------------------------------------------------------------')
       const message = newMessage(user2.Uid, '6 - New message')
       messagesRef.child(`${user1.Uid}/${user2.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a second message arrives for a new user', () => {
@@ -89,24 +96,18 @@ describe('ChatService', () => {
 
       message = newMessage(user1.Uid, '7 - New message (2)')
       messagesRef.child(`${user3.Uid}/${user1.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a second message arrives in a new chat of old user', () => {
       console.log('-------------------------------------------------------------------------------')
       const message = newMessage(user3.Uid, '8 - New message')
       messagesRef.child(`${user1.Uid}/${user3.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should send push notification when a second message arrives in an old chat of old user', () => {
       console.log('-------------------------------------------------------------------------------')
       const message = newMessage(user2.Uid, '9 - New message')
       messagesRef.child(`${user1.Uid}/${user2.Uid}/${message[0]}`).set(message[1])
-
-      // messagesRef.once('value').then(messages => console.log(JSON.stringify(messages, null, 2)))
     })
 
     it('should not send push notification when the sending user is himself', () => {
@@ -116,22 +117,3 @@ describe('ChatService', () => {
     })
   })
 })
-
-let uniqueId = 0
-function newMessage(sendingUser, text) {
-  uniqueId += 1
-  const message = {
-    liked: false,
-    read: false,
-    message: text,
-    userId: sendingUser
-  }
-  return [uniqueId.toString(), message]
-}
-
-function newMessageWithUniqueId(sendingUser, text) {
-  const message = newMessage(sendingUser, text)
-  return {
-    [message[0]]: message[1]
-  }
-}
