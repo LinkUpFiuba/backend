@@ -5,6 +5,7 @@ import Promise from 'bluebird'
 import geolib from 'geolib'
 import LinkService from './linkService'
 import InterestsService from './interestsService'
+import DisableUserService from './disableUserService'
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -45,16 +46,38 @@ export default function UserService() {
       user1.range.maxAge >= user2.age
   }
 
-  const validateFilters = (user, actualUser, links, unlinks) => (
+  const isBlocked = (blockingUser, blockedUser) => {
+    const blocksRef = Database('blocks')
+    return blocksRef.child(`${blockingUser.Uid}/${blockedUser.Uid}`).once('value')
+      .then(block => {
+        return block.exists()
+      })
+  }
+
+  const validateBlocking = (user1, user2) => {
+    return isBlocked(user1, user2).then(block1 => {
+      return isBlocked(user2, user1).then(block2 => {
+        return !block1 && !block2
+      })
+    })
+  }
+
+  const validateFilters = (posibleUserForLink, actualUser, links, unlinks) => {
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
-    // or if they already liked or unliked
-    user.Uid !== actualUser.Uid &&
-      validateAges(user, actualUser) &&
-      validateDistance(user, actualUser) &&
-      !user.invisibleMode &&
-      !unlinks.includes(user.Uid) &&
-      !links.includes(user.Uid)
-  )
+    // or if they already linked or unlinked
+    return validateBlocking(posibleUserForLink, actualUser).then(validateBlocking => {
+      return DisableUserService().isUserDisabled(posibleUserForLink.Uid).then(isDisabled => {
+        return posibleUserForLink.Uid !== actualUser.Uid &&
+          validateAges(posibleUserForLink, actualUser) &&
+          validateDistance(posibleUserForLink, actualUser) &&
+          validateBlocking &&
+          !isDisabled &&
+          !posibleUserForLink.invisibleMode &&
+          !unlinks.includes(posibleUserForLink.Uid) &&
+          !links.includes(posibleUserForLink.Uid)
+      })
+    })
+  }
 
   const calculateMatchingScore = (user, actualUser) => {
     const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
@@ -86,13 +109,18 @@ export default function UserService() {
         return LinkService().getLinks(actualUser).then(links => {
           return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
+            const promisesArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateFilters(user, actualUser, links, unlinks) && search.includes(user.gender)) {
-                usersArray.push(user)
-              }
+              promisesArray.push(
+                validateFilters(user, actualUser, links, unlinks).then(validateFilters => {
+                  if (validateFilters && search.includes(user.gender)) {
+                    usersArray.push(user)
+                  }
+                })
+              )
             })
-            return usersArray
+            return Promise.all(promisesArray).then(() => usersArray)
           })
         })
       })
@@ -104,29 +132,39 @@ export default function UserService() {
         return LinkService().getLinks(actualUser).then(links => {
           return LinkService().getUnlinks(actualUser).then(unlinks => {
             const usersArray = []
+            const promisesArray = []
             users.forEach(queryUser => {
               const user = queryUser.val()
-              if (validateFilters(user, actualUser, links, unlinks)) {
-                usersArray.push(user)
-              }
+              promisesArray.push(
+                validateFilters(user, actualUser, links, unlinks).then(validateFilters => {
+                  if (validateFilters) {
+                    usersArray.push(user)
+                  }
+                })
+              )
             })
-            return usersArray
+            return Promise.all(promisesArray).then(() => usersArray)
           })
         })
       })
   }
+
   function getSearchInterests(actualUser) {
     const search = []
-    if (actualUser.val().interests.male) {
+    if (actualUser.interests.male) {
       search.push(MALE)
     }
-    if (actualUser.val().interests.female) {
+    if (actualUser.interests.female) {
       search.push(FEMALE)
     }
-    if (actualUser.val().interests.friends) {
+    if (actualUser.interests.friends) {
       search.push(FRIENDS)
     }
     return search
+  }
+
+  const translateCondition = isDisabled => {
+    return isDisabled ? 'Disabled' : 'Active'
   }
 
   return {
@@ -141,10 +179,15 @@ export default function UserService() {
         age: user.age
       })
     },
-    getUser: id => {
+    getUser: uid => {
       const usersRef = Database('users')
-      return usersRef.orderByKey().equalTo(id).once('value', snap => {
-        snap.forEach(childSnap => childSnap.val().name)
+      return usersRef.child(uid).once('value').then(user => {
+        return DisableUserService().isUserDisabled(uid).then(isDisabled => {
+          return {
+            ...user.val(),
+            condition: translateCondition(isDisabled)
+          }
+        })
       })
     },
     getPosibleLinks: actualUserUid => {
@@ -155,7 +198,7 @@ export default function UserService() {
       return ref.child(actualUserUid).once('value')
         .then(user => {
           actualUser = user.val()
-          return getSearchInterests(user)
+          return getSearchInterests(actualUser)
         })
         .then(search => {
           userSearch = search

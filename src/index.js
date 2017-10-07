@@ -6,6 +6,8 @@ import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
 import LinkService from './services/linkService'
 import { ChatService } from './services/chatService'
+import ComplaintService from './services/complaintService'
+import DisableUserService from './services/disableUserService'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -32,6 +34,44 @@ app.get('/users/:id', (request, response) => {
   UserService().getUser(request.params.id).then(users => response.json(users))
 })
 
+app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
+app.get('/complaints/:userUid', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsForUser(request.params.userUid)
+    .then(complaints => {
+      UserService().getUser(request.params.userUid)
+        .then(user => {
+          response.json({ user: user, complaints: complaints })
+        })
+    })
+})
+
+app.post('/users/:userUid/disable', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  const userUid = request.params.userUid
+  DisableUserService().blockUser(userUid)
+    .then(() => response.json())
+    .catch(() => {
+      response.status(404)
+      return response.json({ message: 'That user was not found' })
+    })
+})
+
+app.post('/users/:userUid/enable', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  const userUid = request.params.userUid
+  DisableUserService().unblockUser(userUid)
+    .then(() => response.json())
+    .catch(() => {
+      response.status(403)
+      return response.json({ message: 'That user is no disabled' })
+    })
+})
+
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
     response.status(400)
@@ -43,7 +83,7 @@ app.get('/users', (request, response) => {
       UserService().getPosibleLinks(uid).then(users => response.json(users))
     })
     .catch(error => {
-      response.status(401)
+      response.status(403)
       return response.json({ message: error })
     })
 })
