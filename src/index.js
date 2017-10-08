@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import express from 'express'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
