@@ -61,7 +61,7 @@ export default function UserService() {
       })
     })
   }
-  
+
   const validateFilters = (posibleUserForLink, actualUser, links, unlinks) => {
     // Exclude the user who made the request and also by age, distance and if the user has invisible mode on,
     // or if they already linked or unlinked
