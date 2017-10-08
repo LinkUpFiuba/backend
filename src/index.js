@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import express from 'express'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
@@ -6,6 +5,7 @@ import bodyParser from 'body-parser'
 import firebase from 'firebase'
 import firebaseService from './services/firebaseService'
 import LinkService from './services/linkService'
+import { ChatService } from './services/chatService'
 import ComplaintService from './services/complaintService'
 import DisableUserService from './services/disableUserService'
 
@@ -97,6 +97,7 @@ app.post('/getToken', (request, response) => {
 
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
+  ChatService().detectNewMessages()
 }
 
 app.listen(app.get('port'), () => {

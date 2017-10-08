@@ -46,4 +46,24 @@ describe('PushNotificationService', () => {
       })
     })
   })
+
+  describe('#sendNewMessagePush(user1, user2, message)', () => {
+    const user1 = new User().male().get()
+    const user2 = new User().female().get()
+
+    before(() => {
+      const users = {
+        [user1.Uid]: user1,
+        [user2.Uid]: user2
+      }
+      const usersRef = Database('users')
+      usersRef.set(users)
+    })
+
+    it('sends the new message push notification', () => {
+      return PushNotificationService().sendNewMessagePush(user1.Uid, user2.Uid, 'message').then(response => {
+        expect(response.successCount).to.equal(1)
+      })
+    })
+  })
 })

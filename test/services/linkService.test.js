@@ -93,14 +93,22 @@ describe('LinkService', () => {
   })
 
   describe('#onChildAdded()', () => {
-    const user1 = new User().get()
-    const user2 = new User().get()
+    const linkingUser = new User().male().get()
+    const linkedUser = new User().female().get()
+
+    before(() => {
+      const users = {
+        [linkingUser.Uid]: linkingUser,
+        [linkedUser.Uid]: linkedUser
+      }
+      Database('users').set(users)
+    })
 
     describe('when only one user has linked', () => {
       before(() => {
         const links = {
-          [user1.Uid]: {
-            [user2.Uid]: true
+          [linkingUser.Uid]: {
+            [linkedUser.Uid]: true
           }
         }
         const linksRef = Database('links')
@@ -110,8 +118,8 @@ describe('LinkService', () => {
       beforeEach(() => {
         const possibleMatch = {
           aUniqueId: {
-            linkingUser: user1.Uid,
-            linkedUser: user2.Uid
+            linkingUser: linkingUser.Uid,
+            linkedUser: linkedUser.Uid
           }
         }
         const possibleMatchesRef = Database('possibleMatches')
@@ -124,7 +132,7 @@ describe('LinkService', () => {
         return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
           return LinkService().onChildAdded(possibleMatch).then(() => {
             const matchesRef = Database('matches')
-            return matchesRef.child(`${user1.Uid}/${user2.Uid}`).once('value').then(match => {
+            return matchesRef.child(`${linkingUser.Uid}/${linkedUser.Uid}`).once('value').then(match => {
               expect(match.exists()).to.be.false
               expect(match.val()).to.be.null
             })
@@ -149,11 +157,11 @@ describe('LinkService', () => {
     describe('when both users have linked each other', () => {
       before(() => {
         const links = {
-          [user1.Uid]: {
-            [user2.Uid]: true
+          [linkingUser.Uid]: {
+            [linkedUser.Uid]: true
           },
-          [user2.Uid]: {
-            [user1.Uid]: true
+          [linkedUser.Uid]: {
+            [linkingUser.Uid]: true
           }
         }
         const linksRef = Database('links')
@@ -163,8 +171,8 @@ describe('LinkService', () => {
       beforeEach(() => {
         const possibleMatch = {
           aUniqueId: {
-            linkingUser: user1.Uid,
-            linkedUser: user2.Uid
+            linkingUser: linkingUser.Uid,
+            linkedUser: linkedUser.Uid
           }
         }
         const possibleMatchesRef = Database('possibleMatches')
@@ -177,7 +185,7 @@ describe('LinkService', () => {
         return possibleMatchesRef.child('aUniqueId').once('value').then(possibleMatch => {
           return LinkService().onChildAdded(possibleMatch).then(() => {
             const matchesRef = Database('matches')
-            return matchesRef.child(`${user1.Uid}/${user2.Uid}`).once('value').then(match => {
+            return matchesRef.child(`${linkingUser.Uid}/${linkedUser.Uid}`).once('value').then(match => {
               expect(match.exists()).to.be.true
               expect(match.val()).not.to.be.null
               expect(match.val().read).to.be.false
