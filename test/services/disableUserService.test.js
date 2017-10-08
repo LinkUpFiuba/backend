@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, before, it } from 'mocha'
+import { describe, before, beforeEach, it } from 'mocha'
 import Database from '../../src/services/gateway/database'
 import DisableUserService from '../../src/services/disableUserService'
 import { User } from './usersFactory'
@@ -22,7 +22,7 @@ describe('disableUserService', () => {
     })
 
     describe('No disabled users', () => {
-      before(() => {
+      beforeEach(() => {
         Database('disabledUsers').set({})
       })
 
@@ -31,6 +31,12 @@ describe('disableUserService', () => {
           return Database('disabledUsers').child(maleForFriends.Uid.toString()).once('value').then(result => {
             expect(result.exists()).to.be.true
           })
+        })
+      })
+
+      it('should send the disable push notification', () => {
+        return DisableUserService().blockUser(maleForFriends.Uid).then(response => {
+          expect(response.successCount).to.equal(1)
         })
       })
     })

@@ -13,8 +13,7 @@ export const PushNotificationService = () => {
     const payload = {
       notification: {
         title: 'Nuevo link!',
-        body: `${user2.name} también quiere linkear con vos! Sé el primero en iniciar la conversación! 😉`,
-        clickAction: 'com.google.firebase.MESSAGING_EVENT'
+        body: `${user2.name} también quiere linkear con vos! Sé el primero en iniciar la conversación! 😉`
       },
       data: {
         Uid: user2.Uid,
@@ -38,6 +37,19 @@ export const PushNotificationService = () => {
       }
     }
     return Messaging().sendToDevice(user1.tokenFCM, payload)
+  }
+
+  const sendDisableUserPush = user => {
+    const payload = {
+      notification: {
+        title: 'Has sido bloqueado!',
+        body: 'El administrador ha decidido bloquearte debido a las denuncias que ha recibido sobre ti.'
+      },
+      data: {
+        type: 'disable'
+      }
+    }
+    return Messaging().sendToDevice(user.tokenFCM, payload)
   }
 
   const onError = (user, error) => {
@@ -74,6 +86,19 @@ export const PushNotificationService = () => {
         })
       })
     },
+
+    sendDisablePush: userId => {
+      return getUser(userId).then(user => {
+        return sendDisableUserPush(user)
+          .then(response => {
+            return onSuccess(user, response)
+          })
+          .catch(error => {
+            return onError(user, error)
+          })
+      })
+    },
+
     sendNewMessagePush: (user1, user2, message) => {
       let firstUser
       return getUser(user1).then(user => {

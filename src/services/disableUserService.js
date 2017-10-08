@@ -1,5 +1,6 @@
 import Database from './gateway/database'
 import AuthService from './authService'
+import { PushNotificationService } from './pushNotificationService'
 
 export default function DisableUserService() {
   const isUserDisabled = userUid => {
@@ -21,6 +22,9 @@ export default function DisableUserService() {
           return AuthService().disableUser(userUid)
             .then(() => {
               return Database('disabledUsers').child(userUid).set(true)
+            })
+            .then(() => {
+              return PushNotificationService().sendDisablePush(userUid)
             })
         })
     },
