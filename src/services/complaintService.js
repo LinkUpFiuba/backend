@@ -1,6 +1,6 @@
 import Database from './gateway/database'
 import UserService from './userService'
-import DisableUserService from '../../src/services/disableUserService'
+import DisableUserService from './disableUserService'
 
 export default function ComplaintService() {
   const TOTAL_INDEX = 0
