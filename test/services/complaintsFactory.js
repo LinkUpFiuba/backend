@@ -5,24 +5,19 @@ export class Complaint {
       this.complaint = {
         idReporting: 'uid',
         message: 'message',
-        state: 'pending',
+        state: 'new',
         id: Complaint.id
       }
       Complaint.id += 1
     }
 
-    pending() {
-      this.complaint.state = 'pending'
+    new() {
+      this.complaint.state = 'new'
       return this
     }
 
-    rejected() {
-      this.complaint.state = 'rejected'
-      return this
-    }
-
-    approved() {
-      this.complaint.state = 'approved'
+    seen() {
+      this.complaint.state = 'seen'
       return this
     }
 
