@@ -30,7 +30,6 @@ export const PushNotificationService = () => {
       notification: {
         title: user2.name,
         body: message.message
-        // clickAction: 'com.google.firebase.MESSAGING_EVENT'
       },
       data: {
         type: 'message'
