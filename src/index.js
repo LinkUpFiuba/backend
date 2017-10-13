@@ -56,10 +56,11 @@ app.post('/users/:userUid/disable', (request, response) => {
   const userUid = request.params.userUid
   DisableUserService().blockUser(userUid)
     .then(() => response.json())
-    .catch(() => {
-      response.status(404)
-      return response.json({ message: 'That user was not found' })
-    })
+    // .catch(err => {
+    //   console.log(err)
+    //   response.status(404)
+    //   return response.json({ message: 'That user was not found' })
+    // })
 })
 
 app.post('/users/:userUid/enable', (request, response) => {
