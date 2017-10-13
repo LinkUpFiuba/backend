@@ -95,6 +95,8 @@ export const PushNotificationService = () => {
           .catch(error => {
             return onError(user, error)
           })
+      }).catch(() => {
+
       })
     },
 
