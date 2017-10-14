@@ -41,6 +41,17 @@ app.get('/complaints', (request, response) => {
   ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
 })
 
+app.post('/ads', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  const ad = request.body
+  AdsService().createAd(ad)
+    .then(() => response.status(201).send())
+    .catch(error => {
+      response.status(400)
+      return response.json({ message: error })
+    })
+})
+
 app.get('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().getAllAds().then(complaints => response.json(complaints))
