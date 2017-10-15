@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import express from 'express'
+import cors from 'cors'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
@@ -18,6 +19,7 @@ app.set('port', port)
 
 app.use(express.static(`${__dirname}/public`))
 app.use(bodyParser.json())
+app.use(cors())
 
 // views is directory for all template files
 app.set('views', `${__dirname}/views`)
