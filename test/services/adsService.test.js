@@ -1,9 +1,9 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import {describe, before, it} from 'mocha'
+import { describe, before, it } from 'mocha'
 import Database from '../../src/services/gateway/database'
 import AdsService from '../../src/services/adsService'
-import {Ad} from './adsFactory'
+import { Ad } from './adsFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
