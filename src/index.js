@@ -10,6 +10,7 @@ import { ChatService } from './services/chatService'
 import ComplaintService from './services/complaintService'
 import DisableUserService from './services/disableUserService'
 import AdsService from './services/adsService'
+import cors from 'cors'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -18,6 +19,7 @@ app.set('port', port)
 
 app.use(express.static(`${__dirname}/public`))
 app.use(bodyParser.json())
+app.use(cors())
 
 // views is directory for all template files
 app.set('views', `${__dirname}/views`)
