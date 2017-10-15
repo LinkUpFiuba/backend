@@ -10,6 +10,10 @@ export default function AdsService() {
           adsArray.push(ad.val())
         })
       }).then(() => adsArray)
+    },
+
+    deleteAd: adUid => {
+      return Database('ads').child(adUid).remove()
     }
   }
 }
