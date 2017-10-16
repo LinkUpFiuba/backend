@@ -59,6 +59,11 @@ app.get('/ads', (request, response) => {
   AdsService().getAllAds().then(complaints => response.json(complaints))
 })
 
+app.delete('/ads/:adUid', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().deleteAd(request.params.adUid).then(() => response.send())
+})
+
 app.get('/complaints/:userUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsForUser(request.params.userUid)

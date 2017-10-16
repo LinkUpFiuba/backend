@@ -22,9 +22,15 @@ export default function AdsService() {
       const adsArray = []
       return adsRef.once('value').then(ads => {
         ads.forEach(ad => {
-          adsArray.push(ad.val())
+          const completeAd = ad.val()
+          completeAd.uid = ad.key
+          adsArray.push(completeAd)
         })
       }).then(() => adsArray)
+    },
+
+    deleteAd: adUid => {
+      return Database('ads').child(adUid).remove()
     },
 
     createAd: ad => {
