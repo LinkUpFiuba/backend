@@ -30,8 +30,7 @@
     "firebase-token-generator": "^2.0.0",
     "geolib": "^2.0.23",
     "jsonschema": "^1.2.0",
-    "node-fetch": "^1.7.2",
-    "cors": "latest"
+    "node-fetch": "^1.7.2"
   },
   "devDependencies": {
     "chai": "^4.1.1",

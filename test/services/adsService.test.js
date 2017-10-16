@@ -50,7 +50,7 @@ describe('adsService', () => {
         Database('ads').set(ads)
       })
 
-      it('should return one ad', () => {
+      it('should return two ads', () => {
         return AdsService().getAllAds().then(ads => {
           expect(ads.length).to.equal(2)
           expect(ads[0].id).to.equal(googleAd.id)
@@ -69,7 +69,7 @@ describe('adsService', () => {
     })
 
     describe('when there is zero ads', () => {
-      it('should return non ad', () => {
+      it('should return no ad', () => {
         return AdsService().deleteAd(googleAd.id).then(() => {
           return true
         })
@@ -93,7 +93,7 @@ describe('adsService', () => {
       })
     })
 
-    describe('when there are two ad', () => {
+    describe('when there are two ads', () => {
       before(() => {
         const ads = {
           [googleAd.id]: googleAd,

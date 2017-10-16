@@ -11,7 +11,6 @@ import { ChatService } from './services/chatService'
 import ComplaintService from './services/complaintService'
 import DisableUserService from './services/disableUserService'
 import AdsService from './services/adsService'
-import cors from 'cors'
 
 const app = express()
 const port = process.env.PORT || 5000
