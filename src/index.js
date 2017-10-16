@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import express from 'express'
+import cors from 'cors'
 import UserService from './services/userService'
 import Administrator from './services/gateway/administrator'
 import bodyParser from 'body-parser'
@@ -41,6 +42,17 @@ app.get('/users/:id', (request, response) => {
 app.get('/complaints', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
+app.post('/ads', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  const ad = request.body
+  AdsService().createAd(ad)
+    .then(() => response.status(201).send())
+    .catch(error => {
+      response.status(400)
+      return response.json({ message: error })
+    })
 })
 
 app.get('/ads', (request, response) => {
