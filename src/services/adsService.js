@@ -3,10 +3,10 @@ import Validator from 'jsonschema'
 import adSchema from './schemas/adSchema'
 
 export default function AdsService() {
-  const validateUser = user => {
+  const validateAd = ad => {
     const correctness = {}
     const v = new Validator.Validator()
-    const result = v.validate(user, adSchema)
+    const result = v.validate(ad, adSchema)
     if (result.errors.length > 0) {
       correctness.result = false
       correctness.message = result.errors
@@ -29,7 +29,7 @@ export default function AdsService() {
 
     createAd: ad => {
       const adsRef = Database('ads')
-      const correctness = validateUser(ad)
+      const correctness = validateAd(ad)
       if (!correctness.result) {
         return Promise.reject(correctness.message)
       }

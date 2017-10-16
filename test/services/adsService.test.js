@@ -8,7 +8,7 @@ import { Ad } from './adsFactory'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe('complaintService', () => {
+describe('adsService', () => {
   describe('getAllAds', () => {
     const googleAd = new Ad('Google', 'Google image').get()
     const facebookAd = new Ad('Facebook', 'Facebook image').get()
@@ -60,7 +60,7 @@ describe('complaintService', () => {
     })
   })
 
-  describe.only('createAd', () => {
+  describe('createAd', () => {
     const googleAd = new Ad('Google', 'Google image').active().get()
     const facebookAd = new Ad('Facebook', 'Facebook image').active().get()
 
@@ -69,7 +69,7 @@ describe('complaintService', () => {
     })
 
     describe('bad schema', () => {
-      it('should responde with error if ad is empty', () => {
+      it('should respond with error if ad is empty', () => {
         return AdsService().createAd({})
           .then(() => {
             return Promise.reject(new Error('Expected method to reject.'))
