@@ -26,7 +26,7 @@ export default function AdsService() {
   const changeStateOfAd = (adUid, newState) => {
     return adExists(adUid).then(adExists => {
       if (!adExists) {
-        return Promise.reject(new Error('That adUid does not exists'))
+        return Promise.reject(new Error('That adUid does not exist'))
       }
       const updates = {}
       updates[`/${adUid}/state`] = newState

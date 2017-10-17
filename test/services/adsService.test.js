@@ -216,7 +216,7 @@ describe('adsService', () => {
 
   describe('enableAd', () => {
     const googleActiveAd = new Ad('Google', 'Google image').active().get()
-    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disable().get()
+    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
 
     before(() => {
       Database('ads').set({})
@@ -298,7 +298,7 @@ describe('adsService', () => {
 
   describe('disable', () => {
     const googleActiveAd = new Ad('Google', 'Google image').active().get()
-    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disable().get()
+    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
 
     before(() => {
       Database('ads').set({})
@@ -346,7 +346,7 @@ describe('adsService', () => {
         Database('ads').set(ads)
       })
 
-      it('should enable the ad', () => {
+      it('should disable the ad', () => {
         return AdsService().disableAd(googleActiveAd.id).then(() => {
           return AdsService().getAllAds().then(ads => {
             expect(ads[0].uid).to.equal(googleActiveAd.id)
