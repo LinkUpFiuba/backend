@@ -70,6 +70,16 @@ app.delete('/ads/:adUid', (request, response) => {
   AdsService().deleteAd(request.params.adUid).then(() => response.send())
 })
 
+app.post('/ads/:adUid/enable', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().enableAd(request.params.adUid).then(() => response.send())
+})
+
+app.post('/ads/:adUid/disable', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().disableAd(request.params.adUid).then(() => response.send())
+})
+
 app.get('/complaints/:userUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsForUser(request.params.userUid)

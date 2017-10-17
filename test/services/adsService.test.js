@@ -276,4 +276,168 @@ describe('adsService', () => {
       })
     })
   })
+
+  describe('enableAd', () => {
+    const googleActiveAd = new Ad('Google', 'Google image').active().get()
+    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
+
+    before(() => {
+      Database('ads').set({})
+    })
+
+    describe('when the ad does not exists', () => {
+      before(() => {
+        Database('ads').set({})
+      })
+
+      it('should raise an error', () => {
+        return AdsService().enableAd(googleActiveAd.id)
+          .then(() => {
+            return Promise.reject(new Error('Expected method to reject.'))
+          })
+          .catch(() => {
+            return true
+          })
+      })
+    })
+
+    describe('when there is only one ad and it is enable', () => {
+      before(() => {
+        const ads = {
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should do nothing', () => {
+        return AdsService().enableAd(googleActiveAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].uid).to.equal(googleActiveAd.id)
+            expect(ads[0].state).to.equal('Active')
+          })
+        })
+      })
+    })
+
+    describe('when there is only one ad and it is disabled', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should enable the ad', () => {
+        return AdsService().enableAd(facebookDisableAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].uid).to.equal(facebookDisableAd.id)
+            expect(ads[0].state).to.equal('Active')
+          })
+        })
+      })
+    })
+
+    describe('when there are two ads: one enabled and one disabled', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd,
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should enable the disabled ad', () => {
+        return AdsService().enableAd(facebookDisableAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[1].uid).to.equal(facebookDisableAd.id)
+            expect(ads[1].state).to.equal('Active')
+            expect(ads[0].uid).to.equal(googleActiveAd.id)
+            expect(ads[0].state).to.equal('Active')
+          })
+        })
+      })
+    })
+  })
+
+  describe('disable', () => {
+    const googleActiveAd = new Ad('Google', 'Google image').active().get()
+    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
+
+    before(() => {
+      Database('ads').set({})
+    })
+
+    describe('when the ad does not exists', () => {
+      before(() => {
+        Database('ads').set({})
+      })
+
+      it('should raise an error', () => {
+        return AdsService().disableAd(googleActiveAd.id)
+          .then(() => {
+            return Promise.reject(new Error('Expected method to reject.'))
+          })
+          .catch(() => {
+            return true
+          })
+      })
+    })
+
+    describe('when there is only one ad and it is disabled', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should do nothing', () => {
+        return AdsService().disableAd(facebookDisableAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].uid).to.equal(facebookDisableAd.id)
+            expect(ads[0].state).to.equal('Disabled')
+          })
+        })
+      })
+    })
+
+    describe('when there is only one ad and it is enabled', () => {
+      before(() => {
+        const ads = {
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should disable the ad', () => {
+        return AdsService().disableAd(googleActiveAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].uid).to.equal(googleActiveAd.id)
+            expect(ads[0].state).to.equal('Disabled')
+          })
+        })
+      })
+    })
+
+    describe('when there are two ads: one enabled and one disabled', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd,
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should disable the enable ad', () => {
+        return AdsService().disableAd(googleActiveAd.id).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[1].uid).to.equal(facebookDisableAd.id)
+            expect(ads[1].state).to.equal('Disabled')
+            expect(ads[0].uid).to.equal(googleActiveAd.id)
+            expect(ads[0].state).to.equal('Disabled')
+          })
+        })
+      })
+    })
+  })
 })

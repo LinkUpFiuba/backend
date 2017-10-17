@@ -15,7 +15,7 @@ export class Ad {
     return this
   }
 
-  disable() {
+  disabled() {
     this.ad.state = 'Disabled'
     return this
   }

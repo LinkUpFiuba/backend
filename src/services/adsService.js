@@ -28,6 +28,24 @@ export default function AdsService() {
     return correctness
   }
 
+  const adExists = adUid => {
+    const ref = Database('ads')
+    return ref.child(adUid).once('value').then(ad => {
+      return ad.exists()
+    })
+  }
+
+  const changeStateOfAd = (adUid, newState) => {
+    return adExists(adUid).then(adExists => {
+      if (!adExists) {
+        return Promise.reject(new Error('That adUid does not exist'))
+      }
+      const updates = {}
+      updates[`/${adUid}/state`] = newState
+      return Database('ads').update(updates)
+    })
+  }
+
   return {
     getAllAds: getAllAds,
 
@@ -43,6 +61,14 @@ export default function AdsService() {
 
     deleteAd: adUid => {
       return Database('ads').child(adUid).remove()
+    },
+
+    enableAd: adUid => {
+      return changeStateOfAd(adUid, 'Active')
+    },
+
+    disableAd: adUid => {
+      return changeStateOfAd(adUid, 'Disabled')
     },
 
     createAd: ad => {
