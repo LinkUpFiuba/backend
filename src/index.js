@@ -11,6 +11,7 @@ import { ChatService } from './services/chatService'
 import ComplaintService from './services/complaintService'
 import DisableUserService from './services/disableUserService'
 import AdsService from './services/adsService'
+import UserController from './controllers/userController'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -56,7 +57,12 @@ app.post('/ads', (request, response) => {
 
 app.get('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
-  AdsService().getAllAds().then(complaints => response.json(complaints))
+  AdsService().getAllAds().then(ads => response.json(ads))
+})
+
+app.get('/ads/random', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().getRandomActiveAd().then(ad => response.json(ad))
 })
 
 app.delete('/ads/:adUid', (request, response) => {
@@ -90,11 +96,11 @@ app.post('/users/:userUid/disable', (request, response) => {
   const userUid = request.params.userUid
   DisableUserService().blockUser(userUid)
     .then(() => response.json())
-    // .catch(err => {
-    //   console.log(err)
-    //   response.status(404)
-    //   return response.json({ message: 'That user was not found' })
-    // })
+    .catch(err => {
+      console.log(err)
+      response.status(404)
+      return response.json({ message: 'That user was not found' })
+    })
 })
 
 app.post('/users/:userUid/enable', (request, response) => {
@@ -116,7 +122,7 @@ app.get('/users', (request, response) => {
   Administrator().auth().verifyIdToken(request.get('token'))
     .then(decodedToken => {
       const uid = decodedToken.uid
-      UserService().getPosibleLinks(uid).then(users => response.json(users))
+      UserController().getUsersForUser(uid).then(usersWithAd => response.json(usersWithAd))
     })
     .catch(error => {
       response.status(403)

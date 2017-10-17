@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { describe, before, it } from 'mocha'
 import Database from '../../src/services/gateway/database'
 import AdsService from '../../src/services/adsService'
-import { Ad } from './adsFactory'
+import { Ad } from '../factories/adsFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -209,6 +209,89 @@ describe('adsService', () => {
             expect(ads[1].image).to.equal(facebookAd.image)
             expect(ads[1].state).to.equal(facebookAd.state)
           })
+        })
+      })
+    })
+  })
+
+  describe('getRandomActiveAd', () => {
+    const googleActiveAd = new Ad('Google', 'Google image').active().get()
+    const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
+    const facebookActiveAd = new Ad('Facebook', 'Facebook image').active().get()
+
+    describe('when there is zero ads', () => {
+      before(() => {
+        Database('ads').set({})
+      })
+
+      it('should return undefined', () => {
+        return AdsService().getRandomActiveAd().then(ad => {
+          expect(ad).to.equal()
+        })
+      })
+    })
+
+    describe('when there is one active ad', () => {
+      before(() => {
+        const ads = {
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should return the ad', () => {
+        return AdsService().getRandomActiveAd().then(ad => {
+          expect(ad.uid).to.equal(googleActiveAd.id)
+        })
+      })
+    })
+
+    describe('when there is one disable ad', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should return undefined', () => {
+        return AdsService().getRandomActiveAd().then(ad => {
+          expect(ad).to.equal()
+        })
+      })
+    })
+
+    describe('when there is one disable and one enable', () => {
+      before(() => {
+        const ads = {
+          [facebookDisableAd.id]: facebookDisableAd,
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should return the enable ad', () => {
+        return AdsService().getRandomActiveAd().then(ad => {
+          expect(ad.uid).to.equal(googleActiveAd.id)
+        })
+      })
+    })
+
+    describe('when there is two enable ads', () => {
+      before(() => {
+        const ads = {
+          [facebookActiveAd.id]: facebookActiveAd,
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should return one of the enable ad', () => {
+        return AdsService().getRandomActiveAd().then(ad => {
+          if (ad.id !== facebookActiveAd.id && ad.id !== googleActiveAd.id) {
+            return Promise.reject(new Error('Expected to return one ad'))
+          }
+          return true
         })
       })
     })
