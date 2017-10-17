@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, before, it } from 'mocha'
-import { Interest } from '../Factories/interestsFactory'
+import { Interest } from '../factories/interestsFactory'
 import InterestsService from '../../src/services/interestsService'
 
 chai.use(chaiAsPromised)

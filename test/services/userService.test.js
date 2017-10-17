@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before } from 'mocha'
 import UserService from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
-import { User, Interests } from '../Factories/usersFactory'
+import { User, Interests } from '../factories/usersFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect

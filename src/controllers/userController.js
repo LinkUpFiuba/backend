@@ -12,7 +12,7 @@ export default function UserController() {
           users.forEach(user => {
             user.type = 'user'
           })
-          // if there is not ad to add
+          // if there is no ad to add
           if (!ad) {
             return users
           }
