@@ -13,6 +13,7 @@ describe('UserController', () => {
   const maleForFriends = new User().male().likesFriends().get()
   const maleForFriends2 = new User().male().likesFriends().get()
   const femaleForFriends = new User().female().likesFriends().get()
+  const premiumForFriends = new User().male().premium().likesFriends().get()
   const googleAd = new Ad('Google', 'Google image').active().get()
 
   describe('getUsersForUser', () => {
@@ -110,6 +111,31 @@ describe('UserController', () => {
       it('should return both users and ad', () => {
         return UserController().getUsersForUser(maleForFriends.Uid).then(response => {
           expect(response.length).to.equal(3)
+        })
+      })
+    })
+
+    describe('when it is a premium user', () => {
+      before(() => {
+        const users = {
+          [maleForFriends.Uid]: maleForFriends,
+          [femaleForFriends.Uid]: femaleForFriends,
+          [maleForFriends2.Uid]: maleForFriends2,
+          [premiumForFriends.Uid]: premiumForFriends
+        }
+        Database('users').set(users)
+        const ads = {
+          [googleAd.id]: googleAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should return only users (no ad)', () => {
+        return UserController().getUsersForUser(premiumForFriends.Uid).then(response => {
+          expect(response.length).to.equal(3)
+          response.forEach(user => {
+            expect(user.type).to.equal('user')
+          })
         })
       })
     })

@@ -10,6 +10,7 @@ export class User {
       age: 23,
       maxDistance: 100,
       invisibleMode: false,
+      linkUpPlus: false,
       range: {
         minAge: 18,
         maxAge: 28
@@ -52,6 +53,11 @@ export class User {
 
   invisibleModeOn() {
     this.user.invisibleMode = true
+    return this
+  }
+
+  premium() {
+    this.user.linkUpPlus = true
     return this
   }
 
