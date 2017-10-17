@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before, beforeEach } from 'mocha'
 import LinkService from '../../src/services/linkService'
-import { User } from './usersFactory'
+import { User } from '../factories/usersFactory'
 import Database from '../../src/services/gateway/database'
 
 chai.use(chaiAsPromised)
