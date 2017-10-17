@@ -11,12 +11,12 @@ export class Ad {
   }
 
   active() {
-    this.ad.state = 'active'
+    this.ad.state = 'Active'
     return this
   }
 
-  disable() {
-    this.ad.state = 'disable'
+  disabled() {
+    this.ad.state = 'Disabled'
     return this
   }
 
