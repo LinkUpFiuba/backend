@@ -1,27 +1,20 @@
 import Database from './gateway/database'
+import * as Validator from 'jsonschema'
+import adSchema from './schemas/adSchema'
 
 export default function AdsService() {
-  const getAllAds = () => {
-    const adsRef = Database('ads')
+  const getAllAds = state => {
     const adsArray = []
+    const adsRef = state ? Database('ads').orderByChild('state').equalTo(state) : Database('ads')
     return adsRef.once('value').then(ads => {
       ads.forEach(ad => {
-        adsArray.push(ad.val())
+        const completeAd = ad.val()
+        completeAd.uid = ad.key
+        adsArray.push(completeAd)
       })
     }).then(() => adsArray)
   }
 
-  return {
-    getAllAds: getAllAds,
-
-    // return undefined if there is no ad to show
-    getRandomAd: () => {
-      return getAllAds().then(ads => {
-        if (ads.length === 0) {
-          return
-        }
-        return ads[Math.floor(Math.random() * ads.length)]
-      })
   const validateAd = ad => {
     const correctness = {}
     const v = new Validator.Validator()
@@ -36,16 +29,16 @@ export default function AdsService() {
   }
 
   return {
-    getAllAds: () => {
-      const adsRef = Database('ads')
-      const adsArray = []
-      return adsRef.once('value').then(ads => {
-        ads.forEach(ad => {
-          const completeAd = ad.val()
-          completeAd.uid = ad.key
-          adsArray.push(completeAd)
-        })
-      }).then(() => adsArray)
+    getAllAds: getAllAds,
+
+    // return undefined if there is no ad to show
+    getRandomActiveAd: () => {
+      return getAllAds('Active').then(ads => {
+        if (ads.length === 0) {
+          return
+        }
+        return ads[Math.floor(Math.random() * ads.length)]
+      })
     },
 
     deleteAd: adUid => {

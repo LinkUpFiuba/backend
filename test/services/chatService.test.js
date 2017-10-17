@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha'
 import { ChatService } from '../../src/services/chatService'
 import Database from '../../src/services/gateway/database'
-import { User } from './usersFactory'
+import { User } from '../Factories/usersFactory'
 
 // This suite of test is not a real one. It's only for seeing in console if push notifications are sent
 // when they should, but it will no fail if it doesn't. Furthermore, they are more like integration tests,
