@@ -9,6 +9,17 @@ export const PushNotificationService = () => {
     })
   }
 
+  const sendPush = (user, payload) => {
+    if (user.getNotifications) {
+      return Messaging().sendToDevice(user.tokenFCM, payload).then(response => {
+        response.sent = true
+        return response
+      })
+    } else {
+      return Promise.resolve({ sent: false })
+    }
+  }
+
   const sendMatchPush = (user1, user2) => {
     const payload = {
       notification: {
@@ -22,7 +33,7 @@ export const PushNotificationService = () => {
         type: 'match'
       }
     }
-    return Messaging().sendToDevice(user1.tokenFCM, payload)
+    return sendPush(user1, payload)
   }
 
   const sendNewMessagePush = (user1, user2, message) => {
@@ -35,7 +46,7 @@ export const PushNotificationService = () => {
         type: 'message'
       }
     }
-    return Messaging().sendToDevice(user1.tokenFCM, payload)
+    return sendPush(user1, payload)
   }
 
   const sendDisableUserPush = user => {
@@ -48,7 +59,10 @@ export const PushNotificationService = () => {
         type: 'disable'
       }
     }
-    return Messaging().sendToDevice(user.tokenFCM, payload)
+    return Messaging().sendToDevice(user.tokenFCM, payload).then(response => {
+      response.sent = true
+      return response
+    })
   }
 
   const onError = (user, error) => {
@@ -57,7 +71,11 @@ export const PushNotificationService = () => {
   }
 
   const onSuccess = (user, response) => {
-    console.log(`Successfully sent push notification to user ${user.Uid}`)
+    if (response.sent) {
+      console.log(`Successfully sent push notification to user ${user.Uid}`)
+    } else {
+      console.log('User has notifications disabled so no push was sent')
+    }
     return response
   }
 

@@ -19,6 +19,7 @@ export class User {
         latitude: 20,
         longitude: 20
       },
+      getNotifications: true,
       tokenFCM: 'some-token-fcm',
       interests: {
         male: false,
@@ -118,6 +119,11 @@ export class User {
     this.withInterest(Interests.tallerInterest)
     this.withInterest(Interests.fiubaInterest)
     this.withInterest(Interests.programmingInterest)
+    return this
+  }
+
+  withoutNotifications() {
+    this.user.getNotifications = false
     return this
   }
 
