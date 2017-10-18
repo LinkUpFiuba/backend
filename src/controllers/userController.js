@@ -5,7 +5,7 @@ export default function UserController() {
   return {
     getUsersForUser: userUid => {
       return UserService().getPosibleLinks(userUid).then(users => {
-        return UserService().getUser(userUid).then(user => {
+        return UserService().hasLinkUpPlus(userUid).then(hasLinkUpPlus => {
           return AdsService().getRandomActiveAd().then(ad => {
             if (users.length === 0) {
               return []
@@ -14,7 +14,7 @@ export default function UserController() {
               user.type = 'user'
             })
             // If there is no ad to add or if it's a premium user we don't send ads
-            if (!ad || user.linkUpPlus) {
+            if (!ad || hasLinkUpPlus) {
               return users
             }
             ad.type = 'ad'
