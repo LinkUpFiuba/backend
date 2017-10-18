@@ -55,6 +55,12 @@ describe('UserService', () => {
     const femaleForMaleWithThreeInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).get()
     const femaleForMaleWithFourInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).withInterest(Interests.lopilatoInterest).get()
 
+    // The 'withLocation(20.90326, 20)' is in order to the distanceScore to be 0 (i.e. to be at 100km far)
+    const maleForFriendsAt100km = new User().male().likesFriends().withLocation(20.90326, 20).get()
+    const premiumForFriends = new User().male().likesFriends().premium().get()
+    const freeUserForFriends = new User().female().likesFriends().get()
+    const anotherFreeUserForFriends = new User().male().likesFriends().get()
+
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
     }
@@ -727,7 +733,7 @@ describe('UserService', () => {
 
         it('the user in the same spot has the best score', () => {
           return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
-            expect(users[0].matchingScore).to.equal(60)
+            expect(users[0].matchingScore).to.equal(54)
           })
         })
 
@@ -773,19 +779,46 @@ describe('UserService', () => {
 
         it('user with 11 interests in common has the best score', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
-            expect(users[0].matchingScore).to.equal(0.4 * 10 * 10)
+            expect(users[0].matchingScore).to.equal(0.36 * 10 * 10)
           })
         })
 
         it('user with four interests in common has the correct score', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
-            expect(users[2].matchingScore).to.equal(0.4 * 4 * 10)
+            expect(users[2].matchingScore).to.equal(0.36 * 4 * 10)
           })
         })
 
         it('users have the commonInterests property', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
             expect(users[0]).to.have.property('commonInterests')
+          })
+        })
+      })
+
+      describe('when some of them have LinkUp Plus', () => {
+        before(() => {
+          // In the database they are not ordered by premium user or not
+          const users = {
+            [maleForFriendsAt100km.Uid]: maleForFriendsAt100km,
+            [freeUserForFriends.Uid]: freeUserForFriends,
+            [premiumForFriends.Uid]: premiumForFriends,
+            [anotherFreeUserForFriends.Uid]: anotherFreeUserForFriends
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
+
+        it('orders by premium users', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users.length).to.equal(3)
+            expect(users[0].Uid).to.equal(premiumForFriends.Uid)
+          })
+        })
+
+        it('premium user has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[0].matchingScore).to.equal(0.1 * 100)
           })
         })
       })
