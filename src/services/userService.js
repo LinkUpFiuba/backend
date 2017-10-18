@@ -190,6 +190,12 @@ export default function UserService() {
         })
       })
     },
+    hasLinkUpPlus: uid => {
+      const usersRef = Database('users')
+      return usersRef.child(uid).once('value').then(user => {
+        return user.val().linkUpPlus
+      })
+    },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
       let actualUser
