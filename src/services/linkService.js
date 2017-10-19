@@ -95,7 +95,7 @@ export default function LinkService() {
         return linksRef.child(`${user.Uid}/${actualUser.Uid}`).once('value').then(link => {
           if (unlink.exists()) return UNLINK
           if (link.exists()) {
-            if (link.val()) {
+            if (link.val() === 'superlink') {
               return SUPERLINK
             }
             return LINK

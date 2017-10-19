@@ -438,10 +438,10 @@ describe('UserService', () => {
           }
           const links = {
             [maleForFriends.Uid]: {
-              [femaleForFriends.Uid]: true
+              [femaleForFriends.Uid]: 'normal'
             },
             [femaleForFriends.Uid]: {
-              [maleForFriends.Uid]: true
+              [maleForFriends.Uid]: 'normal'
             }
           }
           Database('users').set(users)
@@ -462,7 +462,7 @@ describe('UserService', () => {
           }
           const links = {
             [maleForFriends.Uid]: {
-              [femaleForFriends.Uid]: true
+              [femaleForFriends.Uid]: 'normal'
             }
           }
           Database('users').set(users)
@@ -484,10 +484,10 @@ describe('UserService', () => {
           }
           const links = {
             [maleForFriends.Uid]: {
-              [femaleForFriends.Uid]: true
+              [femaleForFriends.Uid]: 'normal'
             },
             [femaleForFriends.Uid]: {
-              [maleForFriends.Uid]: true
+              [maleForFriends.Uid]: 'normal'
             }
           }
           Database('users').set(users)
@@ -511,16 +511,16 @@ describe('UserService', () => {
           }
           const links = {
             [maleForFriends.Uid]: {
-              [femaleForFriends.Uid]: true,
-              [maleForFriends2.Uid]: true
+              [femaleForFriends.Uid]: 'normal',
+              [maleForFriends2.Uid]: 'normal'
             },
             [femaleForFriends.Uid]: {
-              [maleForFriends.Uid]: true,
-              [maleForFriends2.Uid]: true
+              [maleForFriends.Uid]: 'normal',
+              [maleForFriends2.Uid]: 'normal'
             },
             [maleForFriends2.Uid]: {
-              [maleForFriends.Uid]: true,
-              [femaleForFriends.Uid]: true
+              [maleForFriends.Uid]: 'normal',
+              [femaleForFriends.Uid]: 'normal'
             }
           }
           Database('users').set(users)
@@ -844,10 +844,10 @@ describe('UserService', () => {
 
           const links = {
             [lastFreeUserForFriends.Uid]: {
-              [maleForFriendsAt100km.Uid]: false
+              [maleForFriendsAt100km.Uid]: 'normal'
             },
             [anotherFreeUserForFriends.Uid]: {
-              [maleForFriendsAt100km.Uid]: true
+              [maleForFriendsAt100km.Uid]: 'superlink'
             }
           }
           const linksRef = Database('links')

@@ -108,7 +108,7 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -158,10 +158,10 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           },
           [linkedUser.Uid]: {
-            [linkingUser.Uid]: true
+            [linkingUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -237,7 +237,7 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [maleForFriends.Uid]: {
-            [femaleForFriends.Uid]: false
+            [femaleForFriends.Uid]: 'normal'
           }
         }
         unlinksRef.set({})
@@ -255,7 +255,7 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [maleForFriends.Uid]: {
-            [femaleForFriends.Uid]: true
+            [femaleForFriends.Uid]: 'superlink'
           }
         }
         unlinksRef.set({})
