@@ -7,8 +7,9 @@ import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
 
-export const DISTANCE_WEIGHT = 0.54
-export const INTERESTS_WEIGHT = 0.36
+export const DISTANCE_WEIGHT = 0.48
+export const INTERESTS_WEIGHT = 0.32
+export const LINK_UP_PLUS_WEIGHT = 0.1
 export const LINK_SITUATION_WEIGHT = 0.1
 
 export default function UserService() {
@@ -89,14 +90,17 @@ export default function UserService() {
       // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
       // a 1/x function, so that less distance goes with a better score. All the constants are given to have
       // an smoother function with the corresponding max and min. On the other hand, we care about the
-      // interests as a linear function, with a max of 10 interests in common. In addition, we also give some
-      // prioritization when there's a superlink, a link or an unlink (or even if they haven't link at all).
-      // After that, we weight the scores with a defined value.
+      // interests as a linear function, with a max of 10 interests in common. In addition, we prioritize
+      // candidates that have LinkUp Plus. Finally, we also give some prioritization when there's a superlink,
+      // a link or an unlink (or even if they haven't link at all). After that, we weight the scores with a
+      // defined value.
       // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
       const distanceScore = (A / ((user.distance / B) + C)) + D
       const interestsScore = Math.min(commonInterests.length * 10, 100)
+      const linkUpPlusScore = +user.linkUpPlus * 100 // The + is to convert bool to 0 or 1
       return DISTANCE_WEIGHT * distanceScore +
              INTERESTS_WEIGHT * interestsScore +
+             LINK_UP_PLUS_WEIGHT * linkUpPlusScore +
              LINK_SITUATION_WEIGHT * linkSituationScore
     })
   }

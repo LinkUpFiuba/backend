@@ -5,7 +5,8 @@ import { describe, it, before } from 'mocha'
 import UserService, {
   DISTANCE_WEIGHT,
   INTERESTS_WEIGHT,
-  LINK_SITUATION_WEIGHT
+  LINK_SITUATION_WEIGHT,
+  LINK_UP_PLUS_WEIGHT
 } from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
@@ -62,6 +63,7 @@ describe('UserService', () => {
     // The 'withLocation(20.90326, 20)' is in order to the distanceScore to be 0 (i.e. to be at 100km far)
     const maleForFriendsAt100km = new User().male().likesFriends().withLocation(20.90326, 20).get()
     const freeUserForFriends = new User().female().likesFriends().get()
+    const premiumForFriends = new User().male().likesFriends().premium().get()
     const anotherFreeUserForFriends = new User().male().likesFriends().get()
     const lastFreeUserForFriends = new User().female().likesFriends().get()
     const yetAnotherFreeUserForFriends = new User().male().likesFriends().get()
@@ -797,6 +799,33 @@ describe('UserService', () => {
         it('users have the commonInterests property', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
             expect(users[0]).to.have.property('commonInterests')
+          })
+        })
+      })
+
+      describe('when some of them have LinkUp Plus', () => {
+        before(() => {
+          // In the database they are not ordered by premium user or not
+          const users = {
+            [maleForFriendsAt100km.Uid]: maleForFriendsAt100km,
+            [freeUserForFriends.Uid]: freeUserForFriends,
+            [premiumForFriends.Uid]: premiumForFriends,
+            [anotherFreeUserForFriends.Uid]: anotherFreeUserForFriends
+          }
+          const ref = Database('users')
+          ref.set(users)
+        })
+
+        it('orders by premium users', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users.length).to.equal(3)
+            expect(users[0].Uid).to.equal(premiumForFriends.Uid)
+          })
+        })
+
+        it('premium user has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[0].matchingScore).to.equal(LINK_UP_PLUS_WEIGHT * 100 + LINK_SITUATION_WEIGHT * NO_LINK)
           })
         })
       })
