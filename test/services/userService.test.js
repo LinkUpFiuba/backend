@@ -1,11 +1,15 @@
-
 /* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before } from 'mocha'
-import UserService from '../../src/services/userService'
+import UserService, {
+  DISTANCE_WEIGHT,
+  INTERESTS_WEIGHT,
+  LINK_SITUATION_WEIGHT
+} from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
+import { NO_LINK } from '../../src/services/linkService'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -710,8 +714,8 @@ describe('UserService', () => {
             [femaleForMaleNearMale.Uid]: femaleForMaleNearMale,
             [femaleForMaleNearMaleButFar.Uid]: femaleForMaleNearMaleButFar
           }
-          const ref = Database('users')
-          ref.set(users)
+          const usersRef = Database('users')
+          usersRef.set(users)
         })
 
         it('orders by distance', () => {
@@ -727,13 +731,13 @@ describe('UserService', () => {
 
         it('the user in the same spot has the best score', () => {
           return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
-            expect(users[0].matchingScore).to.equal(60)
+            expect(users[0].matchingScore).to.equal(DISTANCE_WEIGHT * 100 + LINK_SITUATION_WEIGHT * NO_LINK)
           })
         })
 
         it('the furthest user has the worst score', () => {
           return UserService().getPosibleLinks(maleForFemaleInSomePosition.Uid).then(users => {
-            expect(users[4].matchingScore).to.equal(0)
+            expect(users[4].matchingScore).to.equal(DISTANCE_WEIGHT * 0 + LINK_SITUATION_WEIGHT * NO_LINK)
           })
         })
 
@@ -773,13 +777,13 @@ describe('UserService', () => {
 
         it('user with 11 interests in common has the best score', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
-            expect(users[0].matchingScore).to.equal(0.4 * 10 * 10)
+            expect(users[0].matchingScore).to.equal(INTERESTS_WEIGHT * 10 * 10 + LINK_SITUATION_WEIGHT * NO_LINK)
           })
         })
 
         it('user with four interests in common has the correct score', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
-            expect(users[2].matchingScore).to.equal(0.4 * 4 * 10)
+            expect(users[2].matchingScore).to.equal(INTERESTS_WEIGHT * 4 * 10 + LINK_SITUATION_WEIGHT * NO_LINK)
           })
         })
 
