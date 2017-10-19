@@ -16,8 +16,9 @@ export default function UserService() {
   const B = 1
   const C = 12.5
   const D = -12.5
-  const DISTANCE_WEIGHT = 0.6
-  const INTERESTS_WEIGHT = 0.4
+  const DISTANCE_WEIGHT = 0.54
+  const INTERESTS_WEIGHT = 0.36
+  const LINK_UP_PLUS_WEIGHT = 0.1
 
   const validateUser = user => {
     const correctness = {}
@@ -91,7 +92,10 @@ export default function UserService() {
     // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
     const distanceScore = (A / ((user.distance / B) + C)) + D
     const interestsScore = Math.min(commonInterests.length * 10, 100)
-    return DISTANCE_WEIGHT * distanceScore + INTERESTS_WEIGHT * interestsScore
+    const linkUpPlusScore = +user.linkUpPlus * 100 // The + is to convert bool to 0 or 1
+    return DISTANCE_WEIGHT * distanceScore +
+           INTERESTS_WEIGHT * interestsScore +
+           LINK_UP_PLUS_WEIGHT * linkUpPlusScore
   }
 
   const orderByMatchingAlgorithm = (users, actualUser) => {
