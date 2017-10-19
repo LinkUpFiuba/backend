@@ -9,7 +9,7 @@ import UserService, {
 } from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
-import { NO_LINK } from '../../src/services/linkService'
+import { SUPERLINK, LINK, UNLINK, NO_LINK } from '../../src/services/linkService'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -58,6 +58,13 @@ describe('UserService', () => {
     const femaleForMaleWithTwoInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).get()
     const femaleForMaleWithThreeInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).get()
     const femaleForMaleWithFourInterests = new User().female().likesMale().withInterest(Interests.sanLorenzoInterest).withInterest(Interests.adminInterest).withInterest(Interests.fiubaInterest).withInterest(Interests.lopilatoInterest).get()
+
+    // The 'withLocation(20.90326, 20)' is in order to the distanceScore to be 0 (i.e. to be at 100km far)
+    const maleForFriendsAt100km = new User().male().likesFriends().withLocation(20.90326, 20).get()
+    const freeUserForFriends = new User().female().likesFriends().get()
+    const anotherFreeUserForFriends = new User().male().likesFriends().get()
+    const lastFreeUserForFriends = new User().female().likesFriends().get()
+    const yetAnotherFreeUserForFriends = new User().male().likesFriends().get()
 
     const searchForUser = (users, userForSearch) => {
       return users.map(user => user.Uid).includes(userForSearch.Uid)
@@ -790,6 +797,73 @@ describe('UserService', () => {
         it('users have the commonInterests property', () => {
           return UserService().getPosibleLinks(maleForFemaleWithManyInterests.Uid).then(users => {
             expect(users[0]).to.have.property('commonInterests')
+          })
+        })
+      })
+
+      describe('when they have some link situation', () => {
+        before(() => {
+          const users = {
+            [maleForFriendsAt100km.Uid]: maleForFriendsAt100km,
+            [freeUserForFriends.Uid]: freeUserForFriends,
+            [anotherFreeUserForFriends.Uid]: anotherFreeUserForFriends,
+            [lastFreeUserForFriends.Uid]: lastFreeUserForFriends,
+            [yetAnotherFreeUserForFriends.Uid]: yetAnotherFreeUserForFriends
+          }
+          const usersRef = Database('users')
+          usersRef.set(users)
+
+          const links = {
+            [lastFreeUserForFriends.Uid]: {
+              [maleForFriendsAt100km.Uid]: false
+            },
+            [anotherFreeUserForFriends.Uid]: {
+              [maleForFriendsAt100km.Uid]: true
+            }
+          }
+          const linksRef = Database('links')
+          linksRef.set(links)
+
+          const unlinks = {
+            [freeUserForFriends.Uid]: {
+              [maleForFriendsAt100km.Uid]: true
+            }
+          }
+          const unlinksRef = Database('unlinks')
+          unlinksRef.set(unlinks)
+        })
+
+        it('orders by links situations', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users.length).to.equal(4)
+            expect(users[0].Uid).to.equal(anotherFreeUserForFriends.Uid)
+            expect(users[1].Uid).to.equal(lastFreeUserForFriends.Uid)
+            expect(users[2].Uid).to.equal(yetAnotherFreeUserForFriends.Uid)
+            expect(users[3].Uid).to.equal(freeUserForFriends.Uid)
+          })
+        })
+
+        it('user that has superlinked has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[0].matchingScore).to.equal(LINK_SITUATION_WEIGHT * SUPERLINK)
+          })
+        })
+
+        it('user that has linked has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[1].matchingScore).to.equal(LINK_SITUATION_WEIGHT * LINK)
+          })
+        })
+
+        it('user that has not linked nor unlinked has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[2].matchingScore).to.equal(LINK_SITUATION_WEIGHT * NO_LINK)
+          })
+        })
+
+        it('user that has unlinked has the correct score', () => {
+          return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
+            expect(users[3].matchingScore).to.equal(LINK_SITUATION_WEIGHT * UNLINK)
           })
         })
       })
