@@ -141,7 +141,7 @@ app.post('/getToken', (request, response) => {
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
   ChatService().detectNewMessages()
-  schedule.scheduleJob('0 0 * * *', LinkService().updateAvailableSuperlinks())
+  schedule.scheduleJob('0 0 * * *', UserService().updateAvailableSuperlinks)
 }
 
 app.listen(app.get('port'), () => {
