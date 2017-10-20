@@ -842,10 +842,10 @@ describe('UserService', () => {
       it('updates the users availableSuperlinks property', () => {
         return UserService().updateAvailableSuperlinks().then(() => {
           return usersRef.once('value').then(users => {
-            console.log(users.val())
             users.forEach(user => {
-              const superlinks = user.val().linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
-              expect(user.val().availableSuperlinks).to.equal(superlinks)
+              const userJson = user.val()
+              const superlinks = userJson.linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+              expect(userJson.availableSuperlinks).to.equal(superlinks)
             })
           })
         })

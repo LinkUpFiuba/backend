@@ -141,6 +141,7 @@ app.post('/getToken', (request, response) => {
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
   ChatService().detectNewMessages()
+  // Update available superlinks everyday at midnight
   schedule.scheduleJob('0 0 * * *', UserService().updateAvailableSuperlinks)
 }
 
