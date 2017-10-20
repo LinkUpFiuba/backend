@@ -7,6 +7,9 @@ import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
 
+export const PREMIUM_SUPERLINKS = 10
+export const FREE_SUPERLINKS = 5
+
 export default function UserService() {
   const FRIENDS = 'friends'
   const MALE = 'male'
@@ -231,6 +234,16 @@ export default function UserService() {
           const orderedUsers = orderByMatchingAlgorithm(users, actualUser)
           return orderedUsers.slice(0, USERS_PER_REQUEST)
         })
+    },
+    updateAvailableSuperlinks: () => {
+      console.log('Updating available superlinks')
+      const usersRef = Database('users')
+      return usersRef.once('value').then(users => {
+        users.forEach(user => {
+          const superlinks = user.val().linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+          usersRef.child(`${user.key}/availableSuperlinks`).set(superlinks)
+        })
+      })
     }
   }
 }

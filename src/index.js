@@ -12,6 +12,7 @@ import ComplaintService from './services/complaintService'
 import DisableUserService from './services/disableUserService'
 import AdsService from './services/adsService'
 import UserController from './controllers/userController'
+import schedule from 'node-schedule'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -140,6 +141,7 @@ app.post('/getToken', (request, response) => {
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
   ChatService().detectNewMessages()
+  schedule.scheduleJob('0 0 * * *', LinkService().updateAvailableSuperlinks())
 }
 
 app.listen(app.get('port'), () => {

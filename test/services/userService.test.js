@@ -3,7 +3,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before } from 'mocha'
-import UserService from '../../src/services/userService'
+import UserService, { FREE_SUPERLINKS, PREMIUM_SUPERLINKS } from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
 
@@ -819,6 +819,34 @@ describe('UserService', () => {
         it('premium user has the correct score', () => {
           return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
             expect(users[0].matchingScore).to.equal(0.1 * 100)
+          })
+        })
+      })
+    })
+  })
+
+  describe('#updateAvailableSuperlinks()', () => {
+    describe('when there are users that have consumed some superlinks', () => {
+      const usersRef = Database('users')
+      before(() => {
+        const freeUser = new User().male().withAvailableSuperlinks(4).get()
+        const premiumUser = new User().male().premium().withAvailableSuperlinks(2).get()
+
+        const users = {
+          [freeUser.Uid]: freeUser,
+          [premiumUser.Uid]: premiumUser
+        }
+        usersRef.set(users)
+      })
+
+      it('updates the users availableSuperlinks property', () => {
+        return UserService().updateAvailableSuperlinks().then(() => {
+          return usersRef.once('value').then(users => {
+            console.log(users.val())
+            users.forEach(user => {
+              const superlinks = user.val().linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+              expect(user.val().availableSuperlinks).to.equal(superlinks)
+            })
           })
         })
       })
