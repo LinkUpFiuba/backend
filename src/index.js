@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import express from 'express'
 import cors from 'cors'
 import UserService from './services/userService'
@@ -141,8 +140,12 @@ app.post('/getToken', (request, response) => {
 if (process.env.ENVIRONMENT === 'production') {
   LinkService().detectLinks()
   ChatService().detectNewMessages()
-  // Update available superlinks everyday at midnight
-  schedule.scheduleJob('0 0 * * *', UserService().updateAvailableSuperlinks)
+
+  // Update available superlinks everyday at midnight from local time
+  const rule = new schedule.RecurrenceRule()
+  rule.hour = 0
+  rule.minute = 0
+  schedule.scheduleJob(rule, UserService().updateAvailableSuperlinks)
 }
 
 app.listen(app.get('port'), () => {
