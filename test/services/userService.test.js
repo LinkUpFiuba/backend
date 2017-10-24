@@ -6,7 +6,9 @@ import UserService, {
   DISTANCE_WEIGHT,
   INTERESTS_WEIGHT,
   LINK_SITUATION_WEIGHT,
-  LINK_UP_PLUS_WEIGHT
+  LINK_UP_PLUS_WEIGHT,
+  FREE_SUPERLINKS,
+  PREMIUM_SUPERLINKS
 } from '../../src/services/userService'
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
@@ -893,6 +895,34 @@ describe('UserService', () => {
         it('user that has unlinked has the correct score', () => {
           return UserService().getPosibleLinks(maleForFriendsAt100km.Uid).then(users => {
             expect(users[3].matchingScore).to.equal(LINK_SITUATION_WEIGHT * UNLINK)
+          })
+        })
+      })
+    })
+  })
+
+  describe('#updateAvailableSuperlinks()', () => {
+    describe('when there are users that have consumed some superlinks', () => {
+      const usersRef = Database('users')
+      before(() => {
+        const freeUser = new User().male().withAvailableSuperlinks(4).get()
+        const premiumUser = new User().male().premium().withAvailableSuperlinks(2).get()
+
+        const users = {
+          [freeUser.Uid]: freeUser,
+          [premiumUser.Uid]: premiumUser
+        }
+        usersRef.set(users)
+      })
+
+      it('updates the users availableSuperlinks property', () => {
+        return UserService().updateAvailableSuperlinks().then(() => {
+          return usersRef.once('value').then(users => {
+            users.forEach(user => {
+              const userJson = user.val()
+              const superlinks = userJson.linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+              expect(userJson.availableSuperlinks).to.equal(superlinks)
+            })
           })
         })
       })

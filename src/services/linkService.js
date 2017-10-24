@@ -87,7 +87,7 @@ export default function LinkService() {
       })
     },
 
-    getLinkBetween: (actualUser, user) => {
+    getLinkTypeBetween: (actualUser, user) => {
       const unlinksRef = Database('unlinks')
       const linksRef = Database('links')
 

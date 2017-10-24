@@ -7,6 +7,11 @@ import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
 
+// Available superlinks
+export const PREMIUM_SUPERLINKS = 10
+export const FREE_SUPERLINKS = 5
+
+// Matching algorithm weights
 export const DISTANCE_WEIGHT = 0.48
 export const INTERESTS_WEIGHT = 0.32
 export const LINK_UP_PLUS_WEIGHT = 0.1
@@ -83,7 +88,7 @@ export default function UserService() {
   }
 
   const calculateMatchingScore = (user, actualUser) => {
-    return LinkService().getLinkBetween(actualUser, user).then(linkSituationScore => {
+    return LinkService().getLinkTypeBetween(actualUser, user).then(linkSituationScore => {
       const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
       // We include common interests in the user in order to show it in the frontend
       user.commonInterests = commonInterests
@@ -253,6 +258,16 @@ export default function UserService() {
         .then(orderedUsers => {
           return orderedUsers.slice(0, USERS_PER_REQUEST)
         })
+    },
+    updateAvailableSuperlinks: () => {
+      console.log('Updating available superlinks')
+      const usersRef = Database('users')
+      return usersRef.once('value').then(users => {
+        users.forEach(user => {
+          const superlinks = user.val().linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+          usersRef.child(`${user.key}/availableSuperlinks`).set(superlinks)
+        })
+      })
     }
   }
 }

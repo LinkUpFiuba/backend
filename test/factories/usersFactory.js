@@ -20,6 +20,7 @@ export class User {
         longitude: 20
       },
       getNotifications: true,
+      availableSuperlinks: 5,
       tokenFCM: 'some-token-fcm',
       interests: {
         male: false,
@@ -82,6 +83,11 @@ export class User {
 
   likesFriends() {
     this.user.interests.friends = true
+    return this
+  }
+
+  withAvailableSuperlinks(superlinks) {
+    this.user.availableSuperlinks = superlinks
     return this
   }
 
