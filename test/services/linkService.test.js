@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before, beforeEach } from 'mocha'
-import LinkService from '../../src/services/linkService'
+import LinkService, { SUPERLINK, LINK, NO_LINK, UNLINK } from '../../src/services/linkService'
 import { User } from '../factories/usersFactory'
 import Database from '../../src/services/gateway/database'
 
@@ -108,7 +108,7 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -158,10 +158,10 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           },
           [linkedUser.Uid]: {
-            [linkingUser.Uid]: true
+            [linkingUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -204,6 +204,80 @@ describe('LinkService', () => {
               expect(possibleMatches.val()).to.be.null
             })
           })
+        })
+      })
+    })
+  })
+
+  describe('#getLinkBetween', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const linksRef = Database('links')
+    const unlinksRef = Database('unlinks')
+
+    describe('when one user has unlinked the other', () => {
+      before(() => {
+        const unlinks = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: true
+          }
+        }
+        unlinksRef.set(unlinks)
+        linksRef.set({})
+      })
+
+      it('it returns UNLINK', () => {
+        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(UNLINK)
+        })
+      })
+    })
+
+    describe('when one user has linked the other', () => {
+      before(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal'
+          }
+        }
+        unlinksRef.set({})
+        linksRef.set(links)
+      })
+
+      it('it returns LINK', () => {
+        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(LINK)
+        })
+      })
+    })
+
+    describe('when one user has superlinked the other', () => {
+      before(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'superlink'
+          }
+        }
+        unlinksRef.set({})
+        linksRef.set(links)
+      })
+
+      it('it returns SUPERLINK', () => {
+        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(SUPERLINK)
+        })
+      })
+    })
+
+    describe('when one user has not linked nor unlinked the other', () => {
+      before(() => {
+        unlinksRef.set({})
+        linksRef.set({})
+      })
+
+      it('it returns NO_LINK', () => {
+        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(NO_LINK)
         })
       })
     })
