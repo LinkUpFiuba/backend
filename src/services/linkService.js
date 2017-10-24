@@ -1,6 +1,11 @@
 import Database from './gateway/database'
 import { PushNotificationService } from './pushNotificationService'
 
+export const SUPERLINK = 100
+export const LINK = 50
+export const NO_LINK = 20
+export const UNLINK = 0
+
 export default function LinkService() {
   const checkLink = (linkingUser, linkedUser) => {
     const linksRef = Database('links')
@@ -79,6 +84,24 @@ export default function LinkService() {
 
       possibleMatchesRef.on('child_added', possibleMatch => {
         onChildAdded(possibleMatch)
+      })
+    },
+
+    getLinkBetween: (actualUser, user) => {
+      const unlinksRef = Database('unlinks')
+      const linksRef = Database('links')
+
+      return unlinksRef.child(`${user.Uid}/${actualUser.Uid}`).once('value').then(unlink => {
+        return linksRef.child(`${user.Uid}/${actualUser.Uid}`).once('value').then(link => {
+          if (unlink.exists()) return UNLINK
+          if (link.exists()) {
+            if (link.val() === 'superlink') {
+              return SUPERLINK
+            }
+            return LINK
+          }
+          return NO_LINK
+        })
       })
     }
   }

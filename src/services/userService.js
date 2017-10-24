@@ -7,6 +7,11 @@ import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
 
+export const DISTANCE_WEIGHT = 0.48
+export const INTERESTS_WEIGHT = 0.32
+export const LINK_UP_PLUS_WEIGHT = 0.1
+export const LINK_SITUATION_WEIGHT = 0.1
+
 export default function UserService() {
   const FRIENDS = 'friends'
   const MALE = 'male'
@@ -16,9 +21,6 @@ export default function UserService() {
   const B = 1
   const C = 12.5
   const D = -12.5
-  const DISTANCE_WEIGHT = 0.54
-  const INTERESTS_WEIGHT = 0.36
-  const LINK_UP_PLUS_WEIGHT = 0.1
 
   const validateUser = user => {
     const correctness = {}
@@ -81,30 +83,48 @@ export default function UserService() {
   }
 
   const calculateMatchingScore = (user, actualUser) => {
-    const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
-    // We include  common interests in the user in order to show it in the frontend
-    user.commonInterests = commonInterests
-    // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
-    // a 1/x function, so that less distance goes with a better score. All the constants are given to have
-    // an smoother function with the corresponding max and min. On the other hand, we care about the
-    // interests as a linear function, with a max of 10 interests in common.
-    // After that, we weight the scores with a defined value.
-    // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
-    const distanceScore = (A / ((user.distance / B) + C)) + D
-    const interestsScore = Math.min(commonInterests.length * 10, 100)
-    const linkUpPlusScore = +user.linkUpPlus * 100 // The + is to convert bool to 0 or 1
-    return DISTANCE_WEIGHT * distanceScore +
-           INTERESTS_WEIGHT * interestsScore +
-           LINK_UP_PLUS_WEIGHT * linkUpPlusScore
+    return LinkService().getLinkBetween(actualUser, user).then(linkSituationScore => {
+      const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
+      // We include common interests in the user in order to show it in the frontend
+      user.commonInterests = commonInterests
+      // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
+      // a 1/x function, so that less distance goes with a better score. All the constants are given to have
+      // an smoother function with the corresponding max and min. On the other hand, we care about the
+      // interests as a linear function, with a max of 10 interests in common. In addition, we prioritize
+      // candidates that have LinkUp Plus. Finally, we also give some prioritization when there's a superlink,
+      // a link or an unlink (or even if they haven't link at all). After that, we weight the scores with a
+      // defined value.
+      // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
+      const distanceScore = (A / ((user.distance / B) + C)) + D
+      const interestsScore = Math.min(commonInterests.length * 10, 100)
+      const linkUpPlusScore = +user.linkUpPlus * 100 // The + is to convert bool to 0 or 1
+      return DISTANCE_WEIGHT * distanceScore +
+             INTERESTS_WEIGHT * interestsScore +
+             LINK_UP_PLUS_WEIGHT * linkUpPlusScore +
+             LINK_SITUATION_WEIGHT * linkSituationScore
+    })
+  }
+
+  const addMatchingScoreTo = (users, actualUser) => {
+    const usersArray = []
+    const promisesArray = []
+    users.forEach(user => {
+      promisesArray.push(
+        calculateMatchingScore(user, actualUser).then(matchingScore => {
+          user.matchingScore = matchingScore
+          usersArray.push(user)
+        })
+      )
+    })
+    return Promise.all(promisesArray).then(() => usersArray)
   }
 
   const orderByMatchingAlgorithm = (users, actualUser) => {
-    users.map(user => {
-      user.matchingScore = calculateMatchingScore(user, actualUser)
+    return addMatchingScoreTo(users, actualUser).then(usersWithMatchingScore => {
+      // Descending order
+      usersWithMatchingScore.sort((user1, user2) => user2.matchingScore - user1.matchingScore)
+      return usersWithMatchingScore
     })
-    // Descending order
-    users.sort((user1, user2) => user2.matchingScore - user1.matchingScore)
-    return users
   }
 
   const getSexualPosibleMatches = (ref, actualUser, search) => {
@@ -228,7 +248,9 @@ export default function UserService() {
           return getFriendPosibleMatches(ref, actualUser)
         })
         .then(users => {
-          const orderedUsers = orderByMatchingAlgorithm(users, actualUser)
+          return orderByMatchingAlgorithm(users, actualUser)
+        })
+        .then(orderedUsers => {
           return orderedUsers.slice(0, USERS_PER_REQUEST)
         })
     }
