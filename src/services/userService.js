@@ -88,7 +88,7 @@ export default function UserService() {
   }
 
   const calculateMatchingScore = (user, actualUser) => {
-    return LinkService().getLinkBetween(actualUser, user).then(linkSituationScore => {
+    return LinkService().getLinkTypeBetween(actualUser, user).then(linkSituationScore => {
       const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
       // We include common interests in the user in order to show it in the frontend
       user.commonInterests = commonInterests

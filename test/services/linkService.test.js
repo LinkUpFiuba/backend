@@ -209,7 +209,7 @@ describe('LinkService', () => {
     })
   })
 
-  describe('#getLinkBetween', () => {
+  describe('#getLinkTypeBetween', () => {
     const maleForFriends = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
     const linksRef = Database('links')
@@ -227,7 +227,7 @@ describe('LinkService', () => {
       })
 
       it('it returns UNLINK', () => {
-        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
           expect(linkSituation).to.equal(UNLINK)
         })
       })
@@ -245,7 +245,7 @@ describe('LinkService', () => {
       })
 
       it('it returns LINK', () => {
-        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
           expect(linkSituation).to.equal(LINK)
         })
       })
@@ -263,7 +263,7 @@ describe('LinkService', () => {
       })
 
       it('it returns SUPERLINK', () => {
-        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
           expect(linkSituation).to.equal(SUPERLINK)
         })
       })
@@ -276,7 +276,7 @@ describe('LinkService', () => {
       })
 
       it('it returns NO_LINK', () => {
-        return LinkService().getLinkBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
           expect(linkSituation).to.equal(NO_LINK)
         })
       })
