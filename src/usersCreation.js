@@ -177,9 +177,9 @@ const usersToCreate = [
     gender: 'female',
     getNotifications: true,
     interests: {
-      male: true,
+      male: false,
       female: false,
-      friends: false
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -370,9 +370,9 @@ const usersToCreate = [
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -423,9 +423,9 @@ const usersToCreate = [
     gender: 'female',
     getNotifications: true,
     interests: {
-      male: true,
+      male: false,
       female: false,
-      friends: false
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -467,9 +467,9 @@ const usersToCreate = [
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -561,9 +561,9 @@ const usersToCreate = [
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -657,9 +657,9 @@ const usersToCreate = [
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
