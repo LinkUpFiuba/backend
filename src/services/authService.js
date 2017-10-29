@@ -1,6 +1,6 @@
 import Administrator from './gateway/administrator'
 
-export default function DisableUserService() {
+export default function AuthService() {
   const TEST_URL = process.env.MOCKFIREBASE_DB_URL
 
   return {

@@ -68,9 +68,23 @@ export default function LinkService() {
         })
     },
 
-    deleteUnlinks: actualUser => {
+    deleteUnlinks: uid => {
       const unlinksRef = Database('unlinks')
-      return unlinksRef.child(actualUser.Uid).remove()
+      return unlinksRef.child(uid).remove()
+    },
+
+    deleteLinks: uid => {
+      const linksRef = Database('links')
+      return linksRef.child(uid).once('value').then(links => {
+        // Delete links with that user
+        return links.forEach(link => {
+          const linkedUser = link.key
+          linksRef.child(`${linkedUser}/${uid}`).remove()
+        })
+      }).then(() => {
+        // Delete user's links
+        return linksRef.child(uid).remove()
+      })
     },
 
     // This is just for test purposes
