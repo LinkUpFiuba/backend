@@ -98,7 +98,7 @@ const lilita = {
   name: 'Elisa Lilita Carrió'
 }
 
-const ortigozaPhoto = 'http://www.losandes.com.ar/files/image/14/08/image53ec3bd1518476.63157334.jpg'
+const ortigozaPhoto = 'http://media.diarioveloz.com/adjuntos/120/imagenes/001/693/0001693962.jpggi'
 const solPerezPhoto = 'https://k61.kn3.net/taringa/B/D/1/B/E/D/corderoalejandro/B37.jpg'
 const monacoPhoto = 'https://upload.wikimedia.org/wikipedia/commons/4/42/Flickr_-_Carine06_-_Juan_Monaco_%288%29.jpg'
 const tinelliPhoto = 'https://images.clarin.com/2015/05/10/r1W-jXoAXl_930x525.jpg'
