@@ -26,24 +26,7 @@ app.use(cors())
 app.set('views', `${__dirname}/views`)
 app.set('view engine', 'ejs')
 
-app.post('/users', (request, response) => {
-  UserService().createUser(request.body)
-    .then(() => response.status(201).send())
-    .catch(error => {
-      response.status(400)
-      return response.json({ message: error })
-    })
-})
-
-app.get('/users/:id', (request, response) => {
-  UserService().getUser(request.params.id).then(users => response.json(users))
-})
-
-app.get('/complaints', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
-})
-
+// For administrator
 app.post('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   const ad = request.body
@@ -60,11 +43,6 @@ app.get('/ads', (request, response) => {
   AdsService().getAllAds().then(ads => response.json(ads))
 })
 
-app.get('/ads/random', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  AdsService().getRandomActiveAd().then(ad => response.json(ad))
-})
-
 app.delete('/ads/:adUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().deleteAd(request.params.adUid).then(() => response.send())
@@ -78,6 +56,11 @@ app.post('/ads/:adUid/enable', (request, response) => {
 app.post('/ads/:adUid/disable', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().disableAd(request.params.adUid).then(() => response.send())
+})
+
+app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
 })
 
 app.get('/complaints/:userUid', (request, response) => {
@@ -114,6 +97,7 @@ app.post('/users/:userUid/enable', (request, response) => {
     })
 })
 
+// For the app
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
     response.status(400)
@@ -144,6 +128,19 @@ app.delete('/users/:uid', (request, response) => {
       response.status(403)
       return response.json({ message: error })
     })
+})
+
+app.post('/users', (request, response) => {
+  UserService().createUser(request.body)
+    .then(() => response.status(201).send())
+    .catch(error => {
+      response.status(400)
+      return response.json({ message: error })
+    })
+})
+
+app.get('/users/:id', (request, response) => {
+  UserService().getUser(request.params.id).then(users => response.json(users))
 })
 
 app.post('/getToken', (request, response) => {
