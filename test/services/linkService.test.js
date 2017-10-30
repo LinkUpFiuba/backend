@@ -1,8 +1,8 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, it, before, beforeEach } from 'mocha'
-import LinkService from '../../src/services/linkService'
-import { User } from './usersFactory'
+import LinkService, { SUPERLINK, LINK, NO_LINK, UNLINK } from '../../src/services/linkService'
+import { User } from '../factories/usersFactory'
 import Database from '../../src/services/gateway/database'
 
 chai.use(chaiAsPromised)
@@ -26,7 +26,7 @@ describe('LinkService', () => {
       })
 
       it('Delete the unlink', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -47,7 +47,7 @@ describe('LinkService', () => {
       })
 
       it('Delete two unlinks', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -66,7 +66,7 @@ describe('LinkService', () => {
       })
 
       it('Deletes nothing', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -83,7 +83,7 @@ describe('LinkService', () => {
       })
 
       it('Deletes nothing', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -108,7 +108,7 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -158,10 +158,10 @@ describe('LinkService', () => {
       before(() => {
         const links = {
           [linkingUser.Uid]: {
-            [linkedUser.Uid]: true
+            [linkedUser.Uid]: 'normal'
           },
           [linkedUser.Uid]: {
-            [linkingUser.Uid]: true
+            [linkingUser.Uid]: 'normal'
           }
         }
         const linksRef = Database('links')
@@ -203,6 +203,157 @@ describe('LinkService', () => {
               expect(possibleMatches.exists()).to.be.false
               expect(possibleMatches.val()).to.be.null
             })
+          })
+        })
+      })
+    })
+  })
+
+  describe('#getLinkTypeBetween', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const linksRef = Database('links')
+    const unlinksRef = Database('unlinks')
+
+    describe('when one user has unlinked the other', () => {
+      before(() => {
+        const unlinks = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: true
+          }
+        }
+        unlinksRef.set(unlinks)
+        linksRef.set({})
+      })
+
+      it('it returns UNLINK', () => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(UNLINK)
+        })
+      })
+    })
+
+    describe('when one user has linked the other', () => {
+      before(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal'
+          }
+        }
+        unlinksRef.set({})
+        linksRef.set(links)
+      })
+
+      it('it returns LINK', () => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(LINK)
+        })
+      })
+    })
+
+    describe('when one user has superlinked the other', () => {
+      before(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'superlink'
+          }
+        }
+        unlinksRef.set({})
+        linksRef.set(links)
+      })
+
+      it('it returns SUPERLINK', () => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(SUPERLINK)
+        })
+      })
+    })
+
+    describe('when one user has not linked nor unlinked the other', () => {
+      before(() => {
+        unlinksRef.set({})
+        linksRef.set({})
+      })
+
+      it('it returns NO_LINK', () => {
+        return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
+          expect(linkSituation).to.equal(NO_LINK)
+        })
+      })
+    })
+  })
+
+  describe('#deleteLinks(uid)', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const maleForFriends2 = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const linksRef = Database('links')
+
+    describe('when they have linked each other', () => {
+      beforeEach(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal'
+          },
+          [femaleForFriends.Uid]: {
+            [maleForFriends.Uid]: 'normal'
+          }
+        }
+        linksRef.set(links)
+      })
+
+      it('deletes deleting user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+
+      it('deletes deleted user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(femaleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+    })
+
+    describe('when they have not linked each other', () => {
+      beforeEach(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal',
+            [maleForFriends2.Uid]: 'normal'
+          },
+          [femaleForFriends.Uid]: {
+            [maleForFriends2.Uid]: 'normal'
+          }
+        }
+        linksRef.set(links)
+      })
+
+      it('deletes deleting user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+
+      it('deletes no links for deleted user', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(femaleForFriends).then(links => {
+            expect(links.length).to.equal(1)
+            expect(links[0]).to.equal(maleForFriends2.Uid)
+          })
+        })
+      })
+
+      it('deletes no links for the other deleted user', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends2).then(links => {
+            expect(links.length).to.equal(0)
           })
         })
       })

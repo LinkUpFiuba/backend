@@ -10,6 +10,7 @@ export class User {
       age: 23,
       maxDistance: 100,
       invisibleMode: false,
+      linkUpPlus: false,
       range: {
         minAge: 18,
         maxAge: 28
@@ -18,6 +19,8 @@ export class User {
         latitude: 20,
         longitude: 20
       },
+      getNotifications: true,
+      availableSuperlinks: 5,
       tokenFCM: 'some-token-fcm',
       interests: {
         male: false,
@@ -55,6 +58,11 @@ export class User {
     return this
   }
 
+  premium() {
+    this.user.linkUpPlus = true
+    return this
+  }
+
   ageRange(min, max) {
     this.user.range = {
       minAge: min,
@@ -75,6 +83,11 @@ export class User {
 
   likesFriends() {
     this.user.interests.friends = true
+    return this
+  }
+
+  withAvailableSuperlinks(superlinks) {
+    this.user.availableSuperlinks = superlinks
     return this
   }
 
@@ -112,6 +125,11 @@ export class User {
     this.withInterest(Interests.tallerInterest)
     this.withInterest(Interests.fiubaInterest)
     this.withInterest(Interests.programmingInterest)
+    return this
+  }
+
+  withoutNotifications() {
+    this.user.getNotifications = false
     return this
   }
 

@@ -6,6 +6,20 @@ import geolib from 'geolib'
 import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
+import Administrator from './gateway/administrator'
+import { MatchService } from './matchService'
+import { ChatService } from './chatService'
+import ComplaintService from './complaintService'
+
+// Available superlinks
+export const PREMIUM_SUPERLINKS = 10
+export const FREE_SUPERLINKS = 5
+
+// Matching algorithm weights
+export const DISTANCE_WEIGHT = 0.48
+export const INTERESTS_WEIGHT = 0.32
+export const LINK_UP_PLUS_WEIGHT = 0.1
+export const LINK_SITUATION_WEIGHT = 0.1
 
 export default function UserService() {
   const FRIENDS = 'friends'
@@ -16,8 +30,6 @@ export default function UserService() {
   const B = 1
   const C = 12.5
   const D = -12.5
-  const DISTANCE_WEIGHT = 0.6
-  const INTERESTS_WEIGHT = 0.4
 
   const validateUser = user => {
     const correctness = {}
@@ -80,27 +92,48 @@ export default function UserService() {
   }
 
   const calculateMatchingScore = (user, actualUser) => {
-    const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
-    // We include  common interests in the user in order to show it in the frontend
-    user.commonInterests = commonInterests
-    // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
-    // a 1/x function, so that less distance goes with a better score. All the constants are given to have
-    // an smoother function with the corresponding max and min. On the other hand, we care about the
-    // interests as a linear function, with a max of 10 interests in common.
-    // After that, we weight the scores with a defined value.
-    // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
-    const distanceScore = (A / ((user.distance / B) + C)) + D
-    const interestsScore = Math.min(commonInterests.length * 10, 100)
-    return DISTANCE_WEIGHT * distanceScore + INTERESTS_WEIGHT * interestsScore
+    return LinkService().getLinkTypeBetween(actualUser, user).then(linkSituationScore => {
+      const commonInterests = InterestsService().getCommonInterests(user.likesList, actualUser.likesList)
+      // We include common interests in the user in order to show it in the frontend
+      user.commonInterests = commonInterests
+      // The idea of the algorithm is to have a maximum of 100 and a minimum of 0. The distance behaves like
+      // a 1/x function, so that less distance goes with a better score. All the constants are given to have
+      // an smoother function with the corresponding max and min. On the other hand, we care about the
+      // interests as a linear function, with a max of 10 interests in common. In addition, we prioritize
+      // candidates that have LinkUp Plus. Finally, we also give some prioritization when there's a superlink,
+      // a link or an unlink (or even if they haven't link at all). After that, we weight the scores with a
+      // defined value.
+      // See more in: https://docs.google.com/document/d/1N0W029of2x8JeM8JIxyO0bAZbtZqgAAB5I9FQVF01v8
+      const distanceScore = (A / ((user.distance / B) + C)) + D
+      const interestsScore = Math.min(commonInterests.length * 10, 100)
+      const linkUpPlusScore = +user.linkUpPlus * 100 // The + is to convert bool to 0 or 1
+      return DISTANCE_WEIGHT * distanceScore +
+             INTERESTS_WEIGHT * interestsScore +
+             LINK_UP_PLUS_WEIGHT * linkUpPlusScore +
+             LINK_SITUATION_WEIGHT * linkSituationScore
+    })
+  }
+
+  const addMatchingScoreTo = (users, actualUser) => {
+    const usersArray = []
+    const promisesArray = []
+    users.forEach(user => {
+      promisesArray.push(
+        calculateMatchingScore(user, actualUser).then(matchingScore => {
+          user.matchingScore = matchingScore
+          usersArray.push(user)
+        })
+      )
+    })
+    return Promise.all(promisesArray).then(() => usersArray)
   }
 
   const orderByMatchingAlgorithm = (users, actualUser) => {
-    users.map(user => {
-      user.matchingScore = calculateMatchingScore(user, actualUser)
+    return addMatchingScoreTo(users, actualUser).then(usersWithMatchingScore => {
+      // Descending order
+      usersWithMatchingScore.sort((user1, user2) => user2.matchingScore - user1.matchingScore)
+      return usersWithMatchingScore
     })
-    // Descending order
-    users.sort((user1, user2) => user2.matchingScore - user1.matchingScore)
-    return users
   }
 
   const getSexualPosibleMatches = (ref, actualUser, search) => {
@@ -190,6 +223,12 @@ export default function UserService() {
         })
       })
     },
+    hasLinkUpPlus: uid => {
+      const usersRef = Database('users')
+      return usersRef.child(uid).once('value').then(user => {
+        return user.val().linkUpPlus
+      })
+    },
     getPosibleLinks: actualUserUid => {
       const ref = Database('users')
       let actualUser
@@ -211,15 +250,55 @@ export default function UserService() {
           if (users.length > 0) {
             return users
           }
-          LinkService().deleteUnlinks(actualUser)
+          LinkService().deleteUnlinks(actualUserUid)
           if (!userSearch.includes(FRIENDS)) {
             return getSexualPosibleMatches(ref, actualUser, userSearch)
           }
           return getFriendPosibleMatches(ref, actualUser)
         })
         .then(users => {
-          const orderedUsers = orderByMatchingAlgorithm(users, actualUser)
+          return orderByMatchingAlgorithm(users, actualUser)
+        })
+        .then(orderedUsers => {
           return orderedUsers.slice(0, USERS_PER_REQUEST)
+        })
+    },
+    updateAvailableSuperlinks: () => {
+      console.log('Updating available superlinks')
+      const usersRef = Database('users')
+      return usersRef.once('value').then(users => {
+        users.forEach(user => {
+          const superlinks = user.val().linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
+          usersRef.child(`${user.key}/availableSuperlinks`).set(superlinks)
+        })
+      })
+    },
+    deleteUser: uid => {
+      // Delete his session
+      return Administrator().auth().deleteUser(uid)
+        .then(() => {
+          // Set as disabled user both in Firebase and the app
+          return DisableUserService().disableUser(uid)
+        })
+        .then(() => {
+          // Delete unlinks (Although it's not necessary, it's for keeping the DB clean)
+          return LinkService().deleteUnlinks(uid)
+        })
+        .then(() => {
+          // Delete links from and with that user
+          return LinkService().deleteLinks(uid)
+        })
+        .then(() => {
+          // Delete complaints in order not to show them in the administrator anymore
+          return ComplaintService().deleteComplaints(uid)
+        })
+        .then(() => {
+          // Delete messages from that user
+          return ChatService().deleteChats(uid)
+        })
+        .then(() => {
+          // Delete matches and add 'block' for the other user
+          return MatchService().deleteMatches(uid)
         })
     }
   }

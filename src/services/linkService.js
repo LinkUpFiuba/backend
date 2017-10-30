@@ -1,6 +1,11 @@
 import Database from './gateway/database'
 import { PushNotificationService } from './pushNotificationService'
 
+export const SUPERLINK = 100
+export const LINK = 50
+export const NO_LINK = 20
+export const UNLINK = 0
+
 export default function LinkService() {
   const checkLink = (linkingUser, linkedUser) => {
     const linksRef = Database('links')
@@ -63,9 +68,23 @@ export default function LinkService() {
         })
     },
 
-    deleteUnlinks: actualUser => {
+    deleteUnlinks: userUid => {
       const unlinksRef = Database('unlinks')
-      return unlinksRef.child(actualUser.Uid).remove()
+      return unlinksRef.child(userUid).remove()
+    },
+
+    deleteLinks: userUid => {
+      const linksRef = Database('links')
+      return linksRef.child(userUid).once('value').then(links => {
+        // Delete links with that user
+        return links.forEach(link => {
+          const linkedUser = link.key
+          linksRef.child(`${linkedUser}/${userUid}`).remove()
+        })
+      }).then(() => {
+        // Delete user's links
+        return linksRef.child(userUid).remove()
+      })
     },
 
     // This is just for test purposes
@@ -79,6 +98,24 @@ export default function LinkService() {
 
       possibleMatchesRef.on('child_added', possibleMatch => {
         onChildAdded(possibleMatch)
+      })
+    },
+
+    getLinkTypeBetween: (actualUser, user) => {
+      const unlinksRef = Database('unlinks')
+      const linksRef = Database('links')
+
+      return unlinksRef.child(`${user.Uid}/${actualUser.Uid}`).once('value').then(unlink => {
+        return linksRef.child(`${user.Uid}/${actualUser.Uid}`).once('value').then(link => {
+          if (unlink.exists()) return UNLINK
+          if (link.exists()) {
+            if (link.val() === 'superlink') {
+              return SUPERLINK
+            }
+            return LINK
+          }
+          return NO_LINK
+        })
       })
     }
   }

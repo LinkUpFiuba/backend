@@ -3,8 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 import { describe, before, it } from 'mocha'
 import Database from '../../src/services/gateway/database'
 import ComplaintService from '../../src/services/complaintService'
-import { User } from './usersFactory'
-import { Complaint } from './complaintsFactory'
+import { User } from '../factories/usersFactory'
+import { Complaint } from '../factories/complaintsFactory'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect

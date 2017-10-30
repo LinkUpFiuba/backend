@@ -1,3 +1,5 @@
+// Run as `node dist/usersCreation.js` (After running `npm run build`)
+
 import Administrator from './services/gateway/administrator'
 import Database from './services/gateway/database'
 
@@ -96,10 +98,32 @@ const lilita = {
   name: 'Elisa Lilita Carrió'
 }
 
+const ortigozaPhoto = 'http://media.diarioveloz.com/adjuntos/120/imagenes/001/693/0001693962.jpggi'
+const solPerezPhoto = 'https://k61.kn3.net/taringa/B/D/1/B/E/D/corderoalejandro/B37.jpg'
+const monacoPhoto = 'https://upload.wikimedia.org/wikipedia/commons/4/42/Flickr_-_Carine06_-_Juan_Monaco_%288%29.jpg'
+const tinelliPhoto = 'https://images.clarin.com/2015/05/10/r1W-jXoAXl_930x525.jpg'
+const pampitaPhoto = 'http://www3.pictures.gi.zimbio.com/Los+Premios+MTV+Latino+America+2006+Press+ibrnX3-UcEAx.jpg'
+const juanPhoto = 'http://www.equiposytalento.com/upload/talent_estudiantes/000/75/img_0348.jpg'
+const carlitaPhoto = 'http://images.eldiario.es/galicia/Sabela-Ramos-Facultad-Informatica-UDC_EDIIMA20150128_0701_13.jpg'
+const karlPhoto = 'https://mariajosefurio.files.wordpress.com/2010/05/chicototal.jpg'
+const pilarPhoto = 'http://s3-us-west-2.amazonaws.com/bucket-vidasana/wp-content/uploads/2016/01/mujer-pensando.jpg'
+const federicoPhoto = 'https://pbs.twimg.com/profile_images/825466192898953217/EjQD-1vo.jpg'
+const pipaPhoto = 'http://sevilla.abc.es/deportes/orgullodenervion/wp-content/uploads/2017/05/Benedetto.jpg'
+const salinasPhoto = 'http://www.elequipo-deportea.com/upload/news/magda/2017/07/596cb469dcad2_crop.jpg'
+
+const landscapePhoto = {
+  url: 'https://i.pinimg.com/736x/5c/4b/67/5c4b672e04cc92914959cc8e9e8125c7--bucket-list-lakes.jpg'
+}
+
+const sanLorenzoPhoto = {
+  url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Escudo-San-Lorenzo.png/220px-Escudo-San-Lorenzo.png'
+}
+
 const usersToCreate = [
   {
     aboutMe: 'Me gusta la joda',
     age: '32',
+    availableSuperlinks: 5,
     birthday: '10/07/1984',
     education: '',
     email: 'jonny@gmail.com',
@@ -130,25 +154,32 @@ const usersToCreate = [
     },
     maxDistance: 100,
     name: 'Néstor Ortigoza',
-    photoUrl: 'http://www.losandes.com.ar/files/image/14/08/image53ec3bd1518476.63157334.jpg',
+    photoUrl: ortigozaPhoto,
+    profilePhotosList: {
+      0: { url: ortigozaPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 18,
       maxAge: 50
     },
+    tokenFCM: '',
     work: 'Jugador de fútbol en Olimpia'
   },
   {
     aboutMe: 'Tan solo soy una chica',
     age: '23',
+    availableSuperlinks: 5,
     birthday: '07/16/1994',
     education: 'Lasalle',
     email: 'solci@gmail.com',
     gender: 'female',
     getNotifications: true,
     interests: {
-      male: true,
+      male: false,
       female: false,
-      friends: false
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -171,16 +202,23 @@ const usersToCreate = [
     },
     maxDistance: 100,
     name: 'Sol Pérez',
-    photoUrl: 'https://k61.kn3.net/taringa/B/D/1/B/E/D/corderoalejandro/B37.jpg',
+    photoUrl: solPerezPhoto,
+    profilePhotosList: {
+      0: { url: solPerezPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 23,
       maxAge: 40
     },
+    tokenFCM: '',
     work: 'Chica del clima en TyC'
   },
   {
     aboutMe: 'Me dicen Pico',
     age: '33',
+    availableSuperlinks: 5,
     birthday: '03/29/1984',
     education: 'Club Independiente de Tandil',
     email: 'pico@gmail.com',
@@ -221,16 +259,23 @@ const usersToCreate = [
     },
     maxDistance: 30,
     name: 'Juan Mónaco',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Flickr_-_Carine06_-_Juan_Monaco_%288%29.jpg',
+    photoUrl: monacoPhoto,
+    profilePhotosList: {
+      0: { url: monacoPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 22,
       maxAge: 40
     },
+    tokenFCM: '',
     work: 'Ex Tenista'
   },
   {
     aboutMe: 'Aguante San Lorenzo',
     age: '57',
+    availableSuperlinks: 5,
     birthday: '04/01/1960',
     education: 'Colegio Manuel Belgrano',
     email: 'marce@gmail.com',
@@ -260,16 +305,23 @@ const usersToCreate = [
     },
     maxDistance: 40,
     name: 'Marcelo Tinelli',
-    photoUrl: 'https://images.clarin.com/2015/05/10/r1W-jXoAXl_930x525.jpg',
+    photoUrl: tinelliPhoto,
+    profilePhotosList: {
+      0: { url: tinelliPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 18,
       maxAge: 30
     },
+    tokenFCM: '',
     work: 'Capo de Ideas del Sur'
   },
   {
     aboutMe: 'Pampeña hasta la muerte!',
     age: '39',
+    availableSuperlinks: 5,
     birthday: '01/17/1978',
     education: 'Un cole pampeño',
     email: 'pampita@gmail.com',
@@ -295,25 +347,32 @@ const usersToCreate = [
     },
     maxDistance: 35,
     name: 'Caro',
-    photoUrl: 'http://www3.pictures.gi.zimbio.com/Los+Premios+MTV+Latino+America+2006+Press+ibrnX3-UcEAx.jpg',
+    photoUrl: pampitaPhoto,
+    profilePhotosList: {
+      0: { url: pampitaPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 20,
       maxAge: 38
     },
+    tokenFCM: '',
     work: 'Jurado en ShowMatch'
   },
   {
     aboutMe: 'Un típico estudiante de ingeniería',
     age: '25',
+    availableSuperlinks: 5,
     birthday: '04/13/1992',
     education: 'FIUBA | Facultad de Ingeniería de la UBA',
     email: 'estudiante@gmail.com',
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -341,25 +400,32 @@ const usersToCreate = [
     },
     maxDistance: 15,
     name: 'Juan Rodríguez',
-    photoUrl: 'http://www.equiposytalento.com/upload/talent_estudiantes/000/75/img_0348.jpg',
+    photoUrl: juanPhoto,
+    profilePhotosList: {
+      0: { url: juanPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 20,
       maxAge: 35
     },
+    tokenFCM: '',
     work: 'Programador en Despegar.com'
   },
   {
     aboutMe: 'Sapo de otro pozo',
     age: '21',
+    availableSuperlinks: 5,
     birthday: '06/20/1996',
     education: 'UCA - Ingeniería en Informática',
     email: 'estudiante@gmail.com',
     gender: 'female',
     getNotifications: true,
     interests: {
-      male: true,
+      male: false,
       female: false,
-      friends: false
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -378,25 +444,32 @@ const usersToCreate = [
     },
     maxDistance: 15,
     name: 'Carlita Sabella',
-    photoUrl: 'http://images.eldiario.es/galicia/Sabela-Ramos-Facultad-Informatica-UDC_EDIIMA20150128_0701_13.jpg',
+    photoUrl: carlitaPhoto,
+    profilePhotosList: {
+      0: { url: carlitaPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 20,
       maxAge: 25
     },
+    tokenFCM: '',
     work: 'Desempleada'
   },
   {
     aboutMe: 'Socialista a full',
     age: '26',
+    availableSuperlinks: 5,
     birthday: '10/25/1991',
     education: 'Facultad de Sociales - UBA',
     email: 'socialista@gmail.com',
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -416,16 +489,23 @@ const usersToCreate = [
     },
     maxDistance: 20,
     name: 'Karl Rodriguez',
-    photoUrl: 'https://mariajosefurio.files.wordpress.com/2010/05/chicototal.jpg',
+    photoUrl: karlPhoto,
+    profilePhotosList: {
+      0: { url: karlPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 18,
       maxAge: 50
     },
+    tokenFCM: '',
     work: 'Hippie del mundo'
   },
   {
     aboutMe: 'Intento de psicóloga. Busco analizar gente. Freud o muerte.',
     age: '27',
+    availableSuperlinks: 5,
     birthday: '12/09/1989',
     education: 'PsiUBA',
     email: 'psicologa@gmail.com',
@@ -458,25 +538,32 @@ const usersToCreate = [
     },
     maxDistance: 100,
     name: 'Pilar Lyfschik',
-    photoUrl: 'http://s3-us-west-2.amazonaws.com/bucket-vidasana/wp-content/uploads/2016/01/mujer-pensando.jpg',
+    photoUrl: pilarPhoto,
+    profilePhotosList: {
+      0: { url: pilarPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 18,
       maxAge: 30
     },
+    tokenFCM: '',
     work: 'Terapeuta independiente'
   },
   {
     aboutMe: 'Caminante no hay camino, se hace el camino al andar',
     age: '25',
+    availableSuperlinks: 5,
     birthday: '10/15/1993',
     education: 'Marketing en La Fundación',
     email: 'fede@gmail.com',
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -500,16 +587,23 @@ const usersToCreate = [
     },
     maxDistance: 100,
     name: 'Federico Morgante',
-    photoUrl: 'https://pbs.twimg.com/profile_images/825466192898953217/EjQD-1vo.jpg',
+    photoUrl: federicoPhoto,
+    profilePhotosList: {
+      0: { url: federicoPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 18,
       maxAge: 30
     },
+    tokenFCM: '',
     work: 'Trotamundos'
   },
   {
     aboutMe: 'Me dicen pipa.',
     age: '27',
+    availableSuperlinks: 5,
     birthday: '05/07/1990',
     education: '',
     email: 'pipa@gmail.com',
@@ -540,25 +634,32 @@ const usersToCreate = [
     },
     maxDistance: 20,
     name: 'Darío Benedetto',
-    photoUrl: 'http://sevilla.abc.es/deportes/orgullodenervion/wp-content/uploads/2017/05/Benedetto.jpg',
+    photoUrl: pipaPhoto,
+    profilePhotosList: {
+      0: { url: pipaPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 22,
       maxAge: 100
     },
+    tokenFCM: '',
     work: 'Goleador en Boca.'
   },
   {
     aboutMe: 'Me gusta meter goles.',
     age: '31',
+    availableSuperlinks: 5,
     birthday: '06/04/1986',
     education: 'Chaca me enseño todo, papá',
     email: 'rodri@gmail.com',
     gender: 'male',
     getNotifications: true,
     interests: {
-      male: true,
-      female: true,
-      friends: false
+      male: false,
+      female: false,
+      friends: true
     },
     invisibleMode: false,
     likesList: {
@@ -574,11 +675,17 @@ const usersToCreate = [
     },
     maxDistance: 50,
     name: 'Rodrigo Salinas',
-    photoUrl: 'http://www.elequipo-deportea.com/upload/news/magda/2017/07/596cb469dcad2_crop.jpg',
+    photoUrl: salinasPhoto,
+    profilePhotosList: {
+      0: { url: salinasPhoto },
+      1: landscapePhoto,
+      2: sanLorenzoPhoto
+    },
     range: {
       minAge: 20,
       maxAge: 30
     },
+    tokenFCM: '',
     work: 'Goleador de Chaca.'
   }
 ]
