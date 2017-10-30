@@ -52,9 +52,9 @@ export const ChatService = () => {
       onNewMessage(messagesRef)
     },
 
-    deleteChats: uid => {
+    deleteChats: userUid => {
       const messagesRef = Database('messages')
-      return messagesRef.child(uid).remove()
+      return messagesRef.child(userUid).remove()
     }
   }
 }

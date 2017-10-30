@@ -9,6 +9,7 @@ import DisableUserService from './disableUserService'
 import Administrator from './gateway/administrator'
 import { MatchService } from './matchService'
 import { ChatService } from './chatService'
+import ComplaintService from './complaintService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -286,6 +287,10 @@ export default function UserService() {
         .then(() => {
           // Delete links from and with that user
           return LinkService().deleteLinks(uid)
+        })
+        .then(() => {
+          // Delete complaints in order not to show them in the administrator anymore
+          return ComplaintService().deleteComplaints(uid)
         })
         .then(() => {
           // Delete messages from that user
