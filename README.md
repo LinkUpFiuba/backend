@@ -42,7 +42,51 @@ npm test
 ```
 
 ## API
+
+### App
+
 _**Nota:** todos los requests que se hacen deben contener un header con 'token' como clave y el valor del token del usuario como valor_
 
-### - `/users`
-Devuelve todos los usuarios posibles de linkeo con el usuario que hace el request.
+#### `GET` - `/users`
+Devuelve todos los usuarios posibles de linkeo (Es decir, los candidatos) con el usuario que hace el request.
+
+#### `GET` - `/users/<id>`
+Devuelve al usuario `id`.
+
+#### `DELETE` - `/users/<id>`
+Elimina la cuenta del usuario `id`, eliminando sus chats, links, unlinks, denuncias, matches y la sesión en sí.
+
+#### `POST` - `/users`
+[Para testear] Crea un usuario de Firebase para poder hacer requests como si se hicieran desde la app.
+
+#### `POST` - `/getToken`
+[Para testear] Utilizado para obtener el token de Firebase de un usuario creado mediante el `POST` a `/users`, necesario para hacer los requests anteriores.
+
+### Administrador
+
+#### `GET` - `/ads`
+Devuelve todos las publicidades que hay registradas.
+
+#### `POST` - `/ads`
+Crea un nuevo anuncio. Se le debe enviar un `title`, un link a una `image` y un `state`.
+
+#### `DELETE` - `/ads/<id>`
+Borra la publicidad `id`.
+
+#### `POST` - `/ads/<id>/enable`
+Habilita la publicidad `id`.
+
+#### `POST` - `/ads/<id>/disable`
+Deshabilita la publicidad `id`.
+
+#### `GET` - `/complaints`
+Devuelve todas las denuncias de todos los usuarios.
+
+#### `GET` - `/complaints/<id>`
+Devuelve las denuncias para el usuario `id`.
+
+#### `POST` - `/users/<id>/disable`
+Deshabilita al usuario `id` debido a las denuncias recibidas.
+
+#### `POST` - `/users/<id>/enable`
+Habilita a un usuario `id`.
