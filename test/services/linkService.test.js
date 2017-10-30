@@ -26,7 +26,7 @@ describe('LinkService', () => {
       })
 
       it('Delete the unlink', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -47,7 +47,7 @@ describe('LinkService', () => {
       })
 
       it('Delete two unlinks', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -66,7 +66,7 @@ describe('LinkService', () => {
       })
 
       it('Deletes nothing', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -83,7 +83,7 @@ describe('LinkService', () => {
       })
 
       it('Deletes nothing', () => {
-        return LinkService().deleteUnlinks(maleForFriends).then(() => {
+        return LinkService().deleteUnlinks(maleForFriends.Uid).then(() => {
           return LinkService().getUnlinks(maleForFriends).then(unlinks => {
             expect(unlinks.length).to.equal(0)
           })
@@ -278,6 +278,83 @@ describe('LinkService', () => {
       it('it returns NO_LINK', () => {
         return LinkService().getLinkTypeBetween(femaleForFriends, maleForFriends).then(linkSituation => {
           expect(linkSituation).to.equal(NO_LINK)
+        })
+      })
+    })
+  })
+
+  describe('#deleteLinks(uid)', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const maleForFriends2 = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const linksRef = Database('links')
+
+    describe('when they have linked each other', () => {
+      beforeEach(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal'
+          },
+          [femaleForFriends.Uid]: {
+            [maleForFriends.Uid]: 'normal'
+          }
+        }
+        linksRef.set(links)
+      })
+
+      it('deletes deleting user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+
+      it('deletes deleted user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(femaleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+    })
+
+    describe('when they have not linked each other', () => {
+      beforeEach(() => {
+        const links = {
+          [maleForFriends.Uid]: {
+            [femaleForFriends.Uid]: 'normal',
+            [maleForFriends2.Uid]: 'normal'
+          },
+          [femaleForFriends.Uid]: {
+            [maleForFriends2.Uid]: 'normal'
+          }
+        }
+        linksRef.set(links)
+      })
+
+      it('deletes deleting user links', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends).then(links => {
+            expect(links.length).to.equal(0)
+          })
+        })
+      })
+
+      it('deletes no links for deleted user', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(femaleForFriends).then(links => {
+            expect(links.length).to.equal(1)
+            expect(links[0]).to.equal(maleForFriends2.Uid)
+          })
+        })
+      })
+
+      it('deletes no links for the other deleted user', () => {
+        return LinkService().deleteLinks(maleForFriends.Uid).then(() => {
+          return LinkService().getLinks(maleForFriends2).then(links => {
+            expect(links.length).to.equal(0)
+          })
         })
       })
     })

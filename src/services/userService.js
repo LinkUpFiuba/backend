@@ -6,6 +6,10 @@ import geolib from 'geolib'
 import LinkService from './linkService'
 import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
+import Administrator from './gateway/administrator'
+import { MatchService } from './matchService'
+import { ChatService } from './chatService'
+import ComplaintService from './complaintService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -246,7 +250,7 @@ export default function UserService() {
           if (users.length > 0) {
             return users
           }
-          LinkService().deleteUnlinks(actualUser)
+          LinkService().deleteUnlinks(actualUserUid)
           if (!userSearch.includes(FRIENDS)) {
             return getSexualPosibleMatches(ref, actualUser, userSearch)
           }
@@ -268,6 +272,34 @@ export default function UserService() {
           usersRef.child(`${user.key}/availableSuperlinks`).set(superlinks)
         })
       })
+    },
+    deleteUser: uid => {
+      // Delete his session
+      return Administrator().auth().deleteUser(uid)
+        .then(() => {
+          // Set as disabled user both in Firebase and the app
+          return DisableUserService().disableUser(uid)
+        })
+        .then(() => {
+          // Delete unlinks (Although it's not necessary, it's for keeping the DB clean)
+          return LinkService().deleteUnlinks(uid)
+        })
+        .then(() => {
+          // Delete links from and with that user
+          return LinkService().deleteLinks(uid)
+        })
+        .then(() => {
+          // Delete complaints in order not to show them in the administrator anymore
+          return ComplaintService().deleteComplaints(uid)
+        })
+        .then(() => {
+          // Delete messages from that user
+          return ChatService().deleteChats(uid)
+        })
+        .then(() => {
+          // Delete matches and add 'block' for the other user
+          return MatchService().deleteMatches(uid)
+        })
     }
   }
 }

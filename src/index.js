@@ -130,6 +130,22 @@ app.get('/users', (request, response) => {
     })
 })
 
+app.delete('/users/:uid', (request, response) => {
+  if (!request.get('token')) {
+    response.status(400)
+    return response.json({ message: 'El header "token" debe enviarse como parte del request' })
+  }
+  Administrator().auth().verifyIdToken(request.get('token'))
+    .then(decodedToken => {
+      const uid = decodedToken.uid
+      UserService().deleteUser(uid).then(() => response.json())
+    })
+    .catch(error => {
+      response.status(403)
+      return response.json({ message: error })
+    })
+})
+
 app.post('/getToken', (request, response) => {
   firebaseService().initiazeFirebase()
   firebase.auth().signInWithEmailAndPassword(request.body.email, request.body.password)

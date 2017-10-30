@@ -83,6 +83,11 @@ export default function ComplaintService() {
             return complaintsArray
           })
         })
+    },
+
+    deleteComplaints: userUid => {
+      const complaintsRef = Database('complaints')
+      return complaintsRef.child(userUid).remove()
     }
   }
 }

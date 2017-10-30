@@ -10,23 +10,26 @@ export default function DisableUserService() {
     })
   }
 
+  const disableUser = userUid => {
+    return Database('users').child(userUid).once('value').then(user => {
+      if (!user.exists()) {
+        return Promise.reject(new Error('That userUid does not exist'))
+      }
+      return AuthService().disableUser(userUid).then(() => {
+        return Database('disabledUsers').child(userUid).set(true)
+      })
+    })
+  }
+
   return {
     isUserDisabled: isUserDisabled,
 
+    disableUser: disableUser,
+
     blockUser: userUid => {
-      return Database('users').child(userUid).once('value')
-        .then(user => {
-          if (!user.exists()) {
-            return Promise.reject(new Error('That userUid does not exist'))
-          }
-          return AuthService().disableUser(userUid)
-            .then(() => {
-              return Database('disabledUsers').child(userUid).set(true)
-            })
-            .then(() => {
-              return PushNotificationService().sendDisablePush(userUid)
-            })
-        })
+      return disableUser(userUid).then(() => {
+        return PushNotificationService().sendDisablePush(userUid)
+      })
     },
 
     unblockUser: userUid => {
