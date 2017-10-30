@@ -50,6 +50,11 @@ export const ChatService = () => {
       console.log('Starting to detect new chat messages')
       const messagesRef = Database('messages')
       onNewMessage(messagesRef)
+    },
+
+    deleteChats: uid => {
+      const messagesRef = Database('messages')
+      return messagesRef.child(uid).remove()
     }
   }
 }

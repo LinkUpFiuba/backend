@@ -18,7 +18,7 @@ export default function UserController() {
               return users
             }
             ad.type = 'ad'
-            users.splice(Math.floor(Math.random() * users.length), 0, ad)
+            users.splice(Math.round(Math.random() * users.length), 0, ad)
             return users
           })
         })

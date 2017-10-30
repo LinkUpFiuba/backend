@@ -8,6 +8,7 @@ import InterestsService from './interestsService'
 import DisableUserService from './disableUserService'
 import Administrator from './gateway/administrator'
 import { MatchService } from './matchService'
+import { ChatService } from './chatService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -285,6 +286,10 @@ export default function UserService() {
         .then(() => {
           // Delete links from and with that user
           return LinkService().deleteLinks(uid)
+        })
+        .then(() => {
+          // Delete messages from that user
+          return ChatService().deleteChats(uid)
         })
         .then(() => {
           // Delete matches and add 'block' for the other user
