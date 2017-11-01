@@ -132,7 +132,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if title is undefined', () => {
+      it('should respond with error if title is undefined', () => {
         return AdsService().createAd({
           image: facebookAd.image,
           state: facebookAd.state
@@ -145,7 +145,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if image undefined', () => {
+      it('should respond with error if image undefined', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           state: facebookAd.state
@@ -158,7 +158,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if state is undefined', () => {
+      it('should respond with error if state is undefined', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image
@@ -177,13 +177,18 @@ describe('adsService', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image,
-          state: facebookAd.state
+          state: facebookAd.state,
+          ageRange: facebookAd.ageRange,
+          target: facebookAd.target
         }).then(() => {
           return AdsService().getAllAds().then(ads => {
             expect(ads.length).to.equal(1)
             expect(ads[0].title).to.equal(facebookAd.title)
             expect(ads[0].image).to.equal(facebookAd.image)
             expect(ads[0].state).to.equal(facebookAd.state)
+            expect(ads[0].ageRange.max).to.equal(facebookAd.ageRange.max)
+            expect(ads[0].ageRange.min).to.equal(facebookAd.ageRange.min)
+            expect(ads[0].target).to.equal(facebookAd.target)
           })
         })
       })
@@ -201,13 +206,18 @@ describe('adsService', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image,
-          state: facebookAd.state
+          state: facebookAd.state,
+          ageRange: facebookAd.ageRange,
+          target: facebookAd.target
         }).then(() => {
           return AdsService().getAllAds().then(ads => {
             expect(ads.length).to.equal(2)
             expect(ads[1].title).to.equal(facebookAd.title)
             expect(ads[1].image).to.equal(facebookAd.image)
             expect(ads[1].state).to.equal(facebookAd.state)
+            expect(ads[1].ageRange.max).to.equal(facebookAd.ageRange.max)
+            expect(ads[1].ageRange.min).to.equal(facebookAd.ageRange.min)
+            expect(ads[1].target).to.equal(facebookAd.target)
           })
         })
       })

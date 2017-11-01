@@ -77,11 +77,7 @@ export default function AdsService() {
       if (!correctness.result) {
         return Promise.reject(correctness.message)
       }
-      return adsRef.push({
-        title: ad.title,
-        image: ad.image,
-        state: ad.state
-      })
+      return adsRef.push(ad)
     }
   }
 }
