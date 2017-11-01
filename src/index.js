@@ -105,10 +105,19 @@ app.get('/complaints/:userUid', (request, response) => {
     })
 })
 
+// TODO: Hay un tema aca que /complaints/type lo interpreta como el get a /complaints/:userUid, asique hay
+// que buscar otra URL
 app.get('/complaintss/type', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsByType(request.query.startDate, request.query.endDate)
     .then(complaints => response.json(complaints))
+})
+
+// TODO: Idem endpoint anterior
+app.get('/complaintss/disabled', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getDisabledUsersForType(request.query.type)
+    .then(usersWithComplaints => response.json(usersWithComplaints))
 })
 
 app.post('/users/:userUid/disable', (request, response) => {
