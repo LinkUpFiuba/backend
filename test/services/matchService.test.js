@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, it, beforeEach } from 'mocha'
+import { describe, it, before, beforeEach } from 'mocha'
 import { MatchService } from '../../src/services/matchService'
 import { User } from '../factories/usersFactory'
 import Database from '../../src/services/gateway/database'
@@ -9,11 +9,41 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('MatchService', () => {
-  describe('#deleteMatches(uid)', () => {
-    const maleForFriends = new User().male().likesFriends().get()
-    const femaleForFriends = new User().female().likesFriends().get()
-    const matchesRef = Database('matches')
+  const matchesRef = Database('matches')
+  const maleForFriends = new User().male().likesFriends().get()
+  const femaleForFriends = new User().female().likesFriends().get()
 
+  describe('#createMatch(linkingUser, linkedUser)', () => {
+    before(() => {
+      const users = {
+        [maleForFriends.Uid]: maleForFriends,
+        [femaleForFriends.Uid]: femaleForFriends
+      }
+      Database('users').set(users)
+      matchesRef.set({})
+    })
+
+    it('creates the match for the linkingUser', () => {
+      return MatchService().createMatch(maleForFriends.Uid, femaleForFriends.Uid).then(() => {
+        return matchesRef.child(`${maleForFriends.Uid}/${femaleForFriends.Uid}`).once('value').then(match => {
+          console.log(match.val())
+          expect(match.exists()).to.be.true
+          expect(match.val().read).to.be.false
+        })
+      })
+    })
+
+    it('creates the match for the linkedUser', () => {
+      return MatchService().createMatch(maleForFriends.Uid, femaleForFriends.Uid).then(() => {
+        return matchesRef.child(`${femaleForFriends.Uid}/${maleForFriends.Uid}`).once('value').then(match => {
+          expect(match.exists()).to.be.true
+          expect(match.val().read).to.be.false
+        })
+      })
+    })
+  })
+
+  describe('#deleteMatches(uid)', () => {
     beforeEach(() => {
       const matches = {
         [maleForFriends.Uid]: {

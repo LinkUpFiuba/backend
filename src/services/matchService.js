@@ -1,8 +1,21 @@
 import Database from './gateway/database'
+import { PushNotificationService } from './pushNotificationService'
 
-// TODO: Here we should also include the matches creation that is actually in the LinkService
 export const MatchService = () => {
   return {
+    createMatch: (linkingUser, linkedUser) => {
+      const matchesRef = Database('matches')
+      const matchesToCreate = {}
+      matchesToCreate[`${linkedUser}/${linkingUser}/read`] = false
+      matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
+      return matchesRef.update(matchesToCreate).then(() => {
+        console.log('\tMatch successfully created!')
+        return PushNotificationService().sendMatchPush(linkingUser, linkedUser)
+      }).catch(() => {
+        console.log('\tMatch could not be created :(')
+      })
+    },
+
     deleteMatches: uid => {
       const matchesRef = Database('matches')
       return matchesRef.child(uid).once('value').then(matches => {
