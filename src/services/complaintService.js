@@ -121,23 +121,27 @@ export default function ComplaintService() {
 
     getDisabledUsersForType: type => {
       const complaintsRef = Database('complaints')
-      const usersWithComplaintsArray = []
+      const usersWithComplaintsSet = new Set()
       const usersWithComplaintsHash = { disabled: 0, enabled: 0 }
       const promisesArray = []
       return complaintsRef.once('value').then(complaints => {
         return complaints.forEach(user => {
           return user.forEach(complaint => {
             if (complaint.val().type === type) {
-              // TODO: Warning... there are users that have deleted their account as disabledUsers
-              promisesArray.push(DisableUserService().isUserDisabled(user.key).then(isDisabled => {
-                if (isDisabled) {
-                  usersWithComplaintsHash.disabled += 1
-                } else {
-                  usersWithComplaintsHash.enabled += 1
-                }
-              }))
+              usersWithComplaintsSet.add(user.key)
             }
           })
+        })
+      }).then(() => {
+        return usersWithComplaintsSet.forEach(user => {
+          // TODO: Warning... there are users that have deleted their account as disabledUsers
+          promisesArray.push(DisableUserService().isUserDisabled(user).then(isDisabled => {
+            if (isDisabled) {
+              usersWithComplaintsHash.disabled += 1
+            } else {
+              usersWithComplaintsHash.enabled += 1
+            }
+          }))
         })
       }).then(() => {
         return Promise.all(promisesArray).then(() => {

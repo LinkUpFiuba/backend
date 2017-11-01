@@ -255,7 +255,7 @@ describe('complaintService', () => {
     })
   })
 
-  describe('#getComplaintsByType', () => {
+  describe('#getComplaintsByType(startDate, endDate)', () => {
     const maleForFriends = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()
 
@@ -362,6 +362,98 @@ describe('complaintService', () => {
           return ComplaintService().getComplaintsByType('2017-12', undefined).then(complaints => {
             expect(complaints).to.be.empty
           })
+        })
+      })
+    })
+  })
+
+  describe('#getComplaintsByType(type)', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const maleForFriends2 = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+    const femaleForFriends2 = new User().female().likesFriends().get()
+
+    const otherComplaint = new Complaint().other().get()
+    const otherComplaint2 = new Complaint().other().get()
+    const suspiciousComplaint = new Complaint().suspicious().get()
+    const suspiciousComplaint2 = new Complaint().suspicious().get()
+    const suspiciousComplaint3 = new Complaint().suspicious().get()
+    const spamComplaint = new Complaint().spam().get()
+    const spamComplaint2 = new Complaint().spam().get()
+    const spamComplaint3 = new Complaint().spam().get()
+
+    before(() => {
+      const complaints = {
+        [maleForFriends.Uid]: {
+          [otherComplaint.id]: otherComplaint,
+          [suspiciousComplaint.id]: suspiciousComplaint
+        },
+        [maleForFriends2.Uid]: {
+          [spamComplaint.id]: spamComplaint,
+          [spamComplaint2.id]: spamComplaint2
+        },
+        [femaleForFriends.Uid]: {
+          [otherComplaint2.id]: otherComplaint2,
+          [suspiciousComplaint2.id]: suspiciousComplaint2,
+          [spamComplaint3.id]: spamComplaint3
+        },
+        [femaleForFriends2.Uid]: {
+          [suspiciousComplaint3.id]: suspiciousComplaint3
+        }
+      }
+      Database('complaints').set(complaints)
+
+      Database('disabledUsers').set({})
+    })
+
+    it('returns the correct amount for other type', () => {
+      return ComplaintService().getDisabledUsersForType('other').then(usersWithComplaints => {
+        expect(usersWithComplaints.enabled).to.eq(2)
+        expect(usersWithComplaints.disabled).to.eq(0)
+      })
+    })
+
+    it('returns the correct amount for spam type', () => {
+      return ComplaintService().getDisabledUsersForType('spam').then(usersWithComplaints => {
+        expect(usersWithComplaints.enabled).to.eq(2)
+        expect(usersWithComplaints.disabled).to.eq(0)
+      })
+    })
+
+    it('returns the correct amount for suspicious type', () => {
+      return ComplaintService().getDisabledUsersForType('suspicious').then(usersWithComplaints => {
+        expect(usersWithComplaints.enabled).to.eq(3)
+        expect(usersWithComplaints.disabled).to.eq(0)
+      })
+    })
+
+    describe('when there are disabledUsers', () => {
+      before(() => {
+        const disabledUsers = {
+          [maleForFriends.Uid]: true,
+          [femaleForFriends.Uid]: true
+        }
+        Database('disabledUsers').set(disabledUsers)
+      })
+
+      it('returns the correct amount for other type', () => {
+        return ComplaintService().getDisabledUsersForType('other').then(usersWithComplaints => {
+          expect(usersWithComplaints.enabled).to.eq(0)
+          expect(usersWithComplaints.disabled).to.eq(2)
+        })
+      })
+
+      it('returns the correct amount for spam type', () => {
+        return ComplaintService().getDisabledUsersForType('spam').then(usersWithComplaints => {
+          expect(usersWithComplaints.enabled).to.eq(1)
+          expect(usersWithComplaints.disabled).to.eq(1)
+        })
+      })
+
+      it('returns the correct amount for suspicious type', () => {
+        return ComplaintService().getDisabledUsersForType('suspicious').then(usersWithComplaints => {
+          expect(usersWithComplaints.enabled).to.eq(1)
+          expect(usersWithComplaints.disabled).to.eq(2)
         })
       })
     })
