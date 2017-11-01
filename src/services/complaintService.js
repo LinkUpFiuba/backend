@@ -23,6 +23,18 @@ export default function ComplaintService() {
     return isDisabled ? 'Disabled' : 'Active'
   }
 
+  const validTimestamp = (actualTimestamp, startDate, endDate) => {
+    if (startDate) {
+      startDate = startDate.concat('-01 00:00:00')
+      if (startDate > actualTimestamp) return false
+    }
+    if (endDate) {
+      endDate = endDate.concat('-31 23:59:59')
+      if (actualTimestamp > endDate) return false
+    }
+    return true
+  }
+
   return {
     getComplaintsCountForUsers: () => {
       const complaintsRef = Database('complaints')
@@ -83,6 +95,28 @@ export default function ComplaintService() {
             return complaintsArray
           })
         })
+    },
+
+    // The dates must be received as YYYY-MM
+    getComplaintsByType: (startDate, endDate) => {
+      const complaintsRef = Database('complaints')
+      const complaintsHash = {}
+      return complaintsRef.once('value').then(complaints => {
+        return complaints.forEach(user => {
+          return user.forEach(complaint => {
+            const timestamp = complaint.val().timeStamp
+            if (validTimestamp(timestamp, startDate, endDate)) {
+              if (complaintsHash[complaint.val().type]) {
+                complaintsHash[complaint.val().type] += 1
+              } else {
+                complaintsHash[complaint.val().type] = 1
+              }
+            }
+          })
+        })
+      }).then(() => {
+        return complaintsHash
+      })
     },
 
     deleteComplaints: userUid => {

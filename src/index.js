@@ -58,11 +58,6 @@ app.post('/ads/:adUid/disable', (request, response) => {
   AdsService().disableAd(request.params.adUid).then(() => response.send())
 })
 
-app.get('/complaints', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
-})
-
 app.post('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   const ad = request.body
@@ -77,11 +72,6 @@ app.post('/ads', (request, response) => {
 app.get('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().getAllAds().then(ads => response.json(ads))
-})
-
-app.get('/ads/random', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  AdsService().getRandomActiveAd().then(ad => response.json(ad))
 })
 
 app.delete('/ads/:adUid', (request, response) => {
@@ -99,6 +89,11 @@ app.post('/ads/:adUid/disable', (request, response) => {
   AdsService().disableAd(request.params.adUid).then(() => response.send())
 })
 
+app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
 app.get('/complaints/:userUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsForUser(request.params.userUid)
@@ -108,6 +103,12 @@ app.get('/complaints/:userUid', (request, response) => {
           response.json({ user: user, complaints: complaints })
         })
     })
+})
+
+app.get('/complaintss/type', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsByType(request.query.startDate, request.query.endDate)
+    .then(complaints => response.json(complaints))
 })
 
 app.post('/users/:userUid/disable', (request, response) => {
