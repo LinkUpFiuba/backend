@@ -17,7 +17,7 @@ export const MatchService = () => {
     return isHeterosexual && areCouple
   }
 
-  const isStartable = (user, isHeterosexualCouple) => {
+  const canStartChat = (user, isHeterosexualCouple) => {
     return (!isHeterosexualCouple || user.gender !== 'male')
   }
 
@@ -29,9 +29,9 @@ export const MatchService = () => {
           const matchesRef = Database('matches')
           const matchesToCreate = {}
           matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
-          matchesToCreate[`${linkingUser}/${linkedUser}/startable`] = isStartable(user1, isHeterosexualCouple)
+          matchesToCreate[`${linkingUser}/${linkedUser}/startable`] = canStartChat(user1, isHeterosexualCouple)
           matchesToCreate[`${linkedUser}/${linkingUser}/read`] = false
-          matchesToCreate[`${linkedUser}/${linkingUser}/startable`] = isStartable(user2, isHeterosexualCouple)
+          matchesToCreate[`${linkedUser}/${linkingUser}/startable`] = canStartChat(user2, isHeterosexualCouple)
           return matchesRef.update(matchesToCreate).then(() => {
             console.log('\tMatch successfully created!')
             return PushNotificationService().sendMatchPush(linkingUser, linkedUser)
