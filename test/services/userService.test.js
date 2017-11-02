@@ -591,7 +591,7 @@ describe('UserService', () => {
             [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
           }
           const disabledUsers = {
-            [maleForFemaleWithManyInterests.Uid]: true
+            [maleForFemaleWithManyInterests.Uid]: 'blocked'
           }
           const ref = Database('users')
           ref.set(users)
@@ -615,7 +615,7 @@ describe('UserService', () => {
             [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
           }
           const disabledUsers = {
-            [maleForFemaleWithManyInterests.Uid]: true
+            [maleForFemaleWithManyInterests.Uid]: 'blocked'
           }
           const ref = Database('users')
           ref.set(users)
@@ -640,8 +640,8 @@ describe('UserService', () => {
             [femaleForMaleWithOneInterest.Uid]: femaleForMaleWithOneInterest
           }
           const disabledUsers = {
-            [maleForFemaleWithManyInterests.Uid]: true,
-            [maleForMaleAndFemale.Uid]: true
+            [maleForFemaleWithManyInterests.Uid]: 'blocked',
+            [maleForMaleAndFemale.Uid]: 'blocked'
           }
           const ref = Database('users')
           ref.set(users)

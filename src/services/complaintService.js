@@ -44,7 +44,7 @@ export default function ComplaintService() {
         .then(complaints => {
           complaints.forEach(complaintsForUser => {
             promisesArrayOfUsers.push(UserService().getUser(complaintsForUser.key).then(user => {
-              return DisableUserService().isUserDisabled(user.Uid).then(isDisabled => {
+              return DisableUserService().isUserBlocked(user.Uid).then(isDisabled => {
                 const counts = calculateCounts(complaintsForUser)
                 const complaint = {
                   total: counts[TOTAL_INDEX],
@@ -134,8 +134,7 @@ export default function ComplaintService() {
         })
       }).then(() => {
         return usersWithComplaintsSet.forEach(user => {
-          // TODO: Warning... there are users that have deleted their account as disabledUsers
-          promisesArray.push(DisableUserService().isUserDisabled(user).then(isDisabled => {
+          promisesArray.push(DisableUserService().isUserBlocked(user).then(isDisabled => {
             if (isDisabled) {
               usersWithComplaintsHash.disabled += 1
             } else {

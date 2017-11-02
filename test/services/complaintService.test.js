@@ -430,8 +430,8 @@ describe('complaintService', () => {
     describe('when there are disabledUsers', () => {
       before(() => {
         const disabledUsers = {
-          [maleForFriends.Uid]: true,
-          [femaleForFriends.Uid]: true
+          [maleForFriends.Uid]: 'blocked',
+          [femaleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
       })
