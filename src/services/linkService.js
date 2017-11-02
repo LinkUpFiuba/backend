@@ -1,5 +1,5 @@
 import Database from './gateway/database'
-import { PushNotificationService } from './pushNotificationService'
+import { MatchService } from './matchService'
 
 export const SUPERLINK = 100
 export const LINK = 50
@@ -15,16 +15,7 @@ export default function LinkService() {
         // Create push notification!
         console.log(`${isNewMatch ? '\tThere is a new match!' : '\tNo new match :('}`)
         if (isNewMatch) {
-          const matchesRef = Database('matches')
-          const matchesToCreate = {}
-          matchesToCreate[`${linkedUser}/${linkingUser}/read`] = false
-          matchesToCreate[`${linkingUser}/${linkedUser}/read`] = false
-          return matchesRef.update(matchesToCreate).then(() => {
-            console.log('\tMatch successfully created!')
-            return PushNotificationService().sendMatchPush(linkingUser, linkedUser)
-          }).catch(() => {
-            console.log('\tMatch could not be created :(')
-          })
+          return MatchService().createMatch(linkingUser, linkedUser)
         }
       })
   }
