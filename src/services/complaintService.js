@@ -25,11 +25,11 @@ export default function ComplaintService() {
   }
 
   const validTimestamp = (actualTimestamp, startDate, endDate) => {
-    if (startDate) {
+    if (startDate && startDate !== 'undefined') {
       startDate = startDate.concat('-01 00:00:00')
       if (startDate > actualTimestamp) return false
     }
-    if (endDate) {
+    if (endDate && endDate !== 'undefined') {
       endDate = endDate.concat('-31 23:59:59')
       if (actualTimestamp > endDate) return false
     }
