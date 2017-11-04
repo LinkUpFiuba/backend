@@ -105,12 +105,13 @@ export default function ComplaintService() {
       return complaintsRef.once('value').then(complaints => {
         return complaints.forEach(userComplaints => {
           return userComplaints.forEach(complaint => {
+            const complaintType = complaint.val().type
             const timestamp = complaint.val().timeStamp
             if (validTimestamp(timestamp, startDate, endDate)) {
-              if (complaintsHash[complaint.val().type]) {
-                complaintsHash[complaint.val().type] += 1
+              if (complaintsHash[complaintType]) {
+                complaintsHash[complaintType] += 1
               } else {
-                complaintsHash[complaint.val().type] = 1
+                complaintsHash[complaintType] = 1
               }
             }
           })
@@ -134,6 +135,7 @@ export default function ComplaintService() {
           })
         })
       }).then(() => {
+        // Get which of those users are disabled
         return Promise.map(usersWithComplaintsSet, user => {
           return DisableUserService().isUserBlocked(user).then(isDisabled => {
             if (isDisabled) {
