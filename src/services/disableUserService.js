@@ -3,7 +3,7 @@ import AuthService from './authService'
 import { PushNotificationService } from './pushNotificationService'
 
 export default function DisableUserService() {
-  const isUserDisabled = (userUid, type = undefined) => {
+  const isUserDisabled = (userUid, type) => {
     const ref = Database('disabledUsers')
     return ref.child(userUid).once('value').then(user => {
       return user.exists() && (!type || user.val() === type)

@@ -367,7 +367,7 @@ describe('complaintService', () => {
     })
   })
 
-  describe('#getComplaintsByType(type)', () => {
+  describe('#getDisabledUsersForType(type)', () => {
     const maleForFriends = new User().male().likesFriends().get()
     const maleForFriends2 = new User().male().likesFriends().get()
     const femaleForFriends = new User().female().likesFriends().get()

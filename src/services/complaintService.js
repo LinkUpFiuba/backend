@@ -1,6 +1,7 @@
 import Database from './gateway/database'
 import UserService from './userService'
 import DisableUserService from './disableUserService'
+import Promise from 'bluebird'
 
 export default function ComplaintService() {
   const TOTAL_INDEX = 0
@@ -102,8 +103,8 @@ export default function ComplaintService() {
       const complaintsRef = Database('complaints')
       const complaintsHash = {}
       return complaintsRef.once('value').then(complaints => {
-        return complaints.forEach(user => {
-          return user.forEach(complaint => {
+        return complaints.forEach(userComplaints => {
+          return userComplaints.forEach(complaint => {
             const timestamp = complaint.val().timeStamp
             if (validTimestamp(timestamp, startDate, endDate)) {
               if (complaintsHash[complaint.val().type]) {
@@ -123,7 +124,7 @@ export default function ComplaintService() {
       const complaintsRef = Database('complaints')
       const usersWithComplaintsSet = new Set()
       const usersWithComplaintsHash = { disabled: 0, enabled: 0 }
-      const promisesArray = []
+      // Get users with complaints
       return complaintsRef.once('value').then(complaints => {
         return complaints.forEach(user => {
           return user.forEach(complaint => {
@@ -133,17 +134,15 @@ export default function ComplaintService() {
           })
         })
       }).then(() => {
-        return usersWithComplaintsSet.forEach(user => {
-          promisesArray.push(DisableUserService().isUserBlocked(user).then(isDisabled => {
+        return Promise.map(usersWithComplaintsSet, user => {
+          return DisableUserService().isUserBlocked(user).then(isDisabled => {
             if (isDisabled) {
               usersWithComplaintsHash.disabled += 1
             } else {
               usersWithComplaintsHash.enabled += 1
             }
-          }))
-        })
-      }).then(() => {
-        return Promise.all(promisesArray).then(() => {
+          })
+        }).then(() => {
           return usersWithComplaintsHash
         })
       })
