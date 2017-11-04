@@ -1,6 +1,8 @@
+/* eslint-disable no-return-assign */
 import Database from './gateway/database'
 import * as Validator from 'jsonschema'
 import adSchema from './schemas/adSchema'
+import Promise from 'bluebird'
 
 export default function AdsService() {
   const getAllAds = state => {
@@ -46,17 +48,30 @@ export default function AdsService() {
     })
   }
 
+  const getFilteredAds = (gender, age) => {
+    return getAllAds('Active')
+      .then(ads => ads.filter(ad => ad.target === gender && ad.ageRange.min <= age && age <= ad.ageRange.max))
+  }
+
   return {
     getAllAds: getAllAds,
 
     // return undefined if there is no ad to show
-    getRandomActiveAd: () => {
-      return getAllAds('Active').then(ads => {
-        if (ads.length === 0) {
-          return
-        }
-        return ads[Math.floor(Math.random() * ads.length)]
-      })
+    getRandomActiveAd: (gender, age) => {
+      let ads = []
+      return getFilteredAds(gender, age)
+        .then(filteredAds => ads = filteredAds)
+        .then(() => {
+          if (ads === []) {
+            ads = getAllAds('Active')
+          }
+        })
+        .then(() => {
+          if (ads === []) {
+            return
+          }
+          return ads[Math.floor(Math.random() * ads.length)]
+        })
     },
 
     deleteAd: adUid => {
