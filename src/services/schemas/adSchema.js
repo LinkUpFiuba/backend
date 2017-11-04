@@ -4,9 +4,11 @@ const adSchema = {
   'properties': {
     'title': { 'type': 'string' },
     'image': { 'type': 'string' },
-    'state': { 'type': 'string' }
+    'state': { 'type': 'string' },
+    'target': { 'type': 'string' },
+    'ageRange': { 'type': 'object' }
   },
-  'required': ['title', 'image', 'state']
+  'required': ['title', 'image', 'state', 'target', 'ageRange']
 }
 
 export default adSchema
