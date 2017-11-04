@@ -85,10 +85,10 @@ Devuelve todas las denuncias de todos los usuarios.
 #### `GET` - `/complaints/<id>`
 Devuelve las denuncias para el usuario `id`.
 
-#### `GET` - `/complaintss/type`
+#### `GET` - `/analytics/complaints/type`
 Devuelve la cantidad de denuncias de cada tipo. Se pueden especificar los _query parameters_ `startDate` y `endDate` para restringir las fechas. Estos parámetros deben seguir el formato `YYYY-MM`.
 
-#### `GET` - `/complaintss/disabled`
+#### `GET` - `/analytics/complaints/disabled`
 Devuelve la cantidad de denuncias de un tipo especificado mediante el _query parameter_ `type`. Éste debe ser un tipo válido; en caso contrario no devolverá nada. 
 
 #### `POST` - `/users/<id>/disable`
