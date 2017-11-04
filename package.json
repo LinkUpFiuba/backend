@@ -21,7 +21,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
-    "bluebird": "^3.5.0",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
     "express": "4.15.2",
@@ -31,7 +31,8 @@
     "geolib": "^2.0.23",
     "jsonschema": "^1.2.0",
     "node-fetch": "^1.7.2",
-    "node-schedule": "^1.2.5"
+    "node-schedule": "^1.2.5",
+    "lodash": "latest"
   },
   "devDependencies": {
     "chai": "^4.1.1",

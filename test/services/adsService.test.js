@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, before, it } from 'mocha'
@@ -294,6 +295,69 @@ describe('adsService', () => {
           return true
         })
       })
+    })
+
+    describe('when there is two ad but not match with the user (gender) male', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
+    })
+
+    describe('when there is two ad but not match with the user (gender) all', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forAll().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
+    })
+
+    describe.only('when there is two ad but not match with the user (age)', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().ageRange({ min: 70, max: 90 }).forMale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
     })
   })
 
