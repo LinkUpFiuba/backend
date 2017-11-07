@@ -3,7 +3,6 @@ import Database from './gateway/database'
 import * as Validator from 'jsonschema'
 import adSchema from './schemas/adSchema'
 import Promise from 'bluebird'
-import _ from 'lodash'
 
 export default function AdsService() {
   const getAllAds = state => {
@@ -83,11 +82,7 @@ export default function AdsService() {
       if (!correctness.result) {
         return Promise.reject(correctness.message)
       }
-      return adsRef.push({
-        title: ad.title,
-        image: ad.image,
-        state: ad.state
-      })
+      return adsRef.push(ad)
     }
   }
 }

@@ -133,7 +133,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if title is undefined', () => {
+      it('should respond with error if title is undefined', () => {
         return AdsService().createAd({
           image: facebookAd.image,
           state: facebookAd.state
@@ -146,7 +146,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if image undefined', () => {
+      it('should respond with error if image undefined', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           state: facebookAd.state
@@ -159,7 +159,7 @@ describe('adsService', () => {
           })
       })
 
-      it('should responde with error if state is undefined', () => {
+      it('should respond with error if state is undefined', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image
@@ -178,13 +178,18 @@ describe('adsService', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image,
-          state: facebookAd.state
+          state: facebookAd.state,
+          ageRange: facebookAd.ageRange,
+          target: facebookAd.target
         }).then(() => {
           return AdsService().getAllAds().then(ads => {
             expect(ads.length).to.equal(1)
             expect(ads[0].title).to.equal(facebookAd.title)
             expect(ads[0].image).to.equal(facebookAd.image)
             expect(ads[0].state).to.equal(facebookAd.state)
+            expect(ads[0].ageRange.max).to.equal(facebookAd.ageRange.max)
+            expect(ads[0].ageRange.min).to.equal(facebookAd.ageRange.min)
+            expect(ads[0].target).to.equal(facebookAd.target)
           })
         })
       })
@@ -202,13 +207,18 @@ describe('adsService', () => {
         return AdsService().createAd({
           title: facebookAd.title,
           image: facebookAd.image,
-          state: facebookAd.state
+          state: facebookAd.state,
+          ageRange: facebookAd.ageRange,
+          target: facebookAd.target
         }).then(() => {
           return AdsService().getAllAds().then(ads => {
             expect(ads.length).to.equal(2)
             expect(ads[1].title).to.equal(facebookAd.title)
             expect(ads[1].image).to.equal(facebookAd.image)
             expect(ads[1].state).to.equal(facebookAd.state)
+            expect(ads[1].ageRange.max).to.equal(facebookAd.ageRange.max)
+            expect(ads[1].ageRange.min).to.equal(facebookAd.ageRange.min)
+            expect(ads[1].target).to.equal(facebookAd.target)
           })
         })
       })
@@ -297,7 +307,7 @@ describe('adsService', () => {
       })
     })
 
-    describe('when there is two ad but not match with the user (gender) male', () => {
+    describe('when there is two ads: one match and one not (because of gender)', () => {
       const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
       const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
 
@@ -318,7 +328,7 @@ describe('adsService', () => {
       }
     })
 
-    describe('when there is two ad but not match with the user (gender) all', () => {
+    describe('when there is two ads: one match and one not (because of gender)', () => {
       const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
       const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forAll().get()
 
@@ -339,7 +349,7 @@ describe('adsService', () => {
       }
     })
 
-    describe.only('when there is two ad but not match with the user (age)', () => {
+    describe('when there is two ads: one match and one not (because of age)', () => {
       const googleAdForFemale = new Ad('Google', 'Google image').active().ageRange({ min: 70, max: 90 }).forMale().get()
       const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
 
