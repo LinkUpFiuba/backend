@@ -2,7 +2,6 @@
 import Database from './gateway/database'
 import * as Validator from 'jsonschema'
 import adSchema from './schemas/adSchema'
-import Promise from 'bluebird'
 
 export default function AdsService() {
   const getAllAds = state => {
@@ -46,11 +45,6 @@ export default function AdsService() {
       updates[`/${adUid}/state`] = newState
       return Database('ads').update(updates)
     })
-  }
-
-  const getFilteredAds = (gender, age) => {
-    return getAllAds('Active')
-      .then(ads => ads.filter(ad => ad.target === gender && ad.ageRange.min <= age && age <= ad.ageRange.max))
   }
 
   return {

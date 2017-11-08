@@ -307,7 +307,7 @@ describe('adsService', () => {
       })
     })
 
-    describe('when there is two ads: one match and one not (because of gender)', () => {
+    describe('when there are two ads: one match and one not (because of gender)', () => {
       const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
       const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
 
@@ -328,7 +328,7 @@ describe('adsService', () => {
       }
     })
 
-    describe('when there is two ads: one match and one not (because of gender)', () => {
+    describe('when there are two ads: one match and one not (because of gender)', () => {
       const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
       const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forAll().get()
 
