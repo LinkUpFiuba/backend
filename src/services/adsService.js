@@ -58,19 +58,14 @@ export default function AdsService() {
 
     // return undefined if there is no ad to show
     getRandomActiveAd: (gender, age) => {
-      let ads = []
-      return getFilteredAds(gender, age)
-        .then(filteredAds => ads = filteredAds)
-        .then(() => {
-          if (ads === []) {
-            ads = getAllAds('Active')
-          }
+      return getAllAds('Active')
+        .then(allAds => {
+          const filteredAds = allAds.filter(ad => (ad.target === 'all' || ad.target === gender) &&
+            ad.ageRange.min <= age && age <= ad.ageRange.max)
+          return filteredAds.length > 0 ? filteredAds : allAds
         })
-        .then(() => {
-          if (ads === []) {
-            return
-          }
-          return ads[Math.floor(Math.random() * ads.length)]
+        .then(ads => {
+          return ads.length > 0 ? ads[Math.floor(Math.random() * ads.length)] : undefined
         })
     },
 
@@ -92,11 +87,7 @@ export default function AdsService() {
       if (!correctness.result) {
         return Promise.reject(correctness.message)
       }
-      return adsRef.push({
-        title: ad.title,
-        image: ad.image,
-        state: ad.state
-      })
+      return adsRef.push(ad)
     }
   }
 }

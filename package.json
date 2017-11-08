@@ -31,7 +31,8 @@
     "geolib": "^2.0.23",
     "jsonschema": "^1.2.0",
     "node-fetch": "^1.7.2",
-    "node-schedule": "^1.2.5"
+    "node-schedule": "^1.2.5",
+    "lodash": "latest"
   },
   "devDependencies": {
     "chai": "^4.1.1",
