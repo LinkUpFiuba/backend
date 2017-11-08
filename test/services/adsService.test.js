@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { describe, before, beforeEach, it } from 'mocha'
+import { describe, before, it } from 'mocha'
 import Database from '../../src/services/gateway/database'
 import AdsService from '../../src/services/adsService'
 import { Ad } from '../factories/adsFactory'
@@ -218,44 +218,6 @@ describe('adsService', () => {
             expect(ads[1].ageRange.max).to.equal(facebookAd.ageRange.max)
             expect(ads[1].ageRange.min).to.equal(facebookAd.ageRange.min)
             expect(ads[1].target).to.equal(facebookAd.target)
-          })
-        })
-      })
-    })
-  })
-
-  describe.only('updateAd', () => {
-    const googleActiveAd = new Ad('Google', 'Google image').active().get()
-
-    before(() => {
-      Database('ads').set({})
-    })
-
-    describe('when the ad does not exists', () => {
-      it('should return an error', () => {
-        return AdsService().updateAd('invented uid', googleActiveAd)
-          .then(() => {
-            return Promise.reject(new Error('Expected method to reject.'))
-          })
-          .catch(() => {
-            return false
-          })
-      })
-    })
-
-    describe('when ad exists', () => {
-      beforeEach(() => {
-        const ads = {
-          [googleActiveAd.id]: googleActiveAd
-        }
-        Database('ads').set(ads)
-      })
-
-      it('should update title', () => {
-        const newTitle = 'This is the new title!'
-        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, title: newTitle }).then(() => {
-          return AdsService().getAllAds().then(ads => {
-            expect(ads[0].title).to.equal(newTitle)
           })
         })
       })

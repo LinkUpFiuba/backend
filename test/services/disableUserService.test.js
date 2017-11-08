@@ -30,6 +30,7 @@ describe('disableUserService', () => {
         return DisableUserService().blockUser(maleForFriends.Uid).then(() => {
           return Database('disabledUsers').child(maleForFriends.Uid.toString()).once('value').then(result => {
             expect(result.exists()).to.be.true
+            expect(result.val()).to.equal('blocked')
           })
         })
       })
@@ -44,7 +45,7 @@ describe('disableUserService', () => {
     describe('There is a user disabled', () => {
       before(() => {
         const disabledUsers = {
-          [femaleForFriends.Uid]: true
+          [femaleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
         DisableUserService().blockUser(maleForFriends.Uid)
@@ -87,7 +88,7 @@ describe('disableUserService', () => {
     describe('There is a user disabled', () => {
       before(() => {
         const disabledUsers = {
-          [femaleForFriends.Uid]: true
+          [femaleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
       })
@@ -104,8 +105,8 @@ describe('disableUserService', () => {
     describe('Both users are disabled', () => {
       before(() => {
         const disabledUsers = {
-          [femaleForFriends.Uid]: true,
-          [maleForFriends.Uid]: true
+          [femaleForFriends.Uid]: 'blocked',
+          [maleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
         DisableUserService().unblockUser(maleForFriends.Uid)
@@ -144,7 +145,7 @@ describe('disableUserService', () => {
     describe('One disabled user', () => {
       before(() => {
         const disabledUsers = {
-          [femaleForFriends.Uid]: true
+          [femaleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
       })
@@ -165,13 +166,13 @@ describe('disableUserService', () => {
     describe('Both users are disabled', () => {
       before(() => {
         const disabledUsers = {
-          [femaleForFriends.Uid]: true,
-          [maleForFriends.Uid]: true
+          [femaleForFriends.Uid]: 'blocked',
+          [maleForFriends.Uid]: 'blocked'
         }
         Database('disabledUsers').set(disabledUsers)
       })
 
-      it('should return false', () => {
+      it('should return true', () => {
         return DisableUserService().isUserDisabled(maleForFriends.Uid).then(result => {
           expect(result).to.be.true
         })
@@ -181,6 +182,53 @@ describe('disableUserService', () => {
         return DisableUserService().isUserDisabled(femaleForFriends.Uid).then(result => {
           expect(result).to.be.true
         })
+      })
+    })
+
+    describe('when there are blocked and deleted users', () => {
+      before(() => {
+        const disabledUsers = {
+          [femaleForFriends.Uid]: 'blocked',
+          [maleForFriends.Uid]: 'deleted'
+        }
+        Database('disabledUsers').set(disabledUsers)
+      })
+
+      it('returns true for the blocked user', () => {
+        return DisableUserService().isUserDisabled(femaleForFriends.Uid).then(result => {
+          expect(result).to.be.true
+        })
+      })
+
+      it('returns true for the deleted user', () => {
+        return DisableUserService().isUserDisabled(maleForFriends.Uid).then(result => {
+          expect(result).to.be.true
+        })
+      })
+    })
+  })
+
+  describe('isUserBlocked', () => {
+    const maleForFriends = new User().male().likesFriends().get()
+    const femaleForFriends = new User().female().likesFriends().get()
+
+    before(() => {
+      const disabledUsers = {
+        [femaleForFriends.Uid]: 'blocked',
+        [maleForFriends.Uid]: 'deleted'
+      }
+      Database('disabledUsers').set(disabledUsers)
+    })
+
+    it('returns true for the blocked user', () => {
+      return DisableUserService().isUserBlocked(femaleForFriends.Uid).then(result => {
+        expect(result).to.be.true
+      })
+    })
+
+    it('returns false for the deleted user', () => {
+      return DisableUserService().isUserBlocked(maleForFriends.Uid).then(result => {
+        expect(result).to.be.false
       })
     })
   })
