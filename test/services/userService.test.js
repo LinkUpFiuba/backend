@@ -943,7 +943,6 @@ describe('UserService', () => {
     const currentDate = dateFormat(now, 'yyyy-mm')
 
     before(() => {
-      console.log(currentDate)
       usersRef.set(users)
     })
 
