@@ -278,7 +278,7 @@ export default function UserService() {
       return Administrator().auth().deleteUser(uid)
         .then(() => {
           // Set as disabled user both in Firebase and the app
-          return DisableUserService().disableUser(uid)
+          return DisableUserService().disableDeletedUser(uid)
         })
         .then(() => {
           // Delete unlinks (Although it's not necessary, it's for keeping the DB clean)

@@ -11,9 +11,12 @@ export const MatchService = () => {
 
   const heterosexualCouple = (user1, user2) => {
     const isHeterosexual = user1.gender !== user2.gender
-    // Use the linkingUser interests to determine whether it's a link between friends or not
-    // (As the linkedUser may have changed its interests after giving the link)
-    const areCouple = !user1.interests.friends
+    // If user1 is a female, we use her interests (and user2 if user1 is not a female. If there's no female
+    // user or both are female, isHeterosexual will be false so we don't care about which we used for
+    // checking in areCouple
+    const femaleUser = user1.gender === 'female' ? user1 : user2
+    // Use the female interests to determine whether it's a link between friends or not.
+    const areCouple = !femaleUser.interests.friends
     return isHeterosexual && areCouple
   }
 
