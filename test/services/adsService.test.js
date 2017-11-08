@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { describe, before, it } from 'mocha'
@@ -263,6 +264,59 @@ describe('adsService', () => {
           })
         })
       })
+
+      it('should update image and leave everything else the same', () => {
+        const newImage = 'This is the new image!'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, image: newImage }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].image).to.equal(newImage)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update state and leave everything else the same', () => {
+        const newState = 'New State'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, state: newState }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].state).to.equal(newState)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update target and leave everything else the same', () => {
+        const newTarget = 'New target'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, target: newTarget }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].target).to.equal(newTarget)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update ageRange and leave everything else the same', () => {
+        const newAgeRange = { min: 67, max: 78 }
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, ageRange: newAgeRange }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].ageRange.max).to.equal(newAgeRange.max)
+            expect(ads[0].ageRange.min).to.equal(newAgeRange.min)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.deep.equal(googleActiveAd.target)
+          })
+        })
+      })
     })
   })
 
@@ -346,6 +400,69 @@ describe('adsService', () => {
           return true
         })
       })
+    })
+
+    describe('when there are two ads: one match and one not (because of gender)', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
+    })
+
+    describe('when there are two ads: one match and one not (because of gender)', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().forFemale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forAll().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
+    })
+
+    describe('when there is two ads: one match and one not (because of age)', () => {
+      const googleAdForFemale = new Ad('Google', 'Google image').active().ageRange({ min: 70, max: 90 }).forMale().get()
+      const facebookAdForMale = new Ad('Facebook', 'Facebook image').active().forMale().get()
+
+      before(() => {
+        const ads = {
+          [facebookAdForMale.id]: facebookAdForMale,
+          [googleAdForFemale.id]: googleAdForFemale
+        }
+        Database('ads').set(ads)
+      })
+
+      for (let i = 0; i < 10; i++) {
+        it('should return always facebook ad', () => {
+          return AdsService().getRandomActiveAd('male', 50).then(ad => {
+            expect(ad.uid).to.equal(facebookAdForMale.id)
+          })
+        })
+      }
     })
   })
 
