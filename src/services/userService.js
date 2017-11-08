@@ -300,6 +300,15 @@ export default function UserService() {
           // Delete matches and add 'block' for the other user
           return MatchService().deleteMatches(uid)
         })
+    },
+    updateUserActivity: uid => {
+      return UserService().hasLinkUpPlus(uid).then(hasLinkUpPlus => {
+        const premium = hasLinkUpPlus || null // null deletes if exists
+        const updates = {}
+        updates[`users/${uid}`] = true
+        updates[`premiumUsers/${uid}`] = premium
+        return Database('activeUsers').update(updates)
+      })
     }
   }
 }

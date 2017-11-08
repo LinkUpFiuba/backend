@@ -150,6 +150,7 @@ app.get('/users', (request, response) => {
     .then(decodedToken => {
       const uid = decodedToken.uid
       UserController().getUsersForUser(uid).then(usersWithAd => response.json(usersWithAd))
+      UserService().updateUserActivity(uid)
     })
     .catch(error => {
       response.status(403)

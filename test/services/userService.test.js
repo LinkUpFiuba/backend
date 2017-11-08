@@ -928,4 +928,161 @@ describe('UserService', () => {
       })
     })
   })
+
+  describe('#updateUserActivity(uid)', () => {
+    const activeUsersRef = Database('activeUsers')
+    const usersRef = Database('users')
+    const freeUser = new User().male().get()
+    const premiumUser = new User().male().premium().get()
+    const users = {
+      [freeUser.Uid]: freeUser,
+      [premiumUser.Uid]: premiumUser
+    }
+
+    before(() => {
+      usersRef.set(users)
+    })
+
+    describe('when an inactive user makes an activity', () => {
+      before(() => {
+        activeUsersRef.set({})
+      })
+
+      it('updates the activeUsers for the freeUser', () => {
+        return UserService().updateUserActivity(freeUser.Uid).then(() => {
+          return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
+            expect(snapshot.exists()).to.be.true
+          })
+        })
+      })
+
+      it('updates the activeUsers for the premiumUser', () => {
+        return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+          return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
+            expect(snapshot.exists()).to.be.true
+          })
+        })
+      })
+
+      it('does not update the activeUsers in premiumUsers for the freeUser', () => {
+        return UserService().updateUserActivity(freeUser.Uid).then(() => {
+          return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
+            expect(snapshot.exists()).to.be.false
+          })
+        })
+      })
+
+      it('updates the activeUsers in premiumUsers for the premiumUser', () => {
+        return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+          return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
+            expect(snapshot.exists()).to.be.true
+          })
+        })
+      })
+    })
+
+    describe('when an already active user makes an activity', () => {
+      describe('when user have not changed his premium status', () => {
+        before(() => {
+          const activeUsers = {
+            users: {
+              [freeUser.Uid]: true,
+              [premiumUser.Uid]: true
+            },
+            premiumUsers: {
+              [premiumUser.Uid]: true
+            }
+          }
+          activeUsersRef.set(activeUsers)
+          usersRef.set(users)
+        })
+
+        it('updates the activeUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+
+        it('updates the activeUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+
+        it('does not update the activeUsers in premiumUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.false
+            })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+      })
+
+      describe('when user have changed his premium status', () => {
+        before(() => {
+          const activeUsers = {
+            users: {
+              [freeUser.Uid]: true,
+              [premiumUser.Uid]: true
+            },
+            premiumUsers: {
+              [premiumUser.Uid]: true
+            }
+          }
+          activeUsersRef.set(activeUsers)
+
+          // They change their premium status
+          const newUsers = {
+            [freeUser.Uid]: { ...freeUser, linkUpPlus: true },
+            [premiumUser.Uid]: { ...premiumUser, linkUpPlus: false }
+          }
+          usersRef.set(newUsers)
+        })
+
+        it('updates the activeUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+
+        it('updates the activeUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the freeUser (now premium)', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the premiumUser (now free)', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
+              expect(snapshot.exists()).to.be.false
+            })
+          })
+        })
+      })
+    })
+  })
 })
