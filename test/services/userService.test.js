@@ -13,6 +13,7 @@ import UserService, {
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
 import { SUPERLINK, LINK, UNLINK, NO_LINK } from '../../src/services/linkService'
+import dateFormat from 'dateformat'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -929,7 +930,7 @@ describe('UserService', () => {
     })
   })
 
-  describe('#updateUserActivity(uid)', () => {
+  describe.only('#updateUserActivity(uid)', () => {
     const activeUsersRef = Database('activeUsers')
     const usersRef = Database('users')
     const freeUser = new User().male().get()
@@ -938,8 +939,11 @@ describe('UserService', () => {
       [freeUser.Uid]: freeUser,
       [premiumUser.Uid]: premiumUser
     }
+    const now = new Date()
+    const currentDate = dateFormat(now, 'yyyy-mm')
 
     before(() => {
+      console.log(currentDate)
       usersRef.set(users)
     })
 
@@ -950,7 +954,7 @@ describe('UserService', () => {
 
       it('updates the activeUsers for the freeUser', () => {
         return UserService().updateUserActivity(freeUser.Uid).then(() => {
-          return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
+          return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value').then(snapshot => {
             expect(snapshot.exists()).to.be.true
           })
         })
@@ -958,25 +962,28 @@ describe('UserService', () => {
 
       it('updates the activeUsers for the premiumUser', () => {
         return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-          return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
-            expect(snapshot.exists()).to.be.true
-          })
+          return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
         })
       })
 
       it('does not update the activeUsers in premiumUsers for the freeUser', () => {
         return UserService().updateUserActivity(freeUser.Uid).then(() => {
-          return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
-            expect(snapshot.exists()).to.be.false
-          })
+          return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.false
+            })
         })
       })
 
       it('updates the activeUsers in premiumUsers for the premiumUser', () => {
         return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-          return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
-            expect(snapshot.exists()).to.be.true
-          })
+          return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
         })
       })
     })
@@ -999,33 +1006,37 @@ describe('UserService', () => {
 
         it('updates the activeUsers for the freeUser', () => {
           return UserService().updateUserActivity(freeUser.Uid).then(() => {
-            return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
 
         it('updates the activeUsers for the premiumUser', () => {
           return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-            return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
 
         it('does not update the activeUsers in premiumUsers for the freeUser', () => {
           return UserService().updateUserActivity(freeUser.Uid).then(() => {
-            return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.false
-            })
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.false
+              })
           })
         })
 
         it('updates the activeUsers in premiumUsers for the premiumUser', () => {
           return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-            return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
       })
@@ -1053,33 +1064,37 @@ describe('UserService', () => {
 
         it('updates the activeUsers for the freeUser', () => {
           return UserService().updateUserActivity(freeUser.Uid).then(() => {
-            return activeUsersRef.child(`users/${freeUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
 
         it('updates the activeUsers for the premiumUser', () => {
           return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-            return activeUsersRef.child(`users/${premiumUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
 
         it('updates the activeUsers in premiumUsers for the freeUser (now premium)', () => {
           return UserService().updateUserActivity(freeUser.Uid).then(() => {
-            return activeUsersRef.child(`premiumUsers/${freeUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.true
-            })
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
           })
         })
 
         it('updates the activeUsers in premiumUsers for the premiumUser (now free)', () => {
           return UserService().updateUserActivity(premiumUser.Uid).then(() => {
-            return activeUsersRef.child(`premiumUsers/${premiumUser.Uid}`).once('value').then(snapshot => {
-              expect(snapshot.exists()).to.be.false
-            })
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.false
+              })
           })
         })
       })
