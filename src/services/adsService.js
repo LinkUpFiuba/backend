@@ -78,6 +78,21 @@ export default function AdsService() {
         return Promise.reject(correctness.message)
       }
       return adsRef.push(ad)
+    },
+
+    updateAd: (adUid, ad) => {
+      const correctness = validateAd(ad)
+      if (!correctness.result) {
+        return Promise.reject(correctness.message)
+      }
+      const update = {}
+      update[`/${adUid}`] = ad
+      return adExists(adUid).then(exist => {
+        if (!exist) {
+          return Promise.reject(new Error('Ad does not exists'))
+        }
+        return Database('ads').update(update)
+      })
     }
   }
 }

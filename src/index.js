@@ -89,6 +89,16 @@ app.delete('/ads/:adUid', (request, response) => {
   AdsService().deleteAd(request.params.adUid).then(() => response.send())
 })
 
+app.put('/ads/:adUid', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().updateAd(request.params.adUid, request.body).then(() => response.send())
+    .catch(err => {
+      console.log(err)
+      response.status(404)
+      return response.json({ message: 'That ad was not found' })
+    })
+})
+
 app.post('/ads/:adUid/enable', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().enableAd(request.params.adUid).then(() => response.send())
