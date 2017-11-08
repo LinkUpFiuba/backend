@@ -224,6 +224,48 @@ describe('adsService', () => {
     })
   })
 
+  describe('updateAd', () => {
+    const googleActiveAd = new Ad('Google', 'Google image').active().get()
+
+    before(() => {
+      Database('ads').set({})
+    })
+
+    describe('when the ad does not exists', () => {
+      it('should return an error', () => {
+        return AdsService().updateAd('invented uid', googleActiveAd)
+          .then(() => {
+            return Promise.reject(new Error('Expected method to reject.'))
+          })
+          .catch(() => {
+            return false
+          })
+      })
+    })
+
+    describe('when ad exists', () => {
+      before(() => {
+        const ads = {
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should update title and leave everything else the same', () => {
+        const newTitle = 'This is the new title!'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, title: newTitle }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].title).to.equal(newTitle)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+    })
+  })
+
   describe('getRandomActiveAd', () => {
     const googleActiveAd = new Ad('Google', 'Google image').active().get()
     const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
