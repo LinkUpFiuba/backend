@@ -6,13 +6,16 @@ export class Ad {
       id: Ad.id.toString(),
       title: title,
       image: image,
-      ageRange: { min: 18, max: 100 },
-      target: 'All'
+      target: 'all',
+      ageRange: {
+        min: 18,
+        max: 100
+      }
     }
     Ad.id += 1
   }
 
-  setAgeRange(ageRange) {
+  ageRange(ageRange) {
     this.ad.ageRange = ageRange
     return this
   }
@@ -28,17 +31,17 @@ export class Ad {
   }
 
   forAll() {
-    this.ad.target = 'All'
+    this.ad.target = 'all'
     return this
   }
 
   forMale() {
-    this.ad.target = 'Male'
+    this.ad.target = 'male'
     return this
   }
 
   forFemale() {
-    this.ad.target = 'Female'
+    this.ad.target = 'female'
     return this
   }
 
