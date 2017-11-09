@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import Database from './gateway/database'
 import * as Validator from 'jsonschema'
 import adSchema from './schemas/adSchema'
@@ -50,13 +51,16 @@ export default function AdsService() {
     getAllAds: getAllAds,
 
     // return undefined if there is no ad to show
-    getRandomActiveAd: () => {
-      return getAllAds('Active').then(ads => {
-        if (ads.length === 0) {
-          return
-        }
-        return ads[Math.floor(Math.random() * ads.length)]
-      })
+    getRandomActiveAd: (gender, age) => {
+      return getAllAds('Active')
+        .then(allAds => {
+          const filteredAds = allAds.filter(ad => (ad.target === 'all' || ad.target === gender) &&
+            ad.ageRange.min <= age && age <= ad.ageRange.max)
+          return filteredAds.length > 0 ? filteredAds : allAds
+        })
+        .then(ads => {
+          return ads.length > 0 ? ads[Math.floor(Math.random() * ads.length)] : undefined
+        })
     },
 
     deleteAd: adUid => {
@@ -78,6 +82,19 @@ export default function AdsService() {
         return Promise.reject(correctness.message)
       }
       return adsRef.push(ad)
+    },
+
+    updateAd: (adUid, ad) => {
+      const correctness = validateAd(ad)
+      if (!correctness.result) {
+        return Promise.reject(correctness.message)
+      }
+      return adExists(adUid).then(exist => {
+        if (!exist) {
+          return Promise.reject(new Error('Ad does not exists'))
+        }
+        return Database('ads').child(adUid).set(ad)
+      })
     }
   }
 }
