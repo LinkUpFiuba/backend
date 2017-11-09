@@ -10,8 +10,7 @@ import Administrator from './gateway/administrator'
 import { MatchService } from './matchService'
 import { ChatService } from './chatService'
 import ComplaintService from './complaintService'
-import dateFormat from 'dateformat'
-import { validDate } from './dateService'
+import { validDate, getActualDate } from './dateService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -306,8 +305,7 @@ export default function UserService() {
     updateUserActivity: uid => {
       return UserService().hasLinkUpPlus(uid).then(hasLinkUpPlus => {
         const premium = hasLinkUpPlus || null // null deletes if exists
-        const now = new Date()
-        const currentDate = dateFormat(now, 'yyyy-mm')
+        const currentDate = getActualDate()
         const updates = {}
         updates[`${currentDate}/users/${uid}`] = true
         updates[`${currentDate}/premiumUsers/${uid}`] = premium

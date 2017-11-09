@@ -13,7 +13,7 @@ import UserService, {
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
 import { SUPERLINK, LINK, UNLINK, NO_LINK } from '../../src/services/linkService'
-import dateFormat from 'dateformat'
+import { getActualDate } from '../../src/services/dateService'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -939,8 +939,7 @@ describe('UserService', () => {
       [freeUser.Uid]: freeUser,
       [premiumUser.Uid]: premiumUser
     }
-    const now = new Date()
-    const currentDate = dateFormat(now, 'yyyy-mm')
+    const currentDate = getActualDate()
 
     before(() => {
       usersRef.set(users)

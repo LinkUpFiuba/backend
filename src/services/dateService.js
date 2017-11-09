@@ -1,3 +1,5 @@
+import dateFormat from 'dateformat'
+
 export const validTimestamp = (actualTimestamp, startDate, endDate) => {
   if (startDate && startDate !== 'undefined') {
     startDate = startDate.concat('-01 00:00:00')
@@ -18,4 +20,9 @@ export const validDate = (actualDate, startDate, endDate) => {
     if (actualDate > endDate) return false
   }
   return true
+}
+
+export const getActualDate = () => {
+  const now = new Date()
+  return dateFormat(now, 'yyyy-mm')
 }
