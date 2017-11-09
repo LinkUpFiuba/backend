@@ -930,7 +930,7 @@ describe('UserService', () => {
     })
   })
 
-  describe.only('#updateUserActivity(uid)', () => {
+  describe('#updateUserActivity(uid)', () => {
     const activeUsersRef = Database('activeUsers')
     const usersRef = Database('users')
     const freeUser = new User().male().get()
@@ -1094,6 +1094,129 @@ describe('UserService', () => {
               .then(snapshot => {
                 expect(snapshot.exists()).to.be.false
               })
+          })
+        })
+      })
+    })
+  })
+
+  describe('#getActiveUsers(startDate, endDate)', () => {
+    const activeUsersRef = Database('activeUsers')
+    const allActiveUsers = {
+      '2017-09': {
+        'users': 2,
+        'premiumUsers': 1
+      },
+      '2017-10': {
+        'users': 4,
+        'premiumUsers': 2
+      },
+      '2017-11': {
+        'users': 1,
+        'premiumUsers': 0
+      }
+    }
+
+    describe('when there are no activeUsers', () => {
+      before(() => {
+        activeUsersRef.set({})
+      })
+
+      describe('when calling without dates', () => {
+        it('returns an empty hash', () => {
+          return UserService().getActiveUsers().then(users => {
+            expect(users).to.be.empty
+          })
+        })
+      })
+    })
+
+    describe('when there are activeUsers', () => {
+      before(() => {
+        const activeUsers = {
+          '2017-09': {
+            'users': {
+              'user1': true,
+              'user2': true
+            },
+            'premiumUsers': {
+              'user2': true
+            }
+          },
+          '2017-10': {
+            'users': {
+              'user1': true,
+              'user2': true,
+              'user3': true,
+              'user4': true
+            },
+            'premiumUsers': {
+              'user1': true,
+              'user3': true
+            }
+          },
+          '2017-11': {
+            'users': {
+              'user1': true
+            }
+          }
+        }
+        activeUsersRef.set(activeUsers)
+      })
+
+      describe('when calling without dates', () => {
+        it('returns all active users', () => {
+          return UserService().getActiveUsers().then(users => {
+            expect(users).to.deep.equal(allActiveUsers)
+          })
+        })
+
+        it('returns all active users', () => {
+          return UserService().getActiveUsers('undefined', 'undefined').then(users => {
+            expect(users).to.deep.equal(allActiveUsers)
+          })
+        })
+      })
+
+      describe('when calling with dates', () => {
+        describe('when calling with all available dates', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-09', '2017-11').then(users => {
+              expect(users).to.deep.equal(allActiveUsers)
+            })
+          })
+        })
+
+        describe('when calling with more dates than available', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-08', '2017-12').then(users => {
+              expect(users).to.deep.equal(allActiveUsers)
+            })
+          })
+        })
+
+        describe('when calling with a subset of the available dates', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-10', '2017-11').then(users => {
+              expect(users).to.deep.equal({
+                '2017-10': {
+                  'users': 4,
+                  'premiumUsers': 2
+                },
+                '2017-11': {
+                  'users': 1,
+                  'premiumUsers': 0
+                }
+              })
+            })
+          })
+        })
+
+        describe('when calling with dates without data', () => {
+          it('returns an empty hash', () => {
+            return UserService().getActiveUsers('2017-12', '2018-02').then(users => {
+              expect(users).to.be.empty
+            })
           })
         })
       })
