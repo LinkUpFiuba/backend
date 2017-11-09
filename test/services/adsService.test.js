@@ -225,6 +225,101 @@ describe('adsService', () => {
     })
   })
 
+  describe('updateAd', () => {
+    const googleActiveAd = new Ad('Google', 'Google image').active().get()
+
+    before(() => {
+      Database('ads').set({})
+    })
+
+    describe('when the ad does not exists', () => {
+      it('should return an error', () => {
+        return AdsService().updateAd('invented uid', googleActiveAd)
+          .then(() => {
+            return Promise.reject(new Error('Expected method to reject.'))
+          })
+          .catch(() => {
+            return false
+          })
+      })
+    })
+
+    describe('when ad exists', () => {
+      before(() => {
+        const ads = {
+          [googleActiveAd.id]: googleActiveAd
+        }
+        Database('ads').set(ads)
+      })
+
+      it('should update title and leave everything else the same', () => {
+        const newTitle = 'This is the new title!'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, title: newTitle }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].title).to.equal(newTitle)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update image and leave everything else the same', () => {
+        const newImage = 'This is the new image!'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, image: newImage }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].image).to.equal(newImage)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update state and leave everything else the same', () => {
+        const newState = 'New State'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, state: newState }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].state).to.equal(newState)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].target).to.equal(googleActiveAd.target)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update target and leave everything else the same', () => {
+        const newTarget = 'New target'
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, target: newTarget }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].target).to.equal(newTarget)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].ageRange).to.deep.equal(googleActiveAd.ageRange)
+          })
+        })
+      })
+
+      it('should update ageRange and leave everything else the same', () => {
+        const newAgeRange = { min: 67, max: 78 }
+        return AdsService().updateAd(googleActiveAd.id, { ...googleActiveAd, ageRange: newAgeRange }).then(() => {
+          return AdsService().getAllAds().then(ads => {
+            expect(ads[0].ageRange.max).to.equal(newAgeRange.max)
+            expect(ads[0].ageRange.min).to.equal(newAgeRange.min)
+            expect(ads[0].title).to.equal(googleActiveAd.title)
+            expect(ads[0].image).to.equal(googleActiveAd.image)
+            expect(ads[0].state).to.equal(googleActiveAd.state)
+            expect(ads[0].target).to.deep.equal(googleActiveAd.target)
+          })
+        })
+      })
+    })
+  })
+
   describe('getRandomActiveAd', () => {
     const googleActiveAd = new Ad('Google', 'Google image').active().get()
     const facebookDisableAd = new Ad('Facebook', 'Facebook image').disabled().get()
