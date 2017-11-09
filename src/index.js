@@ -140,6 +140,12 @@ app.post('/users/:userUid/enable', (request, response) => {
     })
 })
 
+app.get('/analytics/users', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  UserService().getActiveUsers(request.query.startDate, request.query.endDate)
+    .then(users => response.json(users))
+})
+
 // For the app
 app.get('/users', (request, response) => {
   if (!request.get('token')) {

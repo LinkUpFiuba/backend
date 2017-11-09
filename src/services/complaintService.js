@@ -2,6 +2,7 @@ import Database from './gateway/database'
 import UserService from './userService'
 import DisableUserService from './disableUserService'
 import Promise from 'bluebird'
+import { validTimestamp } from './dateService'
 
 export default function ComplaintService() {
   const TOTAL_INDEX = 0
@@ -22,18 +23,6 @@ export default function ComplaintService() {
 
   const translateCondition = isDisabled => {
     return isDisabled ? 'Disabled' : 'Active'
-  }
-
-  const validTimestamp = (actualTimestamp, startDate, endDate) => {
-    if (startDate && startDate !== 'undefined') {
-      startDate = startDate.concat('-01 00:00:00')
-      if (startDate > actualTimestamp) return false
-    }
-    if (endDate && endDate !== 'undefined') {
-      endDate = endDate.concat('-31 23:59:59')
-      if (actualTimestamp > endDate) return false
-    }
-    return true
   }
 
   return {

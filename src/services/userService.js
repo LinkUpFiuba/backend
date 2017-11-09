@@ -11,6 +11,7 @@ import { MatchService } from './matchService'
 import { ChatService } from './chatService'
 import ComplaintService from './complaintService'
 import dateFormat from 'dateformat'
+import { validDate } from './dateService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -311,6 +312,24 @@ export default function UserService() {
         updates[`${currentDate}/users/${uid}`] = true
         updates[`${currentDate}/premiumUsers/${uid}`] = premium
         return Database('activeUsers').update(updates)
+      })
+    },
+    // This returns only the dates where there is data, it does not fill with 0 between the dates requested
+    getActiveUsers: (startDate, endDate) => {
+      const activeUsersRef = Database('activeUsers')
+      const activeUsersHash = {}
+      return activeUsersRef.once('value').then(activeUsersPerMonth => {
+        return activeUsersPerMonth.forEach(activeUsersInMonth => {
+          const timestamp = activeUsersInMonth.key
+          if (validDate(timestamp, startDate, endDate)) {
+            activeUsersHash[timestamp] = {
+              users: activeUsersInMonth.child('users').numChildren(),
+              premiumUsers: activeUsersInMonth.child('premiumUsers').numChildren()
+            }
+          }
+        })
+      }).then(() => {
+        return activeUsersHash
       })
     }
   }
