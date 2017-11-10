@@ -10,7 +10,7 @@ import Administrator from './gateway/administrator'
 import { MatchService } from './matchService'
 import { ChatService } from './chatService'
 import ComplaintService from './complaintService'
-import { validDate, getActualDate } from './dateService'
+import { validDate, getActualDate, getDatesBetween } from './dateService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -314,15 +314,26 @@ export default function UserService() {
     },
     // This returns only the dates where there is data, it does not fill with 0 between the dates requested
     getActiveUsers: (startDate, endDate) => {
+      // If endDate is not specified, we put the actualDate
+      if (!endDate || endDate === 'undefined') {
+        endDate = getActualDate()
+      }
       const activeUsersRef = Database('activeUsers')
       const activeUsersHash = {}
       return activeUsersRef.once('value').then(activeUsersPerMonth => {
-        return activeUsersPerMonth.forEach(activeUsersInMonth => {
-          const timestamp = activeUsersInMonth.key
+        if (!activeUsersPerMonth.exists()) return {}
+        if (!startDate || startDate === 'undefined') {
+          // Get min date of data
+          startDate = Object.keys(activeUsersPerMonth.val()).reduce((prev, curr) => {
+            return prev < curr ? prev : curr
+          })
+        }
+        return getDatesBetween(startDate, endDate).forEach(date => {
+          const timestamp = date
           if (validDate(timestamp, startDate, endDate)) {
             activeUsersHash[timestamp] = {
-              users: activeUsersInMonth.child('users').numChildren(),
-              premiumUsers: activeUsersInMonth.child('premiumUsers').numChildren()
+              users: activeUsersPerMonth.child(`${date}/users`).numChildren(),
+              premiumUsers: activeUsersPerMonth.child(`${date}/premiumUsers`).numChildren()
             }
           }
         })

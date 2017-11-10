@@ -1128,6 +1128,14 @@ describe('UserService', () => {
           })
         })
       })
+
+      describe('when calling with dates', () => {
+        it('returns an empty hash', () => {
+          return UserService().getActiveUsers('2017-09', '2017-11').then(users => {
+            expect(users).to.be.empty
+          })
+        })
+      })
     })
 
     describe('when there are activeUsers', () => {
@@ -1177,6 +1185,49 @@ describe('UserService', () => {
         })
       })
 
+      describe('when calling only with startDate', () => {
+        it('returns data since then until today', () => {
+          return UserService().getActiveUsers('2017-08').then(users => {
+            expect(users).to.deep.equal({
+              ...allActiveUsers,
+              '2017-08': {
+                'users': 0,
+                'premiumUsers': 0
+              }
+            })
+          })
+        })
+      })
+
+      describe('when calling only with endDate', () => {
+        it('returns data since the first day of data until endDate', () => {
+          return UserService().getActiveUsers(undefined, '2017-10').then(users => {
+            expect(users).to.deep.equal({
+              '2017-09': {
+                'users': 2,
+                'premiumUsers': 1
+              },
+              '2017-10': {
+                'users': 4,
+                'premiumUsers': 2
+              }
+            })
+          })
+        })
+
+        it('returns data since the first day of data until endDate', () => {
+          return UserService().getActiveUsers(undefined, '2017-12').then(users => {
+            expect(users).to.deep.equal({
+              ...allActiveUsers,
+              '2017-12': {
+                'users': 0,
+                'premiumUsers': 0
+              }
+            })
+          })
+        })
+      })
+
       describe('when calling with dates', () => {
         describe('when calling with all available dates', () => {
           it('returns data between those dates', () => {
@@ -1189,7 +1240,17 @@ describe('UserService', () => {
         describe('when calling with more dates than available', () => {
           it('returns data between those dates', () => {
             return UserService().getActiveUsers('2017-08', '2017-12').then(users => {
-              expect(users).to.deep.equal(allActiveUsers)
+              expect(users).to.deep.equal({
+                ...allActiveUsers,
+                '2017-08': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2017-12': {
+                  'users': 0,
+                  'premiumUsers': 0
+                }
+              })
             })
           })
         })
@@ -1214,7 +1275,20 @@ describe('UserService', () => {
         describe('when calling with dates without data', () => {
           it('returns an empty hash', () => {
             return UserService().getActiveUsers('2017-12', '2018-02').then(users => {
-              expect(users).to.be.empty
+              expect(users).to.deep.equal({
+                '2017-12': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2018-01': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2018-02': {
+                  'users': 0,
+                  'premiumUsers': 0
+                }
+              })
             })
           })
         })
