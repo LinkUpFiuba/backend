@@ -42,23 +42,6 @@ export const getDatesBetween = (startDate, endDate) => {
   return dates
 }
 
-export const getDatesBetween2 = (startDate, endDate) => {
-  const day = 1000 * 60 * 60 * 24
-  const date1 = new Date(`${startDate}-02`)
-  const date2 = new Date(`${endDate}-28`)
-
-  const dates = new Set()
-  const diff = (date2.getTime() - date1.getTime()) / day
-  for (let i = 0; i <= diff; i++) {
-    const xx = date1.getTime() + day * i
-    const yy = new Date(xx)
-    const date = dateFormat(yy, 'yyyy-mm')
-
-    dates.add(date)
-  }
-  return dates
-}
-
 export const getActualDate = () => {
   const now = new Date()
   return dateFormat(now, 'yyyy-mm')
