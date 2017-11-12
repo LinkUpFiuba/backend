@@ -13,6 +13,7 @@ import UserService, {
 import Database from '../../src/services/gateway/database'
 import { User, Interests } from '../factories/usersFactory'
 import { SUPERLINK, LINK, UNLINK, NO_LINK } from '../../src/services/linkService'
+import { getActualDate } from '../../src/services/dateService'
 
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -922,6 +923,372 @@ describe('UserService', () => {
               const userJson = user.val()
               const superlinks = userJson.linkUpPlus ? PREMIUM_SUPERLINKS : FREE_SUPERLINKS
               expect(userJson.availableSuperlinks).to.equal(superlinks)
+            })
+          })
+        })
+      })
+    })
+  })
+
+  describe('#updateUserActivity(uid)', () => {
+    const activeUsersRef = Database('activeUsers')
+    const usersRef = Database('users')
+    const freeUser = new User().male().get()
+    const premiumUser = new User().male().premium().get()
+    const users = {
+      [freeUser.Uid]: freeUser,
+      [premiumUser.Uid]: premiumUser
+    }
+    const currentDate = getActualDate()
+
+    before(() => {
+      usersRef.set(users)
+    })
+
+    describe('when an inactive user makes an activity', () => {
+      before(() => {
+        activeUsersRef.set({})
+      })
+
+      it('updates the activeUsers for the freeUser', () => {
+        return UserService().updateUserActivity(freeUser.Uid).then(() => {
+          return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value').then(snapshot => {
+            expect(snapshot.exists()).to.be.true
+          })
+        })
+      })
+
+      it('updates the activeUsers for the premiumUser', () => {
+        return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+          return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+        })
+      })
+
+      it('does not update the activeUsers in premiumUsers for the freeUser', () => {
+        return UserService().updateUserActivity(freeUser.Uid).then(() => {
+          return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.false
+            })
+        })
+      })
+
+      it('updates the activeUsers in premiumUsers for the premiumUser', () => {
+        return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+          return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+            .then(snapshot => {
+              expect(snapshot.exists()).to.be.true
+            })
+        })
+      })
+    })
+
+    describe('when an already active user makes an activity', () => {
+      describe('when user have not changed his premium status', () => {
+        before(() => {
+          const activeUsers = {
+            users: {
+              [freeUser.Uid]: true,
+              [premiumUser.Uid]: true
+            },
+            premiumUsers: {
+              [premiumUser.Uid]: true
+            }
+          }
+          activeUsersRef.set(activeUsers)
+          usersRef.set(users)
+        })
+
+        it('updates the activeUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+
+        it('updates the activeUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+
+        it('does not update the activeUsers in premiumUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.false
+              })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+      })
+
+      describe('when user have changed his premium status', () => {
+        before(() => {
+          const activeUsers = {
+            users: {
+              [freeUser.Uid]: true,
+              [premiumUser.Uid]: true
+            },
+            premiumUsers: {
+              [premiumUser.Uid]: true
+            }
+          }
+          activeUsersRef.set(activeUsers)
+
+          // They change their premium status
+          const newUsers = {
+            [freeUser.Uid]: { ...freeUser, linkUpPlus: true },
+            [premiumUser.Uid]: { ...premiumUser, linkUpPlus: false }
+          }
+          usersRef.set(newUsers)
+        })
+
+        it('updates the activeUsers for the freeUser', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/users/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+
+        it('updates the activeUsers for the premiumUser', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/users/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the freeUser (now premium)', () => {
+          return UserService().updateUserActivity(freeUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${freeUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.true
+              })
+          })
+        })
+
+        it('updates the activeUsers in premiumUsers for the premiumUser (now free)', () => {
+          return UserService().updateUserActivity(premiumUser.Uid).then(() => {
+            return activeUsersRef.child(`${currentDate}/premiumUsers/${premiumUser.Uid}`).once('value')
+              .then(snapshot => {
+                expect(snapshot.exists()).to.be.false
+              })
+          })
+        })
+      })
+    })
+  })
+
+  describe('#getActiveUsers(startDate, endDate)', () => {
+    const activeUsersRef = Database('activeUsers')
+    const allActiveUsers = {
+      '2017-09': {
+        'users': 2,
+        'premiumUsers': 1
+      },
+      '2017-10': {
+        'users': 4,
+        'premiumUsers': 2
+      },
+      '2017-11': {
+        'users': 1,
+        'premiumUsers': 0
+      }
+    }
+
+    describe('when there are no activeUsers', () => {
+      before(() => {
+        activeUsersRef.set({})
+      })
+
+      describe('when calling without dates', () => {
+        it('returns an empty hash', () => {
+          return UserService().getActiveUsers().then(users => {
+            expect(users).to.be.empty
+          })
+        })
+      })
+
+      describe('when calling with dates', () => {
+        it('returns an empty hash', () => {
+          return UserService().getActiveUsers('2017-09', '2017-11').then(users => {
+            expect(users).to.be.empty
+          })
+        })
+      })
+    })
+
+    describe('when there are activeUsers', () => {
+      before(() => {
+        const activeUsers = {
+          '2017-09': {
+            'users': {
+              'user1': true,
+              'user2': true
+            },
+            'premiumUsers': {
+              'user2': true
+            }
+          },
+          '2017-10': {
+            'users': {
+              'user1': true,
+              'user2': true,
+              'user3': true,
+              'user4': true
+            },
+            'premiumUsers': {
+              'user1': true,
+              'user3': true
+            }
+          },
+          '2017-11': {
+            'users': {
+              'user1': true
+            }
+          }
+        }
+        activeUsersRef.set(activeUsers)
+      })
+
+      describe('when calling without dates', () => {
+        it('returns all active users', () => {
+          return UserService().getActiveUsers().then(users => {
+            expect(users).to.deep.equal(allActiveUsers)
+          })
+        })
+
+        it('returns all active users', () => {
+          return UserService().getActiveUsers('undefined', 'undefined').then(users => {
+            expect(users).to.deep.equal(allActiveUsers)
+          })
+        })
+      })
+
+      describe('when calling only with startDate', () => {
+        it('returns data since then until today', () => {
+          return UserService().getActiveUsers('2017-08').then(users => {
+            expect(users).to.deep.equal({
+              ...allActiveUsers,
+              '2017-08': {
+                'users': 0,
+                'premiumUsers': 0
+              }
+            })
+          })
+        })
+      })
+
+      describe('when calling only with endDate', () => {
+        it('returns data since the first day of data until endDate', () => {
+          return UserService().getActiveUsers(undefined, '2017-10').then(users => {
+            expect(users).to.deep.equal({
+              '2017-09': {
+                'users': 2,
+                'premiumUsers': 1
+              },
+              '2017-10': {
+                'users': 4,
+                'premiumUsers': 2
+              }
+            })
+          })
+        })
+
+        it('returns data since the first day of data until endDate', () => {
+          return UserService().getActiveUsers(undefined, '2017-12').then(users => {
+            expect(users).to.deep.equal({
+              ...allActiveUsers,
+              '2017-12': {
+                'users': 0,
+                'premiumUsers': 0
+              }
+            })
+          })
+        })
+      })
+
+      describe('when calling with dates', () => {
+        describe('when calling with all available dates', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-09', '2017-11').then(users => {
+              expect(users).to.deep.equal(allActiveUsers)
+            })
+          })
+        })
+
+        describe('when calling with more dates than available', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-08', '2017-12').then(users => {
+              expect(users).to.deep.equal({
+                ...allActiveUsers,
+                '2017-08': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2017-12': {
+                  'users': 0,
+                  'premiumUsers': 0
+                }
+              })
+            })
+          })
+        })
+
+        describe('when calling with a subset of the available dates', () => {
+          it('returns data between those dates', () => {
+            return UserService().getActiveUsers('2017-10', '2017-11').then(users => {
+              expect(users).to.deep.equal({
+                '2017-10': {
+                  'users': 4,
+                  'premiumUsers': 2
+                },
+                '2017-11': {
+                  'users': 1,
+                  'premiumUsers': 0
+                }
+              })
+            })
+          })
+        })
+
+        describe('when calling with dates without data', () => {
+          it('returns an empty hash', () => {
+            return UserService().getActiveUsers('2017-12', '2018-02').then(users => {
+              expect(users).to.deep.equal({
+                '2017-12': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2018-01': {
+                  'users': 0,
+                  'premiumUsers': 0
+                },
+                '2018-02': {
+                  'users': 0,
+                  'premiumUsers': 0
+                }
+              })
             })
           })
         })

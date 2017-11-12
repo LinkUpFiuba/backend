@@ -150,6 +150,12 @@ app.post('/users/:userUid/enable', (request, response) => {
     })
 })
 
+app.get('/analytics/users', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  UserService().getActiveUsers(request.query.startDate, request.query.endDate)
+    .then(users => response.json(users))
+})
+
 // For the app
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
@@ -160,6 +166,7 @@ app.get('/users', (request, response) => {
     .then(decodedToken => {
       const uid = decodedToken.uid
       UserController().getUsersForUser(uid).then(usersWithAd => response.json(usersWithAd))
+      UserService().updateUserActivity(uid)
     })
     .catch(error => {
       response.status(403)
