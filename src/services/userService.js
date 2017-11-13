@@ -10,6 +10,7 @@ import Administrator from './gateway/administrator'
 import { MatchService } from './matchService'
 import { ChatService } from './chatService'
 import ComplaintService from './complaintService'
+import { validDate, getActualDate, getDatesBetween } from './dateService'
 
 // Available superlinks
 export const PREMIUM_SUPERLINKS = 10
@@ -278,7 +279,7 @@ export default function UserService() {
       return Administrator().auth().deleteUser(uid)
         .then(() => {
           // Set as disabled user both in Firebase and the app
-          return DisableUserService().disableUser(uid)
+          return DisableUserService().disableDeletedUser(uid)
         })
         .then(() => {
           // Delete unlinks (Although it's not necessary, it's for keeping the DB clean)
@@ -300,6 +301,45 @@ export default function UserService() {
           // Delete matches and add 'block' for the other user
           return MatchService().deleteMatches(uid)
         })
+    },
+    updateUserActivity: uid => {
+      return UserService().hasLinkUpPlus(uid).then(hasLinkUpPlus => {
+        const premium = hasLinkUpPlus || null // null deletes if exists
+        const currentDate = getActualDate()
+        const updates = {}
+        updates[`${currentDate}/users/${uid}`] = true
+        updates[`${currentDate}/premiumUsers/${uid}`] = premium
+        return Database('activeUsers').update(updates)
+      })
+    },
+    // This returns only the dates where there is data, it does not fill with 0 between the dates requested
+    getActiveUsers: (startDate, endDate) => {
+      // If endDate is not specified, we put the actualDate
+      if (!endDate || endDate === 'undefined') {
+        endDate = getActualDate()
+      }
+      const activeUsersRef = Database('activeUsers')
+      const activeUsersHash = {}
+      return activeUsersRef.once('value').then(activeUsersPerMonth => {
+        if (!activeUsersPerMonth.exists()) return {}
+        if (!startDate || startDate === 'undefined') {
+          // Get min date of data
+          startDate = Object.keys(activeUsersPerMonth.val()).reduce((prev, curr) => {
+            return prev < curr ? prev : curr
+          })
+        }
+        return getDatesBetween(startDate, endDate).forEach(date => {
+          const timestamp = date
+          if (validDate(timestamp, startDate, endDate)) {
+            activeUsersHash[timestamp] = {
+              users: activeUsersPerMonth.child(`${date}/users`).numChildren(),
+              premiumUsers: activeUsersPerMonth.child(`${date}/premiumUsers`).numChildren()
+            }
+          }
+        })
+      }).then(() => {
+        return activeUsersHash
+      })
     }
   }
 }

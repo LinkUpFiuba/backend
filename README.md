@@ -73,6 +73,9 @@ Crea un nuevo anuncio. Se le debe enviar un `title`, un link a una `image` y un 
 #### `DELETE` - `/ads/<id>`
 Borra la publicidad `id`.
 
+#### `PUT` - `/ads/<id>`
+Hace un update de la publicidad `id`.
+
 #### `POST` - `/ads/<id>/enable`
 Habilita la publicidad `id`.
 
@@ -84,6 +87,15 @@ Devuelve todas las denuncias de todos los usuarios.
 
 #### `GET` - `/complaints/<id>`
 Devuelve las denuncias para el usuario `id`.
+
+#### `GET` - `/analytics/complaints/type`
+Devuelve la cantidad de denuncias de cada tipo. Se pueden especificar los _query parameters_ `startDate` y `endDate` para restringir las fechas. Estos parámetros deben seguir el formato `YYYY-MM`.
+
+#### `GET` - `/analytics/complaints/disabled`
+Devuelve la cantidad de denuncias de un tipo especificado mediante el _query parameter_ `type`. Éste debe ser un tipo válido; en caso contrario no devolverá nada.
+
+#### `GET` - `/analytics/users`
+Devuelve la cantidad de usuarios activos (Y cuántos de ellos premium). Se pueden especificar los _query parameters_ `startDate` y `endDate` para restringir las fechas. Estos parámetros deben seguir el formato `YYYY-MM`.
 
 #### `POST` - `/users/<id>/disable`
 Deshabilita al usuario `id` debido a las denuncias recibidas.

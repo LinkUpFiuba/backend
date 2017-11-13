@@ -58,11 +58,6 @@ app.post('/ads/:adUid/disable', (request, response) => {
   AdsService().disableAd(request.params.adUid).then(() => response.send())
 })
 
-app.get('/complaints', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
-})
-
 app.post('/ads', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   const ad = request.body
@@ -79,14 +74,19 @@ app.get('/ads', (request, response) => {
   AdsService().getAllAds().then(ads => response.json(ads))
 })
 
-app.get('/ads/random', (request, response) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  AdsService().getRandomActiveAd().then(ad => response.json(ad))
-})
-
 app.delete('/ads/:adUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   AdsService().deleteAd(request.params.adUid).then(() => response.send())
+})
+
+app.put('/ads/:adUid', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  AdsService().updateAd(request.params.adUid, request.body).then(() => response.send())
+    .catch(err => {
+      console.log(err)
+      response.status(404)
+      return response.json({ message: 'That ad was not found' })
+    })
 })
 
 app.post('/ads/:adUid/enable', (request, response) => {
@@ -99,6 +99,11 @@ app.post('/ads/:adUid/disable', (request, response) => {
   AdsService().disableAd(request.params.adUid).then(() => response.send())
 })
 
+app.get('/complaints', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsCountForUsers().then(complaints => response.json(complaints))
+})
+
 app.get('/complaints/:userUid', (request, response) => {
   response.header('Access-Control-Allow-Origin', '*')
   ComplaintService().getComplaintsForUser(request.params.userUid)
@@ -108,6 +113,18 @@ app.get('/complaints/:userUid', (request, response) => {
           response.json({ user: user, complaints: complaints })
         })
     })
+})
+
+app.get('/analytics/complaints/type', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getComplaintsByType(request.query.startDate, request.query.endDate)
+    .then(complaints => response.json(complaints))
+})
+
+app.get('/analytics/complaints/disabled', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  ComplaintService().getDisabledUsersForType(request.query.type)
+    .then(usersWithComplaints => response.json(usersWithComplaints))
 })
 
 app.post('/users/:userUid/disable', (request, response) => {
@@ -133,6 +150,12 @@ app.post('/users/:userUid/enable', (request, response) => {
     })
 })
 
+app.get('/analytics/users', (request, response) => {
+  response.header('Access-Control-Allow-Origin', '*')
+  UserService().getActiveUsers(request.query.startDate, request.query.endDate)
+    .then(users => response.json(users))
+})
+
 // For the app
 app.get('/users', (request, response) => {
   if (!request.get('token')) {
@@ -143,6 +166,7 @@ app.get('/users', (request, response) => {
     .then(decodedToken => {
       const uid = decodedToken.uid
       UserController().getUsersForUser(uid).then(usersWithAd => response.json(usersWithAd))
+      UserService().updateUserActivity(uid)
     })
     .catch(error => {
       response.status(403)

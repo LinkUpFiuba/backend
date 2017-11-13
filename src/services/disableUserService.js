@@ -3,20 +3,20 @@ import AuthService from './authService'
 import { PushNotificationService } from './pushNotificationService'
 
 export default function DisableUserService() {
-  const isUserDisabled = userUid => {
+  const isUserDisabled = (userUid, type) => {
     const ref = Database('disabledUsers')
     return ref.child(userUid).once('value').then(user => {
-      return user.exists()
+      return user.exists() && (!type || user.val() === type)
     })
   }
 
-  const disableUser = userUid => {
+  const disableUser = (userUid, type) => {
     return Database('users').child(userUid).once('value').then(user => {
       if (!user.exists()) {
         return Promise.reject(new Error('That userUid does not exist'))
       }
       return AuthService().disableUser(userUid).then(() => {
-        return Database('disabledUsers').child(userUid).set(true)
+        return Database('disabledUsers').child(userUid).set(type)
       })
     })
   }
@@ -24,10 +24,16 @@ export default function DisableUserService() {
   return {
     isUserDisabled: isUserDisabled,
 
-    disableUser: disableUser,
+    isUserBlocked: userUid => {
+      return isUserDisabled(userUid, 'blocked')
+    },
+
+    disableDeletedUser: userUid => {
+      return disableUser(userUid, 'deleted')
+    },
 
     blockUser: userUid => {
-      return disableUser(userUid).then(() => {
+      return disableUser(userUid, 'blocked').then(() => {
         return PushNotificationService().sendDisablePush(userUid)
       })
     },
